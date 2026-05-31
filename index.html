@@ -13,537 +13,524 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      font-family: 'Arial', sans-serif;
-      overflow: hidden;
+      font-family: Arial, sans-serif;
+      user-select: none;
     }
-    #gameContainer {
-      position: relative;
-    }
+    #gameContainer { position: relative; }
     canvas {
       display: block;
       border: 3px solid #e94560;
       border-radius: 8px;
-      box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+      box-shadow: 0 0 30px rgba(233,69,96,0.5);
     }
-    #ui {
+    #hud {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
-    #score {
-      position: absolute;
-      top: 16px; left: 50%;
-      transform: translateX(-50%);
-      color: white;
-      font-size: 32px;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    }
-    #lives {
-      position: absolute;
-      top: 16px; left: 16px;
-      color: #ff6b6b;
-      font-size: 22px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-    }
-    #highScore {
-      position: absolute;
-      top: 16px; right: 16px;
-      color: #ffd700;
-      font-size: 16px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-    }
-    #overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0; left: 0; right: 0;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.75);
-      border-radius: 5px;
-      pointer-events: all;
-    }
-    #overlay h1 {
-      color: #e94560;
-      font-size: 42px;
-      text-shadow: 0 0 20px rgba(233,69,96,0.8);
-      margin-bottom: 8px;
-    }
-    #overlay h2 {
-      color: #ffd700;
-      font-size: 24px;
-      margin-bottom: 24px;
-    }
-    #overlay p {
-      color: #ccc;
-      font-size: 16px;
-      margin: 4px 0;
-    }
-    #startBtn {
-      margin-top: 28px;
-      padding: 14px 40px;
-      font-size: 20px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #e94560, #c62a47);
+      padding: 10px 16px;
+      pointer-events: none;
       color: white;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(233,69,96,0.4);
-      transition: transform 0.1s, box-shadow 0.1s;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 1px 1px 4px #000;
     }
-    #startBtn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(233,69,96,0.6);
+    #lives { color: #ff6b6b; font-size: 22px; }
+    #score { font-size: 22px; }
+    #best  { color: #ffd700; font-size: 16px; }
+    #overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.78);
+      border-radius: 5px;
     }
-    #startBtn:active { transform: translateY(0); }
-    #finalScore { color: white; font-size: 20px; margin-bottom: 8px; }
+    #overlay h1 { color: #e94560; font-size: 40px; margin-bottom: 6px; text-shadow: 0 0 20px rgba(233,69,96,0.9); }
+    #overlay h2 { color: #ffd700; font-size: 22px; margin-bottom: 20px; }
+    .hint { color: #bbb; font-size: 14px; margin: 3px 0; }
+    #finalScore { color: white; font-size: 18px; margin-top: 14px; }
+    #playBtn {
+      margin-top: 22px; padding: 13px 44px;
+      font-size: 20px; font-weight: bold;
+      background: linear-gradient(135deg,#e94560,#c62a47);
+      color: white; border: none; border-radius: 50px;
+      cursor: pointer; box-shadow: 0 4px 15px rgba(233,69,96,0.45);
+      transition: transform 0.1s;
+    }
+    #playBtn:hover { transform: translateY(-2px); }
+    #controls {
+      display: flex; gap: 8px; margin-top: 18px;
+    }
+    .dpad {
+      width: 52px; height: 52px; font-size: 22px;
+      background: rgba(255,255,255,0.15); border: none;
+      border-radius: 10px; color: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
+    }
+    .dpad:active { background: rgba(255,255,255,0.35); }
   </style>
 </head>
 <body>
 <div id="gameContainer">
-  <canvas id="gameCanvas"></canvas>
-  <div id="ui">
-    <div id="score">0</div>
+  <canvas id="c"></canvas>
+  <div id="hud">
     <div id="lives">❤️❤️❤️</div>
-    <div id="highScore">BEST: 0</div>
+    <div id="score">0</div>
+    <div id="best">BEST: 0</div>
   </div>
   <div id="overlay">
-    <h1>🐦 Flappy Crossing</h1>
-    <h2>Cross the road... in the sky!</h2>
-    <p>Press <strong>SPACE</strong> or <strong>TAP</strong> to flap</p>
-    <p>Avoid the pipes and collect coins!</p>
-    <p>You have <strong>3 lives</strong> — use them wisely</p>
+    <h1>🐦 Bird Crossing</h1>
+    <h2>Cross all 4 roads safely!</h2>
+    <p class="hint">Arrow keys / WASD to move</p>
+    <p class="hint">Avoid cars — you have 3 lives</p>
+    <p class="hint">Reach the safe zone to score a point!</p>
     <div id="finalScore"></div>
-    <button id="startBtn">PLAY</button>
+    <button id="playBtn">PLAY</button>
   </div>
+</div>
+<div id="controls">
+  <button class="dpad" id="btnL">◀</button>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="dpad" id="btnU">▲</button>
+    <button class="dpad" id="btnD">▼</button>
+  </div>
+  <button class="dpad" id="btnR">▶</button>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
+const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
-const overlay = document.getElementById('overlay');
-const startBtn = document.getElementById('startBtn');
-const scoreEl = document.getElementById('score');
-const livesEl = document.getElementById('lives');
-const highScoreEl = document.getElementById('highScore');
-const finalScoreEl = document.getElementById('finalScore');
 
-const W = 480, H = 640;
-canvas.width = W;
-canvas.height = H;
+const COLS = 9, ROWS = 9;
+const CELL = 60;
+const W = COLS * CELL, H = ROWS * CELL;
+canvas.width = W; canvas.height = H;
 document.getElementById('gameContainer').style.width = W + 'px';
 
-// Game state
-let state = 'idle'; // idle | playing | dead | gameover
-let score = 0, highScore = 0, lives = 3;
-let frameCount = 0;
+// Row layout (row 0 = top, row 8 = bottom)
+// row 0: safe zone (goal)
+// rows 1-4: roads (4 lanes of traffic)
+// row 5: divider / safe strip
+// rows 6-7: more roads (optional extra challenge strip – used as pavement)
+// row 8: start / safe zone
+// Actually: row 0=goal, 1-4=road lanes, 5=median, 6-7=more roads skipped, 8=start
+// Simplified: 4 road rows between start and goal
 
-// Bird
-const bird = {
-  x: 100, y: H / 2,
-  vy: 0, vx: 0,
-  radius: 18,
-  flapPower: -9,
-  gravity: 0.45,
-  rotation: 0,
-  invincible: 0,
-  trail: [],
-  reset() {
-    this.x = 100; this.y = H / 2;
-    this.vy = 0; this.vx = 0;
-    this.rotation = 0; this.invincible = 0;
-    this.trail = [];
-  }
+const ROW_TYPES = [
+  'goal',    // 0
+  'road',    // 1
+  'road',    // 2
+  'road',    // 3
+  'road',    // 4
+  'median',  // 5
+  'sidewalk',// 6
+  'sidewalk',// 7
+  'start',   // 8
+];
+
+// Road colours
+const COLORS = {
+  goal:      '#2d6a4f',
+  road:      '#333',
+  median:    '#555',
+  sidewalk:  '#8d6e63',
+  start:     '#2d6a4f',
+  line:      '#fff',
+  grass:     '#40916c',
 };
 
-// Pipes
-let pipes = [];
-const PIPE_W = 60;
-const PIPE_GAP = 160;
-const PIPE_SPEED = 3;
+// Traffic lanes config (rows 1-4)
+const LANES = [
+  { row: 1, dir: 1,  speed: 2.2, carW: 80, carH: 36, color: '#e63946', count: 2 },
+  { row: 2, dir: -1, speed: 2.8, carW: 70, carH: 36, color: '#457b9d', count: 3 },
+  { row: 3, dir: 1,  speed: 1.8, carW: 90, carH: 36, color: '#f4a261', count: 2 },
+  { row: 4, dir: -1, speed: 3.2, carW: 65, carH: 36, color: '#8338ec', count: 3 },
+];
 
-// Coins
-let coins = [];
-
-// Particles
+let cars = [];
+let bird, state, score, highScore, lives, frameCount;
 let particles = [];
+let deathTimer = 0;
 
-// Background layers (parallax)
-const bg = {
-  clouds: [],
-  mountains: [],
-  ground: []
-};
-
-function initBg() {
-  bg.clouds = [];
-  for (let i = 0; i < 6; i++) {
-    bg.clouds.push({ x: Math.random() * W, y: 40 + Math.random() * 140, w: 60 + Math.random() * 80, speed: 0.3 + Math.random() * 0.4 });
-  }
-  bg.mountains = [];
-  for (let i = 0; i < 5; i++) {
-    bg.mountains.push({ x: i * 120 + Math.random() * 60, h: 80 + Math.random() * 100 });
-  }
-}
-initBg();
-
-function spawnPipe() {
-  const topH = 80 + Math.random() * (H - PIPE_GAP - 160);
-  pipes.push({ x: W + 20, topH, scored: false });
-  // Maybe spawn a coin in the gap
-  if (Math.random() < 0.6) {
-    coins.push({
-      x: W + 20 + PIPE_W / 2,
-      y: topH + PIPE_GAP / 2,
-      radius: 10,
-      collected: false,
-      anim: Math.random() * Math.PI * 2
-    });
-  }
+function initCars() {
+  cars = [];
+  LANES.forEach(lane => {
+    const spacing = (W + lane.carW) / lane.count;
+    for (let i = 0; i < lane.count; i++) {
+      cars.push({
+        lane,
+        x: (lane.dir === 1 ? -lane.carW + i * spacing : W + i * spacing),
+        y: lane.row * CELL + (CELL - lane.carH) / 2,
+        w: lane.carW,
+        h: lane.carH,
+      });
+    }
+  });
 }
 
-function spawnParticles(x, y, color, count = 12) {
-  for (let i = 0; i < count; i++) {
-    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
-    const speed = 2 + Math.random() * 4;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      life: 1,
-      color,
-      size: 3 + Math.random() * 4
-    });
-  }
+function initBird() {
+  bird = {
+    col: Math.floor(COLS / 2),
+    row: 8,
+    px: 0, py: 0,       // pixel offset for animation
+    moving: false,
+    moveTimer: 0,
+    targetCol: Math.floor(COLS / 2),
+    targetRow: 8,
+    invincible: 0,
+    wobble: 0,
+  };
 }
 
 function resetGame() {
-  bird.reset();
-  pipes = [];
-  coins = [];
-  particles = [];
-  score = 0;
-  lives = 3;
-  frameCount = 0;
-  updateUI();
+  score = 0; lives = 3; frameCount = 0;
+  initCars(); initBird(); particles = [];
+  updateHUD();
 }
 
-function updateUI() {
-  scoreEl.textContent = score;
-  livesEl.textContent = '❤️'.repeat(lives) || '💀';
-  highScoreEl.textContent = 'BEST: ' + highScore;
+function updateHUD() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('lives').textContent = '❤️'.repeat(lives) || '💀';
+  document.getElementById('best').textContent = 'BEST: ' + highScore;
 }
 
-function flap() {
-  if (state === 'idle' || state === 'dead') {
-    if (state === 'dead') {
-      bird.invincible = 90;
-    }
-    state = 'playing';
-    overlay.style.display = 'none';
-  }
-  if (state === 'playing') {
-    bird.vy = bird.flapPower;
-    // Flap particles
-    spawnParticles(bird.x - 10, bird.y + 10, '#87ceeb', 5);
-  }
+// ---- Input ----
+let pendingMove = null;
+const MOVE_FRAMES = 7;
+
+function tryMove(dc, dr) {
+  if (state !== 'playing') return;
+  if (bird.moving) return;
+  const nc = bird.col + dc;
+  const nr = bird.row + dr;
+  if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) return;
+  bird.targetCol = nc;
+  bird.targetRow = nr;
+  bird.moving = true;
+  bird.moveTimer = MOVE_FRAMES;
+  bird.wobble = dr < 0 ? -1 : (dr > 0 ? 1 : 0);
 }
 
-function checkCollision(pipe) {
-  const bx = bird.x, by = bird.y, br = bird.radius - 4;
-  const px = pipe.x, pw = PIPE_W;
-  if (bx + br < px || bx - br > px + pw) return false;
-  if (by - br < pipe.topH) return true;
-  if (by + br > pipe.topH + PIPE_GAP) return true;
-  return false;
+document.addEventListener('keydown', e => {
+  const map = { ArrowUp:'u', ArrowDown:'d', ArrowLeft:'l', ArrowRight:'r',
+                w:'u', s:'d', a:'l', d:'r', W:'u', S:'d', A:'l', D:'r' };
+  const dir = map[e.key];
+  if (dir) { e.preventDefault(); handleDir(dir); }
+});
+document.getElementById('btnU').addEventListener('click', () => handleDir('u'));
+document.getElementById('btnD').addEventListener('click', () => handleDir('d'));
+document.getElementById('btnL').addEventListener('click', () => handleDir('l'));
+document.getElementById('btnR').addEventListener('click', () => handleDir('r'));
+
+function handleDir(dir) {
+  if (state === 'idle' || state === 'dead') { startGame(); return; }
+  if (dir === 'u') tryMove(0, -1);
+  if (dir === 'd') tryMove(0,  1);
+  if (dir === 'l') tryMove(-1, 0);
+  if (dir === 'r') tryMove( 1, 0);
 }
 
-function hitBird() {
-  if (bird.invincible > 0) return;
-  spawnParticles(bird.x, bird.y, '#ff4444', 20);
-  lives--;
-  updateUI();
-  if (lives <= 0) {
-    state = 'gameover';
-    if (score > highScore) highScore = score;
-    showOverlay();
-  } else {
-    state = 'dead';
-    bird.invincible = 120;
-    bird.vy = bird.flapPower * 0.7;
-    showDeadOverlay();
-  }
+document.getElementById('playBtn').addEventListener('click', startGame);
+
+function startGame() {
+  resetGame();
+  state = 'playing';
+  document.getElementById('overlay').style.display = 'none';
 }
 
-function showOverlay() {
-  overlay.style.display = 'flex';
-  document.querySelector('#overlay h1').textContent = '💀 Game Over';
-  document.querySelector('#overlay h2').textContent = 'You ran out of lives!';
-  finalScoreEl.textContent = `Score: ${score}  |  Best: ${highScore}`;
-  startBtn.textContent = 'PLAY AGAIN';
-}
-
-function showDeadOverlay() {
-  overlay.style.display = 'flex';
-  document.querySelector('#overlay h1').textContent = '💥 Ouch!';
-  document.querySelector('#overlay h2').textContent = `Lives left: ${'❤️'.repeat(lives)}`;
-  finalScoreEl.textContent = `Score so far: ${score}`;
-  startBtn.textContent = 'CONTINUE';
-}
-
+// ---- Update ----
 function update() {
+  if (state !== 'playing') return;
   frameCount++;
 
-  // Bird physics
-  if (state === 'playing' || state === 'dead') {
-    bird.vy += bird.gravity;
-    bird.y += bird.vy;
-    bird.rotation = Math.min(Math.max(bird.vy * 3, -25), 70);
+  // Move cars
+  cars.forEach(car => {
+    car.x += car.lane.dir * car.lane.speed;
+    if (car.lane.dir === 1 && car.x > W + 10) car.x = -car.w - 10;
+    if (car.lane.dir === -1 && car.x < -car.w - 10) car.x = W + 10;
+  });
 
-    // Bird trail
-    bird.trail.unshift({ x: bird.x, y: bird.y, life: 1 });
-    if (bird.trail.length > 8) bird.trail.pop();
-    bird.trail.forEach(t => t.life -= 0.12);
-
-    if (bird.invincible > 0) bird.invincible--;
-
-    // Hit floor/ceiling
-    if (bird.y + bird.radius > H - 30) {
-      bird.y = H - 30 - bird.radius;
-      if (state === 'playing') hitBird();
-    }
-    if (bird.y - bird.radius < 0) {
-      bird.y = bird.radius;
-      bird.vy = 2;
+  // Bird movement animation
+  if (bird.moving) {
+    bird.moveTimer--;
+    const t = 1 - bird.moveTimer / MOVE_FRAMES;
+    bird.px = (bird.targetCol - bird.col) * CELL * t;
+    bird.py = (bird.targetRow - bird.row) * CELL * t;
+    if (bird.moveTimer <= 0) {
+      bird.col = bird.targetCol;
+      bird.row = bird.targetRow;
+      bird.px = 0; bird.py = 0;
+      bird.moving = false;
     }
   }
 
-  // Pipes
-  if (state === 'playing') {
-    if (frameCount % 90 === 0) spawnPipe();
+  if (bird.invincible > 0) bird.invincible--;
 
-    pipes.forEach(p => {
-      p.x -= PIPE_SPEED;
-      if (!p.scored && p.x + PIPE_W < bird.x) {
-        p.scored = true;
-        score++;
-        updateUI();
-        spawnParticles(bird.x, bird.y, '#ffd700', 8);
-      }
-      if (checkCollision(p)) hitBird();
-    });
-    pipes = pipes.filter(p => p.x + PIPE_W > -10);
+  // Check goal
+  if (bird.row === 0) {
+    score++;
+    if (score > highScore) highScore = score;
+    spawnParticles(birdPixelX(), birdPixelY(), '#ffd700', 20);
+    updateHUD();
+    bird.row = 8;
+    bird.col = Math.floor(COLS / 2);
+    bird.targetRow = 8; bird.targetCol = Math.floor(COLS / 2);
+  }
 
-    // Coins
-    coins.forEach(c => {
-      c.x -= PIPE_SPEED;
-      c.anim += 0.08;
-      if (!c.collected) {
-        const dx = bird.x - c.x, dy = bird.y - c.y;
-        if (Math.sqrt(dx * dx + dy * dy) < bird.radius + c.radius) {
-          c.collected = true;
-          score++;
-          updateUI();
-          spawnParticles(c.x, c.y, '#ffd700', 10);
-        }
+  // Collision with cars
+  if (!bird.moving && bird.invincible === 0 && ROW_TYPES[bird.row] === 'road') {
+    const bx = bird.col * CELL + CELL / 2;
+    const by = bird.row * CELL + CELL / 2;
+    const br = 18;
+    for (const car of cars) {
+      if (car.lane.row !== bird.row) continue;
+      if (bx + br > car.x + 6 && bx - br < car.x + car.w - 6 &&
+          by + br > car.y + 4 && by - br < car.y + car.h - 4) {
+        hitBird();
+        break;
       }
-    });
-    coins = coins.filter(c => c.x > -20 && !c.collected);
+    }
   }
 
   // Particles
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.1;
-    p.life -= 0.03;
-  });
+  particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.025; });
   particles = particles.filter(p => p.life > 0);
-
-  // Clouds parallax
-  bg.clouds.forEach(c => {
-    c.x -= c.speed;
-    if (c.x + c.w < 0) c.x = W + 20;
-  });
 }
 
-// ---- DRAWING ----
+function birdPixelX() { return bird.col * CELL + bird.px + CELL / 2; }
+function birdPixelY() { return bird.row * CELL + bird.py + CELL / 2; }
 
-function drawBackground() {
-  // Sky gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, '#0f3460');
-  grad.addColorStop(0.5, '#16213e');
-  grad.addColorStop(1, '#1a1a2e');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Stars
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  for (let i = 0; i < 40; i++) {
-    const sx = ((i * 137 + frameCount * 0.1) % W);
-    const sy = ((i * 97) % (H * 0.6));
-    const size = (i % 3 === 0) ? 1.5 : 0.8;
-    ctx.beginPath();
-    ctx.arc(sx, sy, size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Clouds
-  bg.clouds.forEach(c => {
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.beginPath();
-    ctx.ellipse(c.x, c.y, c.w / 2, 18, 0, 0, Math.PI * 2);
-    ctx.ellipse(c.x + c.w * 0.2, c.y - 10, c.w * 0.3, 14, 0, 0, Math.PI * 2);
-    ctx.ellipse(c.x - c.w * 0.2, c.y - 6, c.w * 0.25, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // Ground
-  ctx.fillStyle = '#2d5a27';
-  ctx.fillRect(0, H - 30, W, 30);
-  ctx.fillStyle = '#3d7a37';
-  ctx.fillRect(0, H - 30, W, 6);
-  // Ground stripes
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  for (let i = 0; i < W; i += 40) {
-    const offset = (frameCount * PIPE_SPEED) % 40;
-    ctx.fillRect(i - offset, H - 24, 20, 4);
+function spawnParticles(x, y, color, n) {
+  for (let i = 0; i < n; i++) {
+    const a = (Math.PI * 2 * i) / n;
+    const sp = 1.5 + Math.random() * 3;
+    particles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 2, life: 1, color, size: 3 + Math.random()*3 });
   }
 }
 
-function drawPipes() {
-  pipes.forEach(p => {
-    // Top pipe
-    const topGrad = ctx.createLinearGradient(p.x, 0, p.x + PIPE_W, 0);
-    topGrad.addColorStop(0, '#2ecc40');
-    topGrad.addColorStop(0.4, '#27ae36');
-    topGrad.addColorStop(1, '#1a7a28');
-    ctx.fillStyle = topGrad;
-    ctx.fillRect(p.x, 0, PIPE_W, p.topH);
-    // Top pipe cap
-    ctx.fillStyle = '#27ae36';
-    ctx.fillRect(p.x - 5, p.topH - 24, PIPE_W + 10, 24);
-    // Highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillRect(p.x + 6, 0, 10, p.topH);
-
-    // Bottom pipe
-    const botY = p.topH + PIPE_GAP;
-    ctx.fillStyle = topGrad;
-    ctx.fillRect(p.x, botY, PIPE_W, H - botY);
-    // Bottom pipe cap
-    ctx.fillStyle = '#27ae36';
-    ctx.fillRect(p.x - 5, botY, PIPE_W + 10, 24);
-    // Highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillRect(p.x + 6, botY, 10, H - botY);
-  });
+function hitBird() {
+  spawnParticles(birdPixelX(), birdPixelY(), '#ff4444', 18);
+  lives--;
+  updateHUD();
+  bird.invincible = 100;
+  bird.row = 8; bird.col = Math.floor(COLS / 2);
+  bird.targetRow = 8; bird.targetCol = Math.floor(COLS / 2);
+  bird.px = 0; bird.py = 0; bird.moving = false;
+  if (lives <= 0) {
+    state = 'gameover';
+    showOverlay('💀 Game Over', 'You got run over!', `Score: ${score}  |  Best: ${highScore}`, 'PLAY AGAIN');
+  }
 }
 
-function drawCoins() {
-  coins.forEach(c => {
-    const pulse = 1 + Math.sin(c.anim) * 0.15;
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.scale(pulse, pulse);
-    // Glow
-    ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 12;
-    // Coin body
-    const cGrad = ctx.createRadialGradient(-3, -3, 1, 0, 0, c.radius);
-    cGrad.addColorStop(0, '#ffe066');
-    cGrad.addColorStop(0.6, '#ffd700');
-    cGrad.addColorStop(1, '#b8860b');
-    ctx.fillStyle = cGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, c.radius, 0, Math.PI * 2);
-    ctx.fill();
-    // $ symbol
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#a06000';
-    ctx.font = 'bold 12px Arial';
+function showOverlay(h1, h2, fs, btn) {
+  const ov = document.getElementById('overlay');
+  ov.style.display = 'flex';
+  ov.querySelector('h1').textContent = h1;
+  ov.querySelector('h2').textContent = h2;
+  document.getElementById('finalScore').textContent = fs;
+  document.getElementById('playBtn').textContent = btn;
+}
+
+// ---- Draw ----
+
+function drawRoad(row) {
+  ctx.fillStyle = COLORS.road;
+  ctx.fillRect(0, row * CELL, W, CELL);
+  // Dashed center line
+  ctx.strokeStyle = 'rgba(255,255,200,0.3)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([20, 20]);
+  ctx.lineDashOffset = -(frameCount * 1.5) % 40;
+  ctx.beginPath();
+  ctx.moveTo(0, row * CELL + CELL / 2);
+  ctx.lineTo(W, row * CELL + CELL / 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.lineDashOffset = 0;
+}
+
+function drawRow(row) {
+  const type = ROW_TYPES[row];
+  if (type === 'road') { drawRoad(row); return; }
+  if (type === 'goal') {
+    ctx.fillStyle = '#1b4332';
+    ctx.fillRect(0, row * CELL, W, CELL);
+    ctx.fillStyle = '#40916c';
+    for (let c = 0; c < COLS; c++) {
+      if (c % 2 === 0) ctx.fillRect(c * CELL, row * CELL, CELL, CELL);
+    }
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 28px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('$', 0, 1);
-    ctx.restore();
+    ctx.fillText('🏁 SAFE ZONE', W / 2, row * CELL + CELL / 2);
+    return;
+  }
+  if (type === 'start') {
+    ctx.fillStyle = '#1b4332';
+    ctx.fillRect(0, row * CELL, W, CELL);
+    ctx.fillStyle = '#40916c';
+    for (let c = 0; c < COLS; c++) {
+      if (c % 2 === 0) ctx.fillRect(c * CELL, row * CELL, CELL, CELL);
+    }
+    return;
+  }
+  if (type === 'median') {
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(0, row * CELL, W, CELL);
+    ctx.fillStyle = '#5a5a5a';
+    for (let x = 0; x < W; x += 30) {
+      ctx.fillRect(x, row * CELL + CELL / 2 - 3, 18, 6);
+    }
+    return;
+  }
+  if (type === 'sidewalk') {
+    ctx.fillStyle = '#795548';
+    ctx.fillRect(0, row * CELL, W, CELL);
+    // Tile pattern
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += CELL) {
+      ctx.beginPath(); ctx.moveTo(x, row * CELL); ctx.lineTo(x, (row+1)*CELL); ctx.stroke();
+    }
+    return;
+  }
+}
+
+function drawCar(car) {
+  const r = 6;
+  const x = car.x, y = car.y, w = car.w, h = car.h;
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(x + w/2, y + h + 4, w/2 - 4, 5, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = car.lane.color;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+
+  // Roof
+  const roofX = x + w * 0.2, roofW = w * 0.6, roofH = h * 0.42;
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(roofX + 6, y + h * 0.1);
+  ctx.lineTo(roofX + roofW - 6, y + h * 0.1);
+  ctx.lineTo(roofX + roofW, y + h * 0.1 + roofH);
+  ctx.lineTo(roofX, y + h * 0.1 + roofH);
+  ctx.closePath();
+  ctx.fill();
+
+  // Windows
+  ctx.fillStyle = 'rgba(180,230,255,0.7)';
+  ctx.fillRect(roofX + 4, y + h * 0.12, roofW * 0.42, roofH - 4);
+  ctx.fillRect(roofX + roofW * 0.54, y + h * 0.12, roofW * 0.42, roofH - 4);
+
+  // Wheels
+  ctx.fillStyle = '#222';
+  const wr = 7, wy = y + h - 2;
+  [x + 12, x + w - 12].forEach(wx => {
+    ctx.beginPath(); ctx.arc(wx, wy, wr, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(wx, wy, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#222';
   });
+
+  // Headlights / tail lights
+  const isRight = car.lane.dir === 1;
+  ctx.fillStyle = isRight ? '#ffff88' : '#ff4444';
+  ctx.fillRect(isRight ? x + w - 6 : x + 2, y + 6, 4, 8);
+  ctx.fillRect(isRight ? x + w - 6 : x + 2, y + h - 14, 4, 8);
+  ctx.fillStyle = isRight ? '#ff4444' : '#ffff88';
+  ctx.fillRect(isRight ? x + 2 : x + w - 6, y + 6, 4, 8);
+  ctx.fillRect(isRight ? x + 2 : x + w - 6, y + h - 14, 4, 8);
 }
 
 function drawBird() {
-  // Trail
-  bird.trail.forEach((t, i) => {
-    if (t.life <= 0) return;
-    const alpha = t.life * 0.35;
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#87ceeb';
-    ctx.beginPath();
-    ctx.arc(t.x, t.y, bird.radius * (0.3 + t.life * 0.4), 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  });
+  const bx = birdPixelX();
+  const by = birdPixelY();
 
   ctx.save();
-  ctx.translate(bird.x, bird.y);
-  ctx.rotate((bird.rotation * Math.PI) / 180);
+  ctx.translate(bx, by);
 
-  // Invincibility flicker
-  if (bird.invincible > 0 && Math.floor(bird.invincible / 6) % 2 === 0) {
-    ctx.globalAlpha = 0.4;
+  // Invincible flicker
+  if (bird.invincible > 0 && Math.floor(bird.invincible / 5) % 2 === 1) {
+    ctx.globalAlpha = 0.3;
   }
 
-  // Glow
-  ctx.shadowColor = '#ffdd57';
-  ctx.shadowBlur = 14;
+  // Hop arc when moving up
+  let hopY = 0;
+  if (bird.moving && bird.targetRow < bird.col) {
+    const t = 1 - bird.moveTimer / MOVE_FRAMES;
+    hopY = -Math.sin(t * Math.PI) * 10;
+  }
+  ctx.translate(0, hopY);
 
-  // Body
-  const bodyGrad = ctx.createRadialGradient(-4, -4, 2, 0, 0, bird.radius);
-  bodyGrad.addColorStop(0, '#ffe066');
-  bodyGrad.addColorStop(0.5, '#f9a825');
-  bodyGrad.addColorStop(1, '#e65100');
-  ctx.fillStyle = bodyGrad;
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.beginPath();
-  ctx.ellipse(0, 0, bird.radius, bird.radius * 0.85, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 20, 14, 5, 0, 0, Math.PI*2);
   ctx.fill();
 
+  // Body glow
+  ctx.shadowColor = '#ffdd57';
+  ctx.shadowBlur = 10;
+
+  // Body
+  const grad = ctx.createRadialGradient(-5, -5, 2, 0, 0, 22);
+  grad.addColorStop(0, '#ffe066');
+  grad.addColorStop(0.5, '#f9a825');
+  grad.addColorStop(1, '#e65100');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 20, 17, 0, 0, Math.PI*2);
+  ctx.fill();
   ctx.shadowBlur = 0;
 
-  // Wing
-  const wingAngle = Math.sin(frameCount * 0.3) * 0.4;
+  // Wing flap animation
+  const flap = Math.sin(frameCount * 0.25) * 0.35;
   ctx.save();
-  ctx.rotate(wingAngle);
+  ctx.rotate(flap);
   ctx.fillStyle = '#e65100';
   ctx.beginPath();
-  ctx.ellipse(-4, 4, 12, 7, -0.4, 0, Math.PI * 2);
+  ctx.ellipse(-5, 3, 13, 7, -0.3, 0, Math.PI*2);
   ctx.fill();
   ctx.restore();
 
   // Eye
   ctx.fillStyle = 'white';
-  ctx.beginPath();
-  ctx.arc(7, -5, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#222';
-  ctx.beginPath();
-  ctx.arc(9, -5, 3, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(8, -5, 6, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.arc(10, -5, 3, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = 'white';
-  ctx.beginPath();
-  ctx.arc(10, -6, 1, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(11, -6, 1, 0, Math.PI*2); ctx.fill();
 
   // Beak
   ctx.fillStyle = '#ff7043';
   ctx.beginPath();
-  ctx.moveTo(14, -2);
-  ctx.lineTo(22, 2);
-  ctx.lineTo(14, 5);
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(16, -1); ctx.lineTo(24, 2); ctx.lineTo(16, 5);
+  ctx.closePath(); ctx.fill();
+
+  // Feet
+  ctx.strokeStyle = '#e65100';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  const fStep = bird.moving ? Math.sin(frameCount * 0.4) * 4 : 0;
+  ctx.beginPath(); ctx.moveTo(-6, 16); ctx.lineTo(-6 - fStep, 22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo( 6, 16); ctx.lineTo( 6 + fStep, 22); ctx.stroke();
 
   ctx.restore();
 }
@@ -553,46 +540,58 @@ function drawParticles() {
     ctx.save();
     ctx.globalAlpha = p.life;
     ctx.fillStyle = p.color;
-    ctx.shadowColor = p.color;
-    ctx.shadowBlur = 6;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.shadowColor = p.color; ctx.shadowBlur = 6;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   });
 }
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  drawBackground();
-  drawPipes();
-  drawCoins();
+
+  // Draw all rows
+  for (let r = 0; r < ROWS; r++) drawRow(r);
+
+  // Road borders
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  for (let r = 1; r <= 4; r++) {
+    ctx.strokeRect(0, r * CELL, W, CELL);
+  }
+
+  // Cars
+  cars.forEach(drawCar);
+
+  // Particles
   drawParticles();
+
+  // Bird
   drawBird();
+
+  // Score popup on goal row
+  if (bird.row === 8 && score > 0) {
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`✅ Crossed! Score: ${score}`, 10, (ROWS - 1) * CELL + CELL / 2 + 6);
+    ctx.restore();
+  }
 }
 
-function gameLoop() {
+function loop() {
   update();
   draw();
-  requestAnimationFrame(gameLoop);
+  requestAnimationFrame(loop);
 }
 
-// Controls
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') {
-    e.preventDefault();
-    flap();
-  }
-});
-canvas.addEventListener('click', flap);
-canvas.addEventListener('touchstart', e => { e.preventDefault(); flap(); }, { passive: false });
-
-startBtn.addEventListener('click', () => {
-  resetGame();
-  flap();
-});
-
-gameLoop();
+// Init
+state = 'idle';
+score = 0; highScore = 0; lives = 3;
+initCars(); initBird(); frameCount = 0;
+updateHUD();
+loop();
 </script>
 </body>
 </html>
