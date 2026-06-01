@@ -352,6 +352,8 @@
         <!-- Controls -->
         <div class="controls">
             <button class="btn-primary" id="startBtn">Start Match</button>
+            <button class="btn-success" id="faceBtn" style="display:none;">⚾ Face Ball</button>
+            <button class="btn-success" id="bowlBtn" style="display:none;">🎳 Bowl</button>
             <button class="btn-danger" id="resetBtn">Reset</button>
         </div>
     </div>
@@ -359,10 +361,10 @@
     <!-- Squad Selection Modal -->
     <div class="modal" id="squadModal">
         <div class="modal-content">
-            <div class="modal-header">Select Your Bowlers (⚾)</div>
+            <div class="modal-header">Select Your XI Players</div>
             <div class="modal-body">
                 <p style="margin-bottom: 15px; color: #666;">
-                    Click players to mark them as bowlers. The remaining players will bat first.
+                    Select exactly 11 players for your squad. Players with type "Bowler" or "All-rounder" will be eligible to bowl.
                 </p>
                 <div id="squadContainer"></div>
             </div>
@@ -466,6 +468,8 @@
                 document.getElementById('resetBtn').addEventListener('click', () => this.reset());
                 document.getElementById('confirmSquadBtn').addEventListener('click', () => this.startSquadSelection());
                 document.getElementById('newMatchBtn').addEventListener('click', () => this.reset());
+                document.getElementById('faceBtn').addEventListener('click', () => this.playDelivery());
+                document.getElementById('bowlBtn').addEventListener('click', () => this.playDelivery());
             },
 
             resizeCanvas() {
@@ -509,31 +513,31 @@
 
             startSquadSelection() {
                 const selected = document.querySelectorAll('.player-card.selected');
-                const bowlerCount = selected.length;
 
-                if (bowlerCount === 0 || bowlerCount === 11) {
-                    alert('Select at least 1 bowler and keep some batters!');
+                if (selected.length !== 11) {
+                    alert('Select exactly 11 players for your XI!');
                     return;
                 }
 
-                this.userBowlers = [];
+                // Mark selected players and extract bowlers
                 this.userBatters = [];
+                this.userBowlers = [];
 
                 selected.forEach(card => {
                     const playerName = card.querySelector('.player-name').textContent;
                     const player = INDIA_SQUAD.find(p => p.name === playerName);
-                    this.userBowlers.push(player);
-                });
-
-                INDIA_SQUAD.forEach(player => {
-                    if (!this.userBowlers.find(p => p.name === player.name)) {
+                    if (player) {
                         this.userBatters.push(player);
+                        // By default, mark type=bowl as bowlers
+                        if (player.type === 'bowl' || player.type === 'all') {
+                            this.userBowlers.push(player);
+                        }
                     }
                 });
 
-                // Setup opponent - random selection
-                this.opponentBowlers = OPPONENT_SQUAD.filter(p => p.type === 'bowl');
-                this.opponentBatters = OPPONENT_SQUAD.filter(p => p.type !== 'bowl');
+                // Setup opponent - use their squad as-is
+                this.opponentBowlers = OPPONENT_SQUAD.filter(p => p.type === 'bowl' || p.type === 'all');
+                this.opponentBatters = OPPONENT_SQUAD;
 
                 // Initialize stats
                 this.initializePlayerStats();
@@ -575,6 +579,11 @@
                 this.currentBatter = this.userBatters[0];
                 this.currentBowler = this.opponentBowlers[0];
 
+                // Show Face Ball button
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('faceBtn').style.display = 'inline-block';
+                document.getElementById('bowlBtn').style.display = 'none';
+
                 this.gameLoop();
             },
 
@@ -587,10 +596,7 @@
             },
 
             update() {
-                // Auto-play deliveries
-                if (Math.random() < 0.02) {
-                    this.playDelivery();
-                }
+                // Waits for user input via buttons - no auto-play
             },
 
             playDelivery() {
@@ -677,6 +683,10 @@
                     this.currentBowler = this.userBowlers[0];
                     this.bowlerBalls = {};
                     this.userBowlers.forEach(p => this.bowlerBalls[p.name] = 0);
+
+                    // Switch to Bowl button
+                    document.getElementById('faceBtn').style.display = 'none';
+                    document.getElementById('bowlBtn').style.display = 'inline-block';
                 } else {
                     this.inns2Runs = this.runs;
                     this.inns2Wickets = this.wickets;
@@ -776,16 +786,25 @@
                     this.drawPlayer(cx, cy + 180, this.currentBatter, true, 'bat');
                 }
 
-                // Fielders
-                const fielders = this.inning === 1 ?
-                    this.userBatters.slice(1, 3) :
-                    this.opponentBatters.slice(1, 3);
+                // Fielders - show all 9 fielders around the pitch
+                const fieldingTeam = this.inning === 1 ? this.userBatters : this.opponentBatters;
+                const fielderPositions = [
+                    { x: cx - 180, y: cy - 80, label: 'Mid-wicket' },
+                    { x: cx + 180, y: cy - 80, label: 'Cover' },
+                    { x: cx - 200, y: cy, label: 'Square Leg' },
+                    { x: cx + 200, y: cy, label: 'Point' },
+                    { x: cx - 120, y: cy + 200, label: 'Fine Leg' },
+                    { x: cx + 120, y: cy + 200, label: 'Third Man' },
+                    { x: cx - 50, y: cy - 250, label: 'Extra Cover' },
+                    { x: cx + 50, y: cy - 250, label: 'Deep' },
+                    { x: cx, y: cy + 280, label: 'Keeper' }
+                ];
 
-                fielders.forEach((f, i) => {
-                    const angle = (i - 0.5) * Math.PI / 3;
-                    const fx = cx + 200 * Math.cos(angle);
-                    const fy = cy - 100 + 150 * Math.sin(angle);
-                    this.drawPlayer(fx, fy, f, false, 'field');
+                fielderPositions.forEach((pos, i) => {
+                    const fielder = fieldingTeam[i % fieldingTeam.length];
+                    if (fielder) {
+                        this.drawPlayer(pos.x, pos.y, fielder, false, 'field');
+                    }
                 });
             },
 
