@@ -3,770 +3,431 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cricket Championship 24</title>
+<title>Cricket Championship 24 - Real Cricket 24 Style</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Arial',sans-serif;background:linear-gradient(135deg,#0a1628 0%,#1a2a4a 100%);color:#fff;min-height:100vh;}
-.page{display:none;padding:20px;max-width:1100px;margin:0 auto;}
-.page.active{display:block;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Arial',sans-serif;background:#000;}
+.page{position:fixed;top:0;left:0;width:100%;height:100%;display:none;overflow-y:auto;background:linear-gradient(135deg,#0a1628 0%,#1a2a4a 100%);}
+.page.active{display:flex;flex-direction:column;}
 
 /* HOME */
-.home-header{text-align:center;padding:40px 20px;background:linear-gradient(135deg,#1a3a6a,#0a1628);border-bottom:3px solid #ffb300;}
-.home-header h1{font-size:3em;color:#ffb300;text-shadow:0 0 20px rgba(255,179,0,0.5);}
-.home-header p{color:#aaa;margin-top:8px;font-size:1.1em;}
-.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;padding:40px 20px;}
-.mode-card{background:linear-gradient(135deg,rgba(255,179,0,0.1),rgba(255,107,53,0.1));border:2px solid #ffb300;border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:all 0.3s;}
-.mode-card:hover{transform:translateY(-8px);box-shadow:0 15px 40px rgba(255,179,0,0.3);}
-.mode-card .ico{font-size:3.5em;margin-bottom:15px;}
-.mode-card h2{font-size:1.6em;color:#ffb300;margin-bottom:10px;}
-.mode-card p{color:#ccc;font-size:0.9em;}
+#pgHome{padding:40px 20px;justify-content:center;align-items:center;text-align:center;}
+.home-header h1{font-size:3.5em;color:#ffb300;text-shadow:0 0 30px rgba(255,179,0,0.5);margin-bottom:20px;}
+.home-header p{color:#aaa;font-size:1.2em;margin-bottom:40px;}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:25px;max-width:1000px;}
+.mode-card{background:linear-gradient(135deg,rgba(255,179,0,0.1),rgba(255,107,53,0.1));border:3px solid #ffb300;border-radius:15px;padding:40px 30px;cursor:pointer;transition:all 0.3s;}
+.mode-card:hover{transform:translateY(-10px);box-shadow:0 20px 50px rgba(255,179,0,0.4);}
+.mode-card .ico{font-size:4em;margin-bottom:15px;}
+.mode-card h2{font-size:1.8em;color:#ffb300;margin-bottom:10px;}
+.mode-card p{color:#ccc;font-size:1em;}
 
 /* TEAM SELECT */
-.page-header{background:rgba(0,0,0,0.6);border:2px solid #ffb300;border-radius:10px;padding:20px;text-align:center;margin-bottom:20px;}
-.page-header h2{color:#ffb300;font-size:1.8em;}
-.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0;}
-.team-card{background:rgba(255,179,0,0.08);border:2px solid #555;border-radius:8px;padding:15px;text-align:center;cursor:pointer;transition:all 0.2s;}
+#pgTeam{padding:30px;justify-content:center;}
+.ts-container{max-width:1000px;width:100%;}
+.page-header{background:rgba(0,0,0,0.6);border:3px solid #ffb300;border-radius:15px;padding:25px;text-align:center;margin-bottom:30px;}
+.page-header h2{color:#ffb300;font-size:2em;margin-bottom:10px;}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin:20px 0;}
+.team-card{background:rgba(255,179,0,0.08);border:2px solid #555;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s;}
 .team-card:hover{border-color:#ffb300;background:rgba(255,179,0,0.2);}
-.team-card.selected{border-color:#00ff00;background:rgba(0,255,0,0.15);box-shadow:0 0 12px rgba(0,255,0,0.4);}
-.team-card .flag{font-size:2.5em;}
-.team-card .tname{color:#ffb300;font-weight:bold;margin-top:8px;font-size:0.9em;}
+.team-card.selected{border-color:#00ff00;background:rgba(0,255,0,0.2);box-shadow:0 0 15px rgba(0,255,0,0.5);}
+.team-card .flag{font-size:3em;margin-bottom:10px;}
+.team-card .tname{color:#ffb300;font-weight:bold;font-size:1em;}
+.btn-primary{padding:18px 40px;font-size:1.2em;font-weight:bold;border:3px solid #ffb300;border-radius:10px;background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:all 0.3s;margin-top:20px;}
+.btn-primary:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(255,179,0,0.6);}
 
-/* SQUAD SELECTION */
-.squad-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.squad-pool,.squad-xi{background:rgba(0,0,0,0.6);border:2px solid #ffb300;border-radius:10px;padding:15px;}
-.squad-pool h3,.squad-xi h3{color:#ffb300;margin-bottom:12px;font-size:1.1em;}
-.player-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;border:1px solid #333;margin-bottom:6px;transition:all 0.2s;}
+/* SQUAD */
+#pgSquad{padding:30px;justify-content:flex-start;overflow-y:auto;}
+.squad-container{max-width:1100px;width:100%;margin:0 auto;}
+.squad-layout{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:30px;}
+.squad-pool,.squad-xi{background:rgba(0,0,0,0.7);border:2px solid #ffb300;border-radius:12px;padding:20px;max-height:400px;overflow-y:auto;}
+.squad-pool h3,.squad-xi h3{color:#ffb300;margin-bottom:15px;font-size:1.2em;}
+.player-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;border:1px solid #333;margin-bottom:8px;transition:all 0.2s;background:rgba(255,255,255,0.02);}
 .player-row:hover{border-color:#ffb300;background:rgba(255,179,0,0.1);}
 .player-row.in-xi{background:rgba(0,255,0,0.1);border-color:#00ff00;}
-.player-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:0.85em;flex-shrink:0;}
+.player-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:0.9em;flex-shrink:0;color:#fff;}
 .player-info{flex:1;}
-.player-name{font-weight:bold;font-size:0.9em;}
-.player-role{font-size:0.75em;color:#aaa;}
-.player-stats{font-size:0.75em;color:#ffb300;text-align:right;}
-.xi-slot{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px dashed #555;border-radius:6px;margin-bottom:5px;min-height:44px;}
-.xi-slot.filled{border-style:solid;border-color:#00ff00;background:rgba(0,255,0,0.08);}
-.xi-num{width:22px;height:22px;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75em;flex-shrink:0;}
-.xi-name{flex:1;font-size:0.85em;}
-.xi-role-tag{font-size:0.7em;padding:2px 6px;border-radius:3px;}
+.player-name{font-weight:bold;font-size:0.95em;color:#fff;}
+.player-role{font-size:0.8em;color:#aaa;}
+.xi-slot{display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px solid #333;border-radius:8px;margin-bottom:8px;min-height:50px;background:rgba(255,255,255,0.02);}
+.xi-slot.filled{border-color:#00ff00;background:rgba(0,255,0,0.08);}
+.xi-num{width:30px;height:30px;background:#ffb300;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#000;flex-shrink:0;}
+.xi-name{flex:1;color:#fff;font-size:0.95em;}
+.xi-role-tag{font-size:0.75em;padding:4px 8px;border-radius:4px;font-weight:bold;}
 .tag-bat{background:#1a4a1a;color:#00ff00;}
 .tag-bowl{background:#4a1a1a;color:#ff6b6b;}
 .tag-all{background:#4a3a1a;color:#ffb300;}
 .tag-wk{background:#1a1a4a;color:#6bb3ff;}
-
-/* BATTING ORDER */
-.order-list{list-style:none;}
-.order-item{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid #333;border-radius:6px;margin-bottom:5px;cursor:grab;background:rgba(0,0,0,0.4);}
-.order-item:active{cursor:grabbing;}
-.order-num{width:26px;height:26px;background:#ffb300;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:0.85em;flex-shrink:0;}
 .order-arrows{display:flex;flex-direction:column;gap:2px;}
-.order-arrows button{padding:0 6px;font-size:0.7em;border:1px solid #555;border-radius:3px;background:#222;color:#fff;cursor:pointer;line-height:1.6;}
+.order-arrows button{padding:2px 6px;font-size:0.7em;border:1px solid #555;background:#222;color:#fff;cursor:pointer;border-radius:3px;}
 
 /* GAME PAGE */
-.game-layout{display:grid;grid-template-columns:1fr 320px;gap:15px;}
-.game-main{}
-.game-sidebar{display:flex;flex-direction:column;gap:12px;}
+#pgGame{flex-direction:row;padding:0;background:#000;}
+#gameCanvas{flex:1;display:block;cursor:crosshair;}
+.game-info{position:fixed;top:0;left:0;right:0;z-index:10;padding:15px;background:linear-gradient(180deg,rgba(0,0,0,0.8),transparent);color:#fff;}
+.score-display{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;text-align:center;color:#ffb300;font-weight:bold;font-size:0.95em;}
+.score-val{font-size:1.8em;color:#fff;}
 
-.scoreboard{background:rgba(0,0,0,0.85);border:2px solid #ffb300;border-radius:10px;padding:15px;margin-bottom:12px;}
-.score-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.score-team{font-size:1em;color:#aaa;}
-.score-runs{font-size:2.8em;font-weight:bold;color:#ffb300;line-height:1;}
-.score-overs{font-size:0.85em;color:#aaa;}
-.score-meta{display:flex;gap:20px;margin-top:8px;padding-top:8px;border-top:1px solid #333;}
-.score-meta-item{flex:1;text-align:center;}
-.score-meta-label{font-size:0.7em;color:#777;text-transform:uppercase;}
-.score-meta-val{font-size:1em;color:#fff;font-weight:bold;}
+.game-controls{position:fixed;bottom:0;left:0;right:0;z-index:10;padding:20px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.9));display:flex;gap:15px;justify-content:center;align-items:flex-end;}
+.shot-button{width:80px;height:80px;border:3px solid #ffb300;border-radius:10px;background:linear-gradient(135deg,rgba(255,179,0,0.2),rgba(255,107,53,0.2));color:#fff;font-size:0.9em;font-weight:bold;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;text-align:center;line-height:1.2;}
+.shot-button:hover:not(:disabled){background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;transform:scale(1.08);}
+.shot-button:disabled{opacity:0.3;cursor:not-allowed;}
+.shot-button.active{background:linear-gradient(135deg,#00ff00,#00cc00);border-color:#00ff00;color:#000;box-shadow:0 0 20px rgba(0,255,0,0.6);}
+.shot-emoji{font-size:1.5em;}
+.shot-label{font-size:0.75em;}
 
-.canvas-wrap{position:relative;border:2px solid #ffb300;border-radius:8px;overflow:hidden;margin-bottom:12px;}
-canvas{display:block;width:100%;height:auto;}
-.ball-indicator{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);border:1px solid #ffb300;border-radius:6px;padding:4px 10px;font-size:0.8em;color:#ffb300;}
-.delivery-type{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:1px solid #ff6b35;border-radius:6px;padding:4px 10px;font-size:0.8em;color:#ff6b35;}
+.timing-bar{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);width:300px;height:8px;background:rgba(0,0,0,0.8);border:2px solid #ffb300;border-radius:10px;z-index:10;}
+.timing-indicator{position:absolute;height:100%;width:20px;background:#ff0000;border-radius:8px;left:-10px;top:0;}
 
-.commentary-box{background:rgba(0,0,0,0.8);border-left:4px solid #ffb300;border-radius:6px;padding:12px;color:#ffd700;font-style:italic;min-height:55px;display:flex;align-items:center;margin-bottom:12px;font-size:0.95em;line-height:1.4;}
+.delivery-info{position:fixed;top:80px;left:20px;z-index:10;background:rgba(0,0,0,0.85);border:2px solid #ff6b35;border-radius:10px;padding:12px 16px;color:#ff6b35;font-weight:bold;font-size:0.95em;}
 
-.controls-area{background:rgba(0,0,0,0.8);border:2px solid #ff6b35;border-radius:8px;padding:12px;}
-.ctrl-label{color:#aaa;font-size:0.8em;text-transform:uppercase;margin-bottom:8px;}
-.shot-btns,.bowl-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.shot-btn,.bowl-btn{padding:14px 8px;font-size:0.85em;font-weight:bold;border:2px solid #ffb300;border-radius:8px;background:linear-gradient(135deg,rgba(255,179,0,0.15),rgba(255,107,53,0.15));color:#fff;cursor:pointer;transition:all 0.2s;text-align:center;line-height:1.3;}
-.shot-btn:hover,.bowl-btn:hover{background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;transform:scale(1.03);}
-.shot-btn .shot-name{font-size:1.05em;display:block;}
-.shot-btn .shot-hint{font-size:0.7em;color:#aaa;display:block;margin-top:3px;}
-.shot-btn:hover .shot-hint{color:#000;}
+.commentary{position:fixed;top:20px;right:20px;z-index:10;background:rgba(0,0,0,0.9);border-left:4px solid #ffb300;border-radius:8px;padding:15px;color:#ffd700;max-width:300px;font-size:0.9em;line-height:1.4;font-style:italic;}
 
-.face-btn,.bowl-ready-btn{width:100%;padding:16px;font-size:1.1em;font-weight:bold;border:2px solid #ffb300;border-radius:8px;background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;cursor:pointer;text-transform:uppercase;letter-spacing:1px;}
-.face-btn:hover,.bowl-ready-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(255,179,0,0.5);}
+.status-line{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);color:#ffb300;font-weight:bold;background:rgba(0,0,0,0.8);padding:8px 15px;border-radius:6px;z-index:10;font-size:0.95em;}
 
-/* Sidebar */
-.side-card{background:rgba(0,0,0,0.7);border:1px solid #333;border-radius:8px;padding:12px;}
-.side-card h4{color:#ffb300;font-size:0.85em;text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:6px;}
-.bat-card{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:0.85em;}
-.bat-name{color:#fff;}
-.bat-score{color:#ffb300;font-weight:bold;}
-.bat-on-strike{color:#00ff00;}
-.bowl-sel{display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px;border-radius:5px;cursor:pointer;border:1px solid transparent;}
-.bowl-sel:hover{border-color:#ffb300;background:rgba(255,179,0,0.1);}
-.bowl-sel.active{border-color:#00ff00;background:rgba(0,255,0,0.1);}
-.bowl-sel-name{font-size:0.85em;flex:1;}
-.bowl-sel-stats{font-size:0.75em;color:#aaa;}
-.over-dots{display:flex;gap:4px;flex-wrap:wrap;}
-.dot-ball{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65em;font-weight:bold;border:1px solid #555;}
-.dot-0{background:#222;color:#aaa;}
-.dot-1{background:#1a3a1a;color:#00ff00;}
-.dot-2{background:#1a3a2a;color:#5fff9f;}
-.dot-4{background:#1a1a4a;color:#4a9fff;}
-.dot-6{background:#4a1a1a;color:#ff4a4a;}
-.dot-W{background:#5a1a1a;color:#ff0000;}
+#pgResult{padding:40px 20px;overflow-y:auto;justify-content:flex-start;}
+.result-container{max-width:1100px;margin:0 auto;width:100%;}
+.result-banner{background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;padding:40px;border-radius:15px;text-align:center;margin-bottom:30px;}
+.result-banner h1{font-size:2.8em;font-weight:bold;margin-bottom:10px;}
+.result-banner p{font-size:1.2em;}
+.motm{background:linear-gradient(135deg,rgba(255,179,0,0.2),rgba(255,107,53,0.2));border:3px solid #ffb300;border-radius:15px;padding:30px;text-align:center;margin-bottom:30px;}
+.motm-avatar{width:100px;height:100px;border-radius:50%;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:3em;border:4px solid #ffb300;}
+.motm h2{font-size:2em;color:#fff;margin-bottom:10px;}
+.motm p{color:#aaa;font-size:1.1em;}
+.motm-stat{color:#ffb300;font-size:1.3em;font-weight:bold;margin-top:10px;}
 
-/* BOWLER SELECTOR */
-.bowler-picker{background:rgba(0,0,0,0.8);border:2px solid #ff6b35;border-radius:8px;padding:12px;margin-bottom:12px;}
-.bowler-picker h4{color:#ff6b35;margin-bottom:10px;}
-.bowler-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border:1px solid #333;border-radius:6px;margin-bottom:5px;cursor:pointer;transition:all 0.2s;}
-.bowler-row:hover{border-color:#ffb300;}
-.bowler-row.selected{border-color:#00ff00;background:rgba(0,255,0,0.1);}
-.bowler-row .b-name{font-size:0.9em;}
-.bowler-row .b-stats{font-size:0.75em;color:#aaa;}
-.bowler-row .b-overs{font-size:0.75em;color:#ffb300;}
-
-/* RESULT */
-.result-page{max-width:900px;margin:0 auto;padding:20px;}
-.result-banner{background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;padding:30px;border-radius:12px;text-align:center;margin-bottom:20px;}
-.result-banner h1{font-size:2.5em;font-weight:bold;}
-.result-banner p{font-size:1.2em;margin-top:8px;}
-.scorecard-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
-.scorecard{background:rgba(0,0,0,0.7);border:1px solid #ffb300;border-radius:10px;overflow:hidden;}
-.scorecard h3{background:rgba(255,179,0,0.2);padding:12px 15px;color:#ffb300;font-size:1em;}
+.scorecard{background:rgba(0,0,0,0.8);border:2px solid #ffb300;border-radius:12px;overflow:hidden;margin-bottom:20px;}
+.sc-header{background:rgba(255,179,0,0.2);padding:15px;color:#ffb300;font-weight:bold;font-size:1.1em;}
 .sc-table{width:100%;border-collapse:collapse;}
-.sc-table th{background:rgba(0,0,0,0.5);padding:6px 10px;font-size:0.75em;color:#aaa;text-align:left;text-transform:uppercase;}
-.sc-table td{padding:6px 10px;font-size:0.85em;border-bottom:1px solid rgba(255,255,255,0.05);}
+.sc-table th{background:rgba(0,0,0,0.5);padding:10px;font-size:0.85em;color:#aaa;text-align:left;text-transform:uppercase;}
+.sc-table td{padding:10px;font-size:0.9em;border-bottom:1px solid rgba(255,255,255,0.05);color:#fff;}
 .sc-table tr:hover td{background:rgba(255,179,0,0.05);}
 .sc-runs{color:#ffb300;font-weight:bold;}
-.sc-out{color:#ff6b6b;font-size:0.75em;}
 .sc-wickets{color:#ff6b6b;font-weight:bold;}
+.sc-out{color:#aaa;font-size:0.85em;}
 .sc-economy{color:#aaa;}
-.motm{background:linear-gradient(135deg,rgba(255,179,0,0.2),rgba(255,107,53,0.2));border:2px solid #ffb300;border-radius:10px;padding:20px;text-align:center;margin-bottom:20px;}
-.motm h3{color:#ffb300;font-size:1.1em;margin-bottom:12px;}
-.motm-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:2em;border:3px solid #ffb300;}
-.motm h2{font-size:1.5em;color:#fff;}
-.motm p{color:#aaa;margin-top:5px;}
-.motm .motm-stat{color:#ffb300;font-size:1.1em;margin-top:8px;font-weight:bold;}
 
-/* 3D Player Canvas */
-#playerCanvas{display:none;}
+button.btn-back{padding:12px 25px;background:#444;color:#fff;border:2px solid #666;border-radius:8px;cursor:pointer;font-size:1em;transition:all 0.3s;}
+button.btn-back:hover{background:#555;border-color:#aaa;}
 
-button.btn-primary{padding:14px 30px;font-size:1em;font-weight:bold;border:2px solid #ffb300;border-radius:8px;background:linear-gradient(135deg,#ffb300,#ff6b35);color:#000;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:all 0.2s;}
-button.btn-primary:hover{transform:scale(1.03);box-shadow:0 4px 20px rgba(255,179,0,0.5);}
-button.btn-sec{padding:10px 20px;font-size:0.9em;border:2px solid #555;border-radius:8px;background:rgba(0,0,0,0.5);color:#ccc;cursor:pointer;transition:all 0.2s;}
-button.btn-sec:hover{border-color:#aaa;color:#fff;}
-.btn-row{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;}
-
-.hidden{display:none!important;}
-.steps{display:flex;gap:5px;margin-bottom:20px;}
-.step{padding:6px 14px;border-radius:20px;font-size:0.8em;border:1px solid #555;color:#aaa;}
+.steps{display:flex;gap:8px;margin-bottom:20px;}
+.step{padding:8px 15px;border-radius:20px;font-size:0.9em;border:2px solid #555;color:#aaa;}
 .step.active{background:#ffb300;color:#000;border-color:#ffb300;font-weight:bold;}
 .step.done{background:rgba(0,255,0,0.2);border-color:#00ff00;color:#00ff00;}
 
-.over-history{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
-
-@media(max-width:700px){
-  .game-layout{grid-template-columns:1fr;}
-  .scorecard-wrap{grid-template-columns:1fr;}
-  .squad-layout{grid-template-columns:1fr;}
-}
+.hidden{display:none!important;}
 </style>
 </head>
 <body>
 
-<!-- HOME PAGE -->
+<!-- HOME -->
 <div id="pgHome" class="page active">
   <div class="home-header">
     <h1>🏏 CRICKET CHAMPIONSHIP 24</h1>
-    <p>Full squad selection • Realistic match simulation • Detailed scorecard</p>
+    <p>Realistic Live Cricket Simulation with Timing-Based Shots</p>
   </div>
   <div class="mode-grid">
     <div class="mode-card" onclick="startMode('worldcup')">
       <div class="ico">🌍</div>
       <h2>World Cup</h2>
-      <p>Play as an international team. T20 World Cup format with 8 nations.</p>
+      <p>Play as an international team. T20 format with real squads.</p>
     </div>
     <div class="mode-card" onclick="startMode('ipl')">
       <div class="ico">🏟️</div>
       <h2>IPL</h2>
-      <p>Choose your IPL franchise. Build your XI and chase the trophy.</p>
+      <p>Choose your IPL franchise and compete.</p>
     </div>
     <div class="mode-card" onclick="startMode('friendly')">
       <div class="ico">🤝</div>
       <h2>Friendly</h2>
-      <p>Quick practice match. Pick any team and play 10 overs.</p>
+      <p>Quick match. 5 overs per side.</p>
     </div>
   </div>
 </div>
 
-<!-- TEAM SELECT PAGE -->
+<!-- TEAM SELECT -->
 <div id="pgTeam" class="page">
-  <div style="padding:20px;max-width:900px;margin:0 auto;">
+  <div class="ts-container">
     <div class="page-header"><h2 id="teamSelectTitle">SELECT YOUR TEAM</h2></div>
     <div class="team-grid" id="teamList"></div>
-    <div class="btn-row">
+    <div style="text-align:center;">
       <button class="btn-primary" onclick="goToSquadSelect()">NEXT: SELECT SQUAD →</button>
-      <button class="btn-sec" onclick="showPage('pgHome')">← Back</button>
+      <button class="btn-back" style="margin-left:15px;" onclick="showPage('pgHome')">← Back</button>
     </div>
   </div>
 </div>
 
-<!-- SQUAD + BATTING ORDER PAGE -->
+<!-- SQUAD SELECT -->
 <div id="pgSquad" class="page">
-  <div style="padding:20px;max-width:1000px;margin:0 auto;">
-    <div class="steps">
+  <div class="squad-container">
+    <div class="steps" style="margin-bottom:15px;">
       <div class="step done">1. Team</div>
-      <div class="step active">2. Squad & Order</div>
+      <div class="step active">2. Squad</div>
       <div class="step">3. Play</div>
     </div>
     <div class="page-header">
-      <h2>SELECT YOUR PLAYING XI &amp; BATTING ORDER</h2>
-      <p style="color:#aaa;font-size:0.85em;margin-top:6px;">Click players to add to XI. Drag or use arrows to set batting order. <span id="xiCount" style="color:#ffb300;">0/11 selected</span></p>
+      <h2>SELECT YOUR XI &amp; BATTING ORDER</h2>
+      <p style="color:#aaa;margin-top:8px;font-size:0.95em;"><span id="xiCount" style="color:#ffb300;">0/11</span> selected. Click to add. Use ▲▼ to order.</p>
     </div>
     <div class="squad-layout">
-      <!-- Pool -->
       <div class="squad-pool">
-        <h3>SQUAD (15 players)</h3>
+        <h3>AVAILABLE PLAYERS (15)</h3>
         <div id="squadPool"></div>
       </div>
-      <!-- XI & Order -->
       <div class="squad-xi">
-        <h3>PLAYING XI &amp; BATTING ORDER</h3>
+        <h3>YOUR XI &amp; BATTING ORDER</h3>
         <div id="xiOrderList"></div>
       </div>
     </div>
-    <div class="btn-row">
+    <div style="text-align:center;margin-top:20px;">
       <button class="btn-primary" onclick="startMatch()">START MATCH 🏏</button>
-      <button class="btn-sec" onclick="showPage('pgTeam')">← Back</button>
+      <button class="btn-back" style="margin-left:15px;" onclick="showPage('pgTeam')">← Back</button>
     </div>
   </div>
 </div>
 
-<!-- GAME PAGE -->
+<!-- GAME -->
 <div id="pgGame" class="page">
-  <div style="padding:15px;">
-    <div class="game-layout">
-      <!-- Main -->
-      <div class="game-main">
-        <!-- Scoreboard -->
-        <div class="scoreboard">
-          <div class="score-top">
-            <div>
-              <div class="score-team" id="battingTeamName">Team</div>
-              <div class="score-runs" id="scoreRuns">0/0</div>
-              <div class="score-overs" id="scoreOvers">0.0 overs</div>
-            </div>
-            <div style="text-align:right;">
-              <div id="inningLabel" style="color:#aaa;font-size:0.85em;">1st Innings</div>
-              <div id="targetLine" style="color:#ff6b35;font-size:0.9em;font-weight:bold;margin-top:4px;"></div>
-            </div>
-          </div>
-          <div class="score-meta">
-            <div class="score-meta-item">
-              <div class="score-meta-label">Batter</div>
-              <div class="score-meta-val" id="metaBatter">-</div>
-            </div>
-            <div class="score-meta-item">
-              <div class="score-meta-label">Runs(Balls)</div>
-              <div class="score-meta-val" id="metaBatterScore">-</div>
-            </div>
-            <div class="score-meta-item">
-              <div class="score-meta-label">SR</div>
-              <div class="score-meta-val" id="metaSR">-</div>
-            </div>
-            <div class="score-meta-item">
-              <div class="score-meta-label">Bowler</div>
-              <div class="score-meta-val" id="metaBowler">-</div>
-            </div>
-            <div class="score-meta-item">
-              <div class="score-meta-label">Bowling</div>
-              <div class="score-meta-val" id="metaBowlerFig">-</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Canvas -->
-        <div class="canvas-wrap">
-          <canvas id="gameCanvas" width="700" height="380"></canvas>
-          <div class="ball-indicator" id="ballIndicator">Ball 1</div>
-          <div class="delivery-type" id="deliveryType"></div>
-        </div>
-
-        <!-- Commentary -->
-        <div class="commentary-box" id="commBox">Welcome to Cricket Championship 24!</div>
-
-        <!-- This over -->
-        <div style="margin-bottom:12px;padding:8px 12px;background:rgba(0,0,0,0.5);border-radius:6px;">
-          <span style="color:#aaa;font-size:0.75em;text-transform:uppercase;">This Over: </span>
-          <div class="over-dots" id="overDots"></div>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls-area" id="controlsArea">
-          <div class="ctrl-label" id="ctrlLabel">Choose your action</div>
-
-          <!-- Face ball button -->
-          <button class="face-btn hidden" id="btnFace" onclick="faceBall()">⚾ FACE BALL</button>
-
-          <!-- Shot selection -->
-          <div class="shot-btns hidden" id="shotBtns">
-            <button class="shot-btn" onclick="playShot('drive')">
-              <span class="shot-name">🏏 DRIVE</span>
-              <span class="shot-hint">Full length • Straight/Off</span>
-            </button>
-            <button class="shot-btn" onclick="playShot('cut')">
-              <span class="shot-name">✂️ CUT</span>
-              <span class="shot-hint">Short ball • Off side</span>
-            </button>
-            <button class="shot-btn" onclick="playShot('sweep')">
-              <span class="shot-name">🌊 SWEEP</span>
-              <span class="shot-hint">Spin • Leg side</span>
-            </button>
-            <button class="shot-btn" onclick="playShot('loft')">
-              <span class="shot-name">⬆️ LOFT</span>
-              <span class="shot-hint">Aerial • High risk/reward</span>
-            </button>
-          </div>
-
-          <!-- Bowling ready button -->
-          <button class="bowl-ready-btn hidden" id="btnBowl" onclick="openBowlSelect()">🎳 BOWL NEXT DELIVERY</button>
-
-          <!-- Bowl type selection -->
-          <div class="bowl-btns hidden" id="bowlBtns">
-            <button class="bowl-btn" onclick="playBowl('fast')">⚡ FAST<br><span style="font-size:0.7em;opacity:0.7;">Good length</span></button>
-            <button class="bowl-btn" onclick="playBowl('bouncer')">💥 BOUNCER<br><span style="font-size:0.7em;opacity:0.7;">Short pitched</span></button>
-            <button class="bowl-btn" onclick="playBowl('yorker')">📍 YORKER<br><span style="font-size:0.7em;opacity:0.7;">Full toss/blockhole</span></button>
-            <button class="bowl-btn" onclick="playBowl('spin')">🌀 SPIN<br><span style="font-size:0.7em;opacity:0.7;">Turn &amp; flight</span></button>
-          </div>
-        </div>
-
-        <button class="btn-sec" style="margin-top:10px;width:100%;" onclick="confirmBack()">← Back to Home</button>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="game-sidebar">
-
-        <!-- Batting -->
-        <div class="side-card">
-          <h4>⚾ Batting</h4>
-          <div id="sideBarBatters"></div>
-        </div>
-
-        <!-- Bowling (shown when user is bowling) -->
-        <div class="side-card" id="sideBarBowlerPick" style="display:none;">
-          <h4>🎳 Pick Bowler</h4>
-          <div id="bowlerPickList"></div>
-        </div>
-
-        <!-- Bowling figures -->
-        <div class="side-card">
-          <h4>🎳 Bowling</h4>
-          <div id="sideBarBowlers"></div>
-        </div>
-
-        <!-- Fall of wickets -->
-        <div class="side-card">
-          <h4>📉 Fall of Wickets</h4>
-          <div id="sideBarFOW" style="font-size:0.8em;color:#aaa;line-height:1.8;"></div>
-        </div>
-
-      </div>
+  <canvas id="gameCanvas"></canvas>
+  <div class="game-info">
+    <div class="score-display">
+      <div><div class="score-val" id="scoreRuns">0/0</div>Runs/Wickets</div>
+      <div><div class="score-val" id="scoreOvers">0.0</div>Overs</div>
+      <div><div class="score-val" id="scoreBatter">-</div>Batter</div>
+      <div><div class="score-val" id="scoreSR">0</div>Strike Rate</div>
     </div>
+  </div>
+  <div class="delivery-info" id="deliveryInfo"></div>
+  <div class="commentary" id="commBox"></div>
+  <div class="status-line" id="statusLine"></div>
+  <div class="timing-bar" id="timingBar">
+    <div class="timing-indicator" id="timingIndicator"></div>
+  </div>
+  <div class="game-controls" id="controlsArea">
+    <button class="shot-button" id="btnDefend" onclick="playShot('defend')">
+      <span class="shot-emoji">🛡️</span>
+      <span class="shot-label">DEFEND</span>
+    </button>
+    <button class="shot-button" id="btnDrive" onclick="playShot('drive')">
+      <span class="shot-emoji">🏏</span>
+      <span class="shot-label">DRIVE</span>
+    </button>
+    <button class="shot-button" id="btnCut" onclick="playShot('cut')">
+      <span class="shot-emoji">✂️</span>
+      <span class="shot-label">CUT</span>
+    </button>
+    <button class="shot-button" id="btnLoft" onclick="playShot('loft')">
+      <span class="shot-emoji">⬆️</span>
+      <span class="shot-label">LOFT</span>
+    </button>
   </div>
 </div>
 
-<!-- RESULT PAGE -->
+<!-- RESULT -->
 <div id="pgResult" class="page">
-  <div class="result-page">
+  <div class="result-container">
     <div class="result-banner" id="resultBanner"></div>
-
-    <!-- MOTM -->
     <div class="motm" id="motmBox"></div>
-
-    <!-- Scorecards -->
-    <div class="scorecard-wrap" id="scorecardWrap"></div>
-
-    <div class="btn-row" style="justify-content:center;">
-      <button class="btn-primary" onclick="showPage('pgHome')">🏠 Play Again</button>
+    <div id="scorecardWrap"></div>
+    <div style="text-align:center;margin-top:30px;">
+      <button class="btn-primary" onclick="showPage('pgHome')">🏠 PLAY AGAIN</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================================
-// DATA
-// ============================================================
+// ============ GAME STATE ============
+let G = {
+  mode: null,
+  team: null, opp: null,
+  userXI: [], oppXI: [],
+  userBowlers: [], oppBowlers: [],
+  inning: 1,
+  totalOvers: 10,
+  i1: { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, bowlerIdx:0, fow:[], scores:[], bowlerFigs:{} },
+  i2: { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, bowlerIdx:0, fow:[], scores:[], bowlerFigs:{} },
+  phase: 'idle',
+  selectedBowler: null,
+};
 
 const TEAMS = {
   worldcup: {
-    IND: { name:'India', flag:'🇮🇳', color:'#003580',
-      squad:[
-        {id:'vk',name:'V. Kohli',role:'BAT',bat:95,bowl:20,avg:52,sr:138},
-        {id:'rs',name:'R. Sharma',role:'BAT',bat:90,bowl:15,avg:48,sr:140},
-        {id:'sg',name:'S. Gill',role:'BAT',bat:82,bowl:10,avg:42,sr:142},
-        {id:'kl',name:'KL Rahul',role:'WK',bat:85,bowl:5,avg:45,sr:135},
-        {id:'rp',name:'R. Pant',role:'WK',bat:80,bowl:5,avg:38,sr:155},
-        {id:'sk',name:'S. Kumar',role:'BAT',bat:88,bowl:25,avg:40,sr:170},
-        {id:'hp',name:'H. Pandya',role:'ALL',bat:70,bowl:75,avg:30,sr:145},
-        {id:'ax',name:'A. Patel',role:'ALL',bat:55,bowl:80,avg:22,sr:120},
-        {id:'ws',name:'W. Sundar',role:'ALL',bat:50,bowl:75,avg:18,sr:115},
-        {id:'jb',name:'J. Bumrah',role:'BOWL',bat:10,bowl:95,avg:8,sr:80},
-        {id:'ms2',name:'M. Siraj',role:'BOWL',bat:8,bowl:82,avg:6,sr:70},
-        {id:'yc',name:'Y. Chahal',role:'BOWL',bat:5,bowl:85,avg:5,sr:65},
-        {id:'bs',name:'B. Shami',role:'BOWL',bat:12,bowl:88,avg:7,sr:75},
-        {id:'kh',name:'K. Yadav',role:'BOWL',bat:8,bowl:78,avg:6,sr:68},
-        {id:'dj',name:'D. Jurel',role:'WK',bat:65,bowl:5,avg:28,sr:130},
-      ]
-    },
-    AUS: { name:'Australia', flag:'🇦🇺', color:'#ffcc00',
-      squad:[
-        {id:'dw',name:'D. Warner',role:'BAT',bat:88,bowl:10,avg:46,sr:142},
-        {id:'tw',name:'T. Head',role:'BAT',bat:85,bowl:20,avg:42,sr:155},
-        {id:'se',name:'S. Smith',role:'BAT',bat:90,bowl:25,avg:56,sr:128},
-        {id:'mp',name:'M. Marsh',role:'ALL',bat:72,bowl:72,avg:32,sr:138},
-        {id:'gm',name:'G. Maxwell',role:'ALL',bat:80,bowl:70,avg:34,sr:165},
-        {id:'ia',name:'I. Inglis',role:'WK',bat:68,bowl:5,avg:28,sr:132},
-        {id:'ca',name:'C. Alcott',role:'BOWL',bat:10,bowl:78,avg:8,sr:72},
-        {id:'pcu',name:'P. Cummins',role:'BOWL',bat:20,bowl:92,avg:9,sr:78},
-        {id:'mst',name:'M. Starc',role:'BOWL',bat:15,bowl:88,avg:8,sr:75},
-        {id:'ad',name:'A. Zampa',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'jh',name:'J. Hazlewood',role:'BOWL',bat:5,bowl:85,avg:6,sr:60},
-        {id:'mm',name:'M. Stoinis',role:'ALL',bat:75,bowl:65,avg:35,sr:148},
-        {id:'sb',name:'S. Bancroft',role:'BAT',bat:72,bowl:10,avg:36,sr:125},
-        {id:'bc',name:'B. Couch',role:'WK',bat:60,bowl:5,avg:24,sr:128},
-        {id:'nw',name:'N. Waite',role:'ALL',bat:62,bowl:62,avg:25,sr:130},
-      ]
-    },
-    ENG: { name:'England', flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', color:'#003580',
-      squad:[
-        {id:'jb2',name:'J. Buttler',role:'WK',bat:90,bowl:5,avg:46,sr:150},
-        {id:'pb',name:'P. Salt',role:'WK',bat:82,bowl:5,avg:38,sr:158},
-        {id:'jo',name:'J. Roy',role:'BAT',bat:80,bowl:10,avg:38,sr:148},
-        {id:'jm',name:'J. Malan',role:'BAT',bat:78,bowl:10,avg:40,sr:135},
-        {id:'hr',name:'H. Root',role:'BAT',bat:88,bowl:40,avg:54,sr:130},
-        {id:'bl',name:'B. Livingstone',role:'ALL',bat:78,bowl:72,avg:32,sr:158},
-        {id:'cm',name:'C. Morris',role:'ALL',bat:65,bowl:70,avg:28,sr:140},
-        {id:'sa2',name:'S. Archer',role:'BOWL',bat:15,bowl:90,avg:8,sr:75},
-        {id:'mw',name:'M. Wood',role:'BOWL',bat:20,bowl:85,avg:9,sr:78},
-        {id:'ar',name:'A. Rashid',role:'BOWL',bat:18,bowl:85,avg:8,sr:70},
-        {id:'jc',name:'J. Curran',role:'ALL',bat:60,bowl:75,avg:24,sr:135},
-        {id:'wb',name:'W. Brook',role:'BAT',bat:82,bowl:10,avg:42,sr:148},
-        {id:'db',name:'D. Bess',role:'ALL',bat:50,bowl:72,avg:20,sr:118},
-        {id:'lo',name:'L. Ollie',role:'WK',bat:65,bowl:5,avg:28,sr:130},
-        {id:'ts',name:'T. Tongue',role:'BOWL',bat:8,bowl:78,avg:7,sr:65},
-      ]
-    },
-    PAK: { name:'Pakistan', flag:'🇵🇰', color:'#01411c',
-      squad:[
-        {id:'br',name:'B. Azam',role:'BAT',bat:95,bowl:15,avg:55,sr:132},
-        {id:'mr',name:'M. Rizwan',role:'WK',bat:85,bowl:5,avg:46,sr:128},
-        {id:'fz',name:'F. Zaman',role:'BAT',bat:80,bowl:10,avg:38,sr:148},
-        {id:'mr2',name:'M. Hafeez',role:'ALL',bat:72,bowl:68,avg:32,sr:128},
-        {id:'im',name:'I. Malik',role:'ALL',bat:70,bowl:72,avg:30,sr:135},
-        {id:'sa3',name:'S. Afridi',role:'ALL',bat:68,bowl:80,avg:28,sr:148},
-        {id:'na',name:'N. Arshad',role:'ALL',bat:65,bowl:75,avg:25,sr:140},
-        {id:'hr2',name:'H. Rauf',role:'BOWL',bat:12,bowl:85,avg:8,sr:72},
-        {id:'si',name:'S. Irfan',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'mn',name:'M. Nawaz',role:'ALL',bat:55,bowl:78,avg:22,sr:118},
-        {id:'up',name:'U. Petrus',role:'BOWL',bat:10,bowl:80,avg:8,sr:68},
-        {id:'ab',name:'A. Butt',role:'BAT',bat:74,bowl:10,avg:34,sr:132},
-        {id:'zk',name:'Z. Khan',role:'BOWL',bat:8,bowl:78,avg:6,sr:60},
-        {id:'ms3',name:'M. Shami',role:'BOWL',bat:10,bowl:75,avg:7,sr:65},
-        {id:'wbk',name:'W. Baig',role:'WK',bat:62,bowl:5,avg:25,sr:125},
-      ]
-    },
-    NZ: { name:'New Zealand', flag:'🇳🇿', color:'#000000',
-      squad:[
-        {id:'kw',name:'K. Williamson',role:'BAT',bat:92,bowl:20,avg:50,sr:128},
-        {id:'mc',name:'M. Conway',role:'BAT',bat:82,bowl:5,avg:40,sr:138},
-        {id:'gb',name:'G. Blundell',role:'WK',bat:75,bowl:5,avg:35,sr:130},
-        {id:'da',name:'D. Allen',role:'ALL',bat:68,bowl:72,avg:26,sr:135},
-        {id:'js',name:'J. Sodhi',role:'BOWL',bat:15,bowl:82,avg:9,sr:70},
-        {id:'ts2',name:'T. Southee',role:'BOWL',bat:18,bowl:88,avg:9,sr:75},
-        {id:'mh',name:'M. Henry',role:'BOWL',bat:12,bowl:82,avg:8,sr:68},
-        {id:'lf',name:'L. Ferguson',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'gp',name:'G. Phillips',role:'ALL',bat:72,bowl:62,avg:30,sr:145},
-        {id:'rr',name:'R. Ravindra',role:'ALL',bat:70,bowl:68,avg:28,sr:138},
-        {id:'mp2',name:'M. Papps',role:'BAT',bat:68,bowl:5,avg:30,sr:128},
-        {id:'dc2',name:'D. Cleaver',role:'WK',bat:62,bowl:5,avg:26,sr:125},
-        {id:'ac',name:'A. Cooke',role:'ALL',bat:60,bowl:65,avg:24,sr:120},
-        {id:'br2',name:'B. Randell',role:'BOWL',bat:5,bowl:75,avg:6,sr:58},
-        {id:'cb',name:'C. Bracewell',role:'ALL',bat:55,bowl:72,avg:22,sr:118},
-      ]
-    },
-    SA: { name:'South Africa', flag:'🇿🇦', color:'#007a4d',
-      squad:[
-        {id:'kd',name:'Q. de Kock',role:'WK',bat:88,bowl:5,avg:46,sr:148},
-        {id:'rm',name:'R. Rossouw',role:'BAT',bat:82,bowl:10,avg:40,sr:152},
-        {id:'tm',name:'T. Stubbs',role:'ALL',bat:78,bowl:65,avg:35,sr:145},
-        {id:'hk',name:'H. Klaasen',role:'WK',bat:85,bowl:5,avg:42,sr:155},
-        {id:'mj',name:'M. Jansen',role:'ALL',bat:60,bowl:80,avg:22,sr:132},
-        {id:'ka',name:'K. Ackermann',role:'BAT',bat:72,bowl:15,avg:32,sr:130},
-        {id:'kp',name:'K. Phangiso',role:'BOWL',bat:10,bowl:78,avg:8,sr:68},
-        {id:'nh',name:'N. Hendricks',role:'BAT',bat:78,bowl:10,avg:36,sr:138},
-        {id:'ls',name:'L. Sipamla',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'tr',name:'T. Rabada',role:'BOWL',bat:12,bowl:90,avg:8,sr:72},
-        {id:'im2',name:'I. Maharaj',role:'BOWL',bat:15,bowl:80,avg:9,sr:68},
-        {id:'da2',name:'D. Bergkamp',role:'ALL',bat:65,bowl:70,avg:26,sr:138},
-        {id:'rs2',name:'R. Smuts',role:'ALL',bat:68,bowl:68,avg:28,sr:132},
-        {id:'as',name:'A. Storari',role:'WK',bat:58,bowl:5,avg:22,sr:122},
-        {id:'ls2',name:'L. Shamsi',role:'BOWL',bat:5,bowl:82,avg:6,sr:60},
-      ]
-    },
-    WI: { name:'West Indies', flag:'🌴', color:'#7b0d1e',
-      squad:[
-        {id:'ep',name:'E. Powell',role:'BAT',bat:85,bowl:20,avg:42,sr:162},
-        {id:'bp',name:'B. King',role:'BAT',bat:88,bowl:10,avg:46,sr:148},
-        {id:'np',name:'N. Pooran',role:'WK',bat:90,bowl:5,avg:48,sr:168},
-        {id:'rm2',name:'R. Chase',role:'ALL',bat:70,bowl:72,avg:30,sr:135},
-        {id:'ah',name:'A. Hosein',role:'ALL',bat:62,bowl:75,avg:25,sr:130},
-        {id:'aj',name:'A. Joseph',role:'BOWL',bat:10,bowl:88,avg:8,sr:72},
-        {id:'jh2',name:'J. Holder',role:'ALL',bat:62,bowl:82,avg:25,sr:128},
-        {id:'of',name:'O. Fernando',role:'ALL',bat:68,bowl:70,avg:28,sr:138},
-        {id:'ys',name:'Y. Seales',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'hm',name:'H. Morris',role:'BAT',bat:80,bowl:12,avg:38,sr:145},
-        {id:'km',name:'K. Mayers',role:'ALL',bat:72,bowl:65,avg:32,sr:142},
-        {id:'db2',name:'D. Brown',role:'WK',bat:60,bowl:5,avg:25,sr:128},
-        {id:'rr2',name:'R. Reifer',role:'ALL',bat:62,bowl:65,avg:24,sr:132},
-        {id:'gt',name:'G. Thomas',role:'BOWL',bat:5,bowl:78,avg:6,sr:60},
-        {id:'pr',name:'P. Roach',role:'BOWL',bat:10,bowl:80,avg:8,sr:68},
-      ]
-    },
-    SL: { name:'Sri Lanka', flag:'🇱🇰', color:'#003087',
-      squad:[
-        {id:'pw',name:'P. Nissanka',role:'BAT',bat:82,bowl:10,avg:38,sr:135},
-        {id:'km2',name:'K. Mendis',role:'BAT',bat:88,bowl:15,avg:45,sr:138},
-        {id:'cf',name:'C. Fernando',role:'BOWL',bat:8,bowl:78,avg:7,sr:65},
-        {id:'dd',name:'D. de Silva',role:'ALL',bat:72,bowl:70,avg:30,sr:132},
-        {id:'bt',name:'B. Thirimanne',role:'BAT',bat:75,bowl:10,avg:35,sr:128},
-        {id:'wr',name:'W. Rajapaksa',role:'ALL',bat:78,bowl:62,avg:34,sr:148},
-        {id:'kp2',name:'K. Perera',role:'WK',bat:70,bowl:5,avg:30,sr:135},
-        {id:'dk2',name:'D. Karunaratne',role:'BAT',bat:72,bowl:8,avg:32,sr:125},
-        {id:'lc',name:'L. Chameera',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'wh',name:'W. Hasaranga',role:'ALL',bat:65,bowl:88,avg:25,sr:138},
-        {id:'mk',name:'M. Kumara',role:'BOWL',bat:5,bowl:78,avg:6,sr:58},
-        {id:'ag',name:'A. Gunaratne',role:'ALL',bat:68,bowl:68,avg:28,sr:132},
-        {id:'tp',name:'T. Perera',role:'ALL',bat:70,bowl:65,avg:30,sr:142},
-        {id:'np2',name:'N. Pradeep',role:'BOWL',bat:6,bowl:75,avg:6,sr:60},
-        {id:'dc3',name:'D. Chandimal',role:'WK',bat:68,bowl:5,avg:30,sr:128},
-      ]
-    },
+    IND: {name:'India',flag:'🇮🇳',squad:[
+      {id:'vk',name:'V. Kohli',role:'BAT',bat:95,bowl:20},{id:'rs',name:'R. Sharma',role:'BAT',bat:90,bowl:15},
+      {id:'sg',name:'S. Gill',role:'BAT',bat:82,bowl:10},{id:'kl',name:'KL Rahul',role:'WK',bat:85,bowl:5},
+      {id:'rp',name:'R. Pant',role:'WK',bat:80,bowl:5},{id:'sk',name:'S. Kumar',role:'BAT',bat:88,bowl:25},
+      {id:'hp',name:'H. Pandya',role:'ALL',bat:70,bowl:75},{id:'ax',name:'A. Patel',role:'ALL',bat:55,bowl:80},
+      {id:'ws',name:'W. Sundar',role:'ALL',bat:50,bowl:75},{id:'jb',name:'J. Bumrah',role:'BOWL',bat:10,bowl:95},
+      {id:'ms2',name:'M. Siraj',role:'BOWL',bat:8,bowl:82},{id:'yc',name:'Y. Chahal',role:'BOWL',bat:5,bowl:85},
+      {id:'bs',name:'B. Shami',role:'BOWL',bat:12,bowl:88},{id:'kh',name:'K. Yadav',role:'BOWL',bat:8,bowl:78},
+      {id:'dj',name:'D. Jurel',role:'WK',bat:65,bowl:5}
+    ]},
+    AUS: {name:'Australia',flag:'🇦🇺',squad:[
+      {id:'dw',name:'D. Warner',role:'BAT',bat:88,bowl:10},{id:'tw',name:'T. Head',role:'BAT',bat:85,bowl:20},
+      {id:'se',name:'S. Smith',role:'BAT',bat:90,bowl:25},{id:'mp',name:'M. Marsh',role:'ALL',bat:72,bowl:72},
+      {id:'gm',name:'G. Maxwell',role:'ALL',bat:80,bowl:70},{id:'ia',name:'I. Inglis',role:'WK',bat:68,bowl:5},
+      {id:'ca',name:'C. Alcott',role:'BOWL',bat:10,bowl:78},{id:'pcu',name:'P. Cummins',role:'BOWL',bat:20,bowl:92},
+      {id:'mst',name:'M. Starc',role:'BOWL',bat:15,bowl:88},{id:'ad',name:'A. Zampa',role:'BOWL',bat:8,bowl:82},
+      {id:'jh',name:'J. Hazlewood',role:'BOWL',bat:5,bowl:85},{id:'mm',name:'M. Stoinis',role:'ALL',bat:75,bowl:65},
+      {id:'sb',name:'S. Bancroft',role:'BAT',bat:72,bowl:10},{id:'bc',name:'B. Couch',role:'WK',bat:60,bowl:5},
+      {id:'nw',name:'N. Waite',role:'ALL',bat:62,bowl:62}
+    ]},
+    ENG: {name:'England',flag:'🏴',squad:[
+      {id:'jb2',name:'J. Buttler',role:'WK',bat:90,bowl:5},{id:'pb',name:'P. Salt',role:'WK',bat:82,bowl:5},
+      {id:'jo',name:'J. Roy',role:'BAT',bat:80,bowl:10},{id:'jm',name:'J. Malan',role:'BAT',bat:78,bowl:10},
+      {id:'hr',name:'H. Root',role:'BAT',bat:88,bowl:40},{id:'bl',name:'B. Livingstone',role:'ALL',bat:78,bowl:72},
+      {id:'cm',name:'C. Morris',role:'ALL',bat:65,bowl:70},{id:'sa2',name:'S. Archer',role:'BOWL',bat:15,bowl:90},
+      {id:'mw',name:'M. Wood',role:'BOWL',bat:20,bowl:85},{id:'ar',name:'A. Rashid',role:'BOWL',bat:18,bowl:85},
+      {id:'jc',name:'J. Curran',role:'ALL',bat:60,bowl:75},{id:'wb',name:'W. Brook',role:'BAT',bat:82,bowl:10},
+      {id:'db',name:'D. Bess',role:'ALL',bat:50,bowl:72},{id:'lo',name:'L. Ollie',role:'WK',bat:65,bowl:5},
+      {id:'ts',name:'T. Tongue',role:'BOWL',bat:8,bowl:78}
+    ]},
+    PAK: {name:'Pakistan',flag:'🇵🇰',squad:[
+      {id:'ba',name:'B. Azam',role:'BAT',bat:95,bowl:15},{id:'mr',name:'M. Rizwan',role:'WK',bat:85,bowl:5},
+      {id:'fz',name:'F. Zaman',role:'BAT',bat:80,bowl:10},{id:'mh',name:'M. Hafeez',role:'ALL',bat:72,bowl:68},
+      {id:'im',name:'I. Malik',role:'ALL',bat:70,bowl:72},{id:'sa3',name:'S. Afridi',role:'ALL',bat:68,bowl:80},
+      {id:'na',name:'N. Arshad',role:'ALL',bat:65,bowl:75},{id:'hr2',name:'H. Rauf',role:'BOWL',bat:12,bowl:85},
+      {id:'si',name:'S. Irfan',role:'BOWL',bat:8,bowl:82},{id:'mn',name:'M. Nawaz',role:'ALL',bat:55,bowl:78},
+      {id:'up',name:'U. Petrus',role:'BOWL',bat:10,bowl:80},{id:'ab',name:'A. Butt',role:'BAT',bat:74,bowl:10},
+      {id:'zk',name:'Z. Khan',role:'BOWL',bat:8,bowl:78},{id:'ms3',name:'M. Shami',role:'BOWL',bat:10,bowl:75},
+      {id:'wb',name:'W. Baig',role:'WK',bat:62,bowl:5}
+    ]},
+    NZ: {name:'New Zealand',flag:'🇳🇿',squad:[
+      {id:'kw',name:'K. Williamson',role:'BAT',bat:92,bowl:20},{id:'mc',name:'M. Conway',role:'BAT',bat:82,bowl:5},
+      {id:'gb',name:'G. Blundell',role:'WK',bat:75,bowl:5},{id:'da',name:'D. Allen',role:'ALL',bat:68,bowl:72},
+      {id:'js',name:'J. Sodhi',role:'BOWL',bat:15,bowl:82},{id:'ts2',name:'T. Southee',role:'BOWL',bat:18,bowl:88},
+      {id:'mh2',name:'M. Henry',role:'BOWL',bat:12,bowl:82},{id:'lf',name:'L. Ferguson',role:'BOWL',bat:8,bowl:80},
+      {id:'gp',name:'G. Phillips',role:'ALL',bat:72,bowl:62},{id:'rr',name:'R. Ravindra',role:'ALL',bat:70,bowl:68},
+      {id:'mp2',name:'M. Papps',role:'BAT',bat:68,bowl:5},{id:'dc2',name:'D. Cleaver',role:'WK',bat:62,bowl:5},
+      {id:'ac',name:'A. Cooke',role:'ALL',bat:60,bowl:65},{id:'br2',name:'B. Randell',role:'BOWL',bat:5,bowl:75},
+      {id:'cb',name:'C. Bracewell',role:'ALL',bat:55,bowl:72}
+    ]},
+    SA: {name:'South Africa',flag:'🇿🇦',squad:[
+      {id:'qdk',name:'Q. de Kock',role:'WK',bat:88,bowl:5},{id:'rm',name:'R. Rossouw',role:'BAT',bat:82,bowl:10},
+      {id:'ts3',name:'T. Stubbs',role:'ALL',bat:78,bowl:65},{id:'hk',name:'H. Klaasen',role:'WK',bat:85,bowl:5},
+      {id:'mj',name:'M. Jansen',role:'ALL',bat:60,bowl:80},{id:'ka',name:'K. Ackermann',role:'BAT',bat:72,bowl:15},
+      {id:'kp',name:'K. Phangiso',role:'BOWL',bat:10,bowl:78},{id:'nh',name:'N. Hendricks',role:'BAT',bat:78,bowl:10},
+      {id:'ls',name:'L. Sipamla',role:'BOWL',bat:8,bowl:80},{id:'tr',name:'T. Rabada',role:'BOWL',bat:12,bowl:90},
+      {id:'im2',name:'I. Maharaj',role:'BOWL',bat:15,bowl:80},{id:'db2',name:'D. Bergkamp',role:'ALL',bat:65,bowl:70},
+      {id:'rs2',name:'R. Smuts',role:'ALL',bat:68,bowl:68},{id:'as',name:'A. Storari',role:'WK',bat:58,bowl:5},
+      {id:'ls2',name:'L. Shamsi',role:'BOWL',bat:5,bowl:82}
+    ]},
+    WI: {name:'West Indies',flag:'🌴',squad:[
+      {id:'ep',name:'E. Powell',role:'BAT',bat:85,bowl:20},{id:'bk',name:'B. King',role:'BAT',bat:88,bowl:10},
+      {id:'np',name:'N. Pooran',role:'WK',bat:90,bowl:5},{id:'rc',name:'R. Chase',role:'ALL',bat:70,bowl:72},
+      {id:'ah',name:'A. Hosein',role:'ALL',bat:62,bowl:75},{id:'aj',name:'A. Joseph',role:'BOWL',bat:10,bowl:88},
+      {id:'jh2',name:'J. Holder',role:'ALL',bat:62,bowl:82},{id:'of',name:'O. Fernando',role:'ALL',bat:68,bowl:70},
+      {id:'ys',name:'Y. Seales',role:'BOWL',bat:8,bowl:82},{id:'hm',name:'H. Morris',role:'BAT',bat:80,bowl:12},
+      {id:'km2',name:'K. Mayers',role:'ALL',bat:72,bowl:65},{id:'db3',name:'D. Brown',role:'WK',bat:60,bowl:5},
+      {id:'rr2',name:'R. Reifer',role:'ALL',bat:62,bowl:65},{id:'gt',name:'G. Thomas',role:'BOWL',bat:5,bowl:78},
+      {id:'pr',name:'P. Roach',role:'BOWL',bat:10,bowl:80}
+    ]},
+    SL: {name:'Sri Lanka',flag:'🇱🇰',squad:[
+      {id:'pn',name:'P. Nissanka',role:'BAT',bat:82,bowl:10},{id:'km3',name:'K. Mendis',role:'BAT',bat:88,bowl:15},
+      {id:'cf',name:'C. Fernando',role:'BOWL',bat:8,bowl:78},{id:'ds',name:'D. de Silva',role:'ALL',bat:72,bowl:70},
+      {id:'bt',name:'B. Thirimanne',role:'BAT',bat:75,bowl:10},{id:'wr',name:'W. Rajapaksa',role:'ALL',bat:78,bowl:62},
+      {id:'kp2',name:'K. Perera',role:'WK',bat:70,bowl:5},{id:'dk',name:'D. Karunaratne',role:'BAT',bat:72,bowl:8},
+      {id:'lc',name:'L. Chameera',role:'BOWL',bat:8,bowl:82},{id:'wh',name:'W. Hasaranga',role:'ALL',bat:65,bowl:88},
+      {id:'mk',name:'M. Kumara',role:'BOWL',bat:5,bowl:78},{id:'ag',name:'A. Gunaratne',role:'ALL',bat:68,bowl:68},
+      {id:'tp',name:'T. Perera',role:'ALL',bat:70,bowl:65},{id:'np2',name:'N. Pradeep',role:'BOWL',bat:6,bowl:75},
+      {id:'dc3',name:'D. Chandimal',role:'WK',bat:68,bowl:5}
+    ]}
   },
   ipl: {
-    MI: { name:'Mumbai Indians', flag:'🌊', color:'#004ba0',
-      squad:[
-        {id:'rs3',name:'R. Sharma',role:'BAT',bat:90,bowl:15,avg:48,sr:140},
-        {id:'iq',name:'I. Kishan',role:'WK',bat:80,bowl:5,avg:36,sr:155},
-        {id:'st',name:'S. Tendulkar Jr',role:'BAT',bat:72,bowl:10,avg:32,sr:138},
-        {id:'sk2',name:'S. Yadav',role:'ALL',bat:82,bowl:40,avg:35,sr:162},
-        {id:'tj',name:'T. Stubbs',role:'ALL',bat:75,bowl:60,avg:30,sr:145},
-        {id:'ha',name:'H. Pandya',role:'ALL',bat:72,bowl:75,avg:30,sr:145},
-        {id:'ko',name:'K. Pollard',role:'ALL',bat:78,bowl:68,avg:32,sr:158},
-        {id:'dl',name:'D. Lasith',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'jb3',name:'J. Bumrah',role:'BOWL',bat:10,bowl:95,avg:8,sr:80},
-        {id:'rb2',name:'R. Boult',role:'BOWL',bat:8,bowl:85,avg:7,sr:65},
-        {id:'pj',name:'P. Jalaj',role:'BOWL',bat:6,bowl:78,avg:6,sr:60},
-        {id:'ak2',name:'A. Khan',role:'ALL',bat:55,bowl:72,avg:22,sr:118},
-        {id:'nm',name:'N. Morkel',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'vs2',name:'V. Suryakumar',role:'BAT',bat:88,bowl:20,avg:40,sr:168},
-        {id:'dn',name:'D. Naik',role:'WK',bat:60,bowl:5,avg:25,sr:125},
-      ]
-    },
-    CSK: { name:'Chennai Super Kings', flag:'🦁', color:'#f9cd05',
-      squad:[
-        {id:'ms4',name:'MS Dhoni',role:'WK',bat:82,bowl:5,avg:40,sr:152},
-        {id:'fu',name:'F. du Plessis',role:'BAT',bat:85,bowl:10,avg:42,sr:138},
-        {id:'dr',name:'D. Ruturaj',role:'BAT',bat:82,bowl:5,avg:38,sr:138},
-        {id:'at',name:'A. Tilak',role:'ALL',bat:70,bowl:65,avg:28,sr:135},
-        {id:'mj2',name:'M. Jadeja',role:'ALL',bat:68,bowl:82,avg:28,sr:128},
-        {id:'ru',name:'R. Uthappa',role:'WK',bat:75,bowl:5,avg:32,sr:140},
-        {id:'dc4',name:'D. Conway',role:'BAT',bat:82,bowl:5,avg:40,sr:138},
-        {id:'da3',name:'D. Chahar',role:'BOWL',bat:18,bowl:82,avg:10,sr:80},
-        {id:'mb',name:'M. Bravo',role:'ALL',bat:62,bowl:78,avg:26,sr:132},
-        {id:'ms5',name:'M. Santner',role:'ALL',bat:55,bowl:75,avg:22,sr:118},
-        {id:'tp2',name:'T. Pathirana',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'st2',name:'S. Thakur',role:'ALL',bat:58,bowl:75,avg:24,sr:128},
-        {id:'mu',name:'M. Uchenna',role:'BOWL',bat:6,bowl:75,avg:6,sr:58},
-        {id:'sm2',name:'S. Moeen',role:'ALL',bat:70,bowl:72,avg:30,sr:140},
-        {id:'ra',name:'R. Ashwin',role:'ALL',bat:50,bowl:82,avg:20,sr:112},
-      ]
-    },
-    RCB: { name:'Royal Challengers', flag:'🔴', color:'#ec1c24',
-      squad:[
-        {id:'vk2',name:'V. Kohli',role:'BAT',bat:95,bowl:20,avg:52,sr:138},
-        {id:'ga',name:'G. Anand',role:'WK',bat:78,bowl:5,avg:34,sr:145},
-        {id:'fa',name:'F. Allen',role:'ALL',bat:78,bowl:65,avg:34,sr:162},
-        {id:'gm2',name:'G. Maxwell',role:'ALL',bat:80,bowl:70,avg:34,sr:165},
-        {id:'cb2',name:'C. Broad',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'mm2',name:'M. Morris',role:'ALL',bat:68,bowl:72,avg:28,sr:138},
-        {id:'yw',name:'Y. Wankhede',role:'BOWL',bat:6,bowl:78,avg:6,sr:60},
-        {id:'as2',name:'A. Sams',role:'ALL',bat:62,bowl:75,avg:25,sr:132},
-        {id:'sp',name:'S. Padikkal',role:'BAT',bat:78,bowl:10,avg:35,sr:138},
-        {id:'re',name:'R. Elgar',role:'BAT',bat:72,bowl:12,avg:32,sr:128},
-        {id:'hk2',name:'H. Khan',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'mk2',name:'M. Kirmani',role:'WK',bat:60,bowl:5,avg:24,sr:128},
-        {id:'sg2',name:'S. Gopal',role:'BOWL',bat:10,bowl:78,avg:8,sr:68},
-        {id:'mr3',name:'M. Rao',role:'ALL',bat:58,bowl:70,avg:22,sr:120},
-        {id:'km3',name:'K. Morris',role:'BAT',bat:68,bowl:10,avg:30,sr:132},
-      ]
-    },
-    KKR: { name:'Kolkata Knight Riders', flag:'👑', color:'#3a225d',
-      squad:[
-        {id:'ss',name:'S. Iyer',role:'BAT',bat:85,bowl:15,avg:42,sr:138},
-        {id:'va',name:'V. Arora',role:'WK',bat:72,bowl:5,avg:30,sr:138},
-        {id:'rn',name:'R. Narine',role:'ALL',bat:75,bowl:82,avg:32,sr:158},
-        {id:'ak3',name:'A. Russell',role:'ALL',bat:82,bowl:72,avg:34,sr:172},
-        {id:'ns',name:'N. Rana',role:'ALL',bat:75,bowl:62,avg:30,sr:142},
-        {id:'su',name:'S. Umesh',role:'BOWL',bat:10,bowl:82,avg:8,sr:72},
-        {id:'pc',name:'P. Chakravarthy',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'sr2',name:'S. Rashid',role:'ALL',bat:60,bowl:80,avg:24,sr:130},
-        {id:'tk',name:'T. Kohli',role:'BAT',bat:75,bowl:10,avg:34,sr:135},
-        {id:'mp3',name:'M. Pant',role:'WK',bat:78,bowl:5,avg:35,sr:148},
-        {id:'dk3',name:'D. Kaul',role:'BOWL',bat:8,bowl:78,avg:7,sr:65},
-        {id:'lf2',name:'L. Ferguson',role:'BOWL',bat:6,bowl:80,avg:6,sr:60},
-        {id:'vg',name:'V. Gill',role:'BAT',bat:68,bowl:8,avg:30,sr:130},
-        {id:'an',name:'A. Nath',role:'ALL',bat:58,bowl:68,avg:22,sr:120},
-        {id:'js2',name:'J. Sini',role:'WK',bat:55,bowl:5,avg:22,sr:118},
-      ]
-    },
-    DC: { name:'Delhi Capitals', flag:'🏛️', color:'#17479e',
-      squad:[
-        {id:'pd',name:'P. Dhawan',role:'BAT',bat:85,bowl:10,avg:44,sr:135},
-        {id:'ds',name:'D. Shaw',role:'BAT',bat:80,bowl:5,avg:36,sr:158},
-        {id:'rs4',name:'R. Pant',role:'WK',bat:82,bowl:5,avg:38,sr:155},
-        {id:'la',name:'L. Axar',role:'ALL',bat:65,bowl:80,avg:26,sr:128},
-        {id:'mj3',name:'M. Jayadev',role:'ALL',bat:68,bowl:68,avg:28,sr:132},
-        {id:'as3',name:'A. Stoinis',role:'ALL',bat:75,bowl:65,avg:32,sr:148},
-        {id:'rk',name:'R. Khan',role:'BOWL',bat:8,bowl:85,avg:7,sr:65},
-        {id:'ia2',name:'I. Ansari',role:'ALL',bat:60,bowl:72,avg:24,sr:125},
-        {id:'ap',name:'A. Prithvi',role:'BAT',bat:78,bowl:5,avg:36,sr:152},
-        {id:'ns2',name:'N. Saini',role:'BOWL',bat:8,bowl:80,avg:7,sr:68},
-        {id:'hn',name:'H. Negi',role:'ALL',bat:58,bowl:70,avg:22,sr:118},
-        {id:'rs5',name:'R. Singh',role:'BOWL',bat:6,bowl:75,avg:6,sr:60},
-        {id:'ks',name:'K. Shimron',role:'BAT',bat:70,bowl:10,avg:30,sr:132},
-        {id:'mv',name:'M. Vohra',role:'BAT',bat:68,bowl:8,avg:28,sr:128},
-        {id:'dt',name:'D. Taylor',role:'WK',bat:58,bowl:5,avg:24,sr:122},
-      ]
-    },
-    PBKS: { name:'Punjab Kings', flag:'🦅', color:'#ed1b24',
-      squad:[
-        {id:'ks2',name:'K. L. Rahul',role:'WK',bat:85,bowl:5,avg:44,sr:132},
-        {id:'ms6',name:'M. Agarwal',role:'BAT',bat:80,bowl:10,avg:38,sr:145},
-        {id:'ch',name:'C. Henriques',role:'ALL',bat:70,bowl:65,avg:30,sr:135},
-        {id:'sh',name:'S. Hetmyer',role:'BAT',bat:80,bowl:5,avg:36,sr:158},
-        {id:'kp3',name:'K. Pollard',role:'ALL',bat:78,bowl:68,avg:32,sr:158},
-        {id:'ra2',name:'R. Arshdeep',role:'BOWL',bat:10,bowl:85,avg:8,sr:70},
-        {id:'rs6',name:'R. Bishnoi',role:'BOWL',bat:12,bowl:82,avg:9,sr:72},
-        {id:'sh2',name:'S. Harpreet',role:'BOWL',bat:8,bowl:78,avg:7,sr:65},
-        {id:'rk2',name:'R. Kotak',role:'BAT',bat:72,bowl:8,avg:32,sr:132},
-        {id:'ds2',name:'D. Sams',role:'ALL',bat:60,bowl:75,avg:24,sr:130},
-        {id:'ln',name:'L. Nathan',role:'ALL',bat:62,bowl:68,avg:25,sr:128},
-        {id:'mb2',name:'M. Bairstow',role:'WK',bat:82,bowl:5,avg:40,sr:148},
-        {id:'ji',name:'J. Ingram',role:'BAT',bat:70,bowl:10,avg:30,sr:135},
-        {id:'ss2',name:'S. Sidhu',role:'ALL',bat:58,bowl:70,avg:22,sr:118},
-        {id:'ps',name:'P. Sandeep',role:'BOWL',bat:6,bowl:75,avg:6,sr:58},
-      ]
-    },
-    RR: { name:'Rajasthan Royals', flag:'🎪', color:'#ea1a85',
-      squad:[
-        {id:'ss3',name:'S. Samson',role:'WK',bat:80,bowl:5,avg:36,sr:148},
-        {id:'jb4',name:'J. Buttler',role:'WK',bat:90,bowl:5,avg:46,sr:150},
-        {id:'dg',name:'D. Goyal',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'ys2',name:'Y. B. Singh',role:'BAT',bat:78,bowl:10,avg:36,sr:140},
-        {id:'sh3',name:'S. Hetmyer',role:'BAT',bat:78,bowl:5,avg:34,sr:158},
-        {id:'rp2',name:'R. Parag',role:'ALL',bat:72,bowl:65,avg:28,sr:138},
-        {id:'jk',name:'J. Kumar',role:'ALL',bat:65,bowl:72,avg:26,sr:130},
-        {id:'tp3',name:'T. Boult',role:'BOWL',bat:8,bowl:85,avg:7,sr:65},
-        {id:'rk3',name:'R. Kartik',role:'BOWL',bat:10,bowl:78,avg:8,sr:68},
-        {id:'np3',name:'N. Pooran',role:'WK',bat:88,bowl:5,avg:45,sr:165},
-        {id:'an2',name:'A. Nabi',role:'ALL',bat:68,bowl:72,avg:28,sr:132},
-        {id:'dp',name:'D. Parag',role:'ALL',bat:65,bowl:60,avg:25,sr:128},
-        {id:'mk3',name:'M. Kartik',role:'BOWL',bat:8,bowl:75,avg:7,sr:62},
-        {id:'lv',name:'L. Vivek',role:'BAT',bat:68,bowl:8,avg:28,sr:132},
-        {id:'rs7',name:'R. Sanga',role:'BAT',bat:72,bowl:10,avg:32,sr:135},
-      ]
-    },
-    SRH: { name:'Sunrisers Hyderabad', flag:'🌅', color:'#f26522',
-      squad:[
-        {id:'dw2',name:'D. Warner',role:'BAT',bat:88,bowl:10,avg:46,sr:142},
-        {id:'jb5',name:'J. Bairstow',role:'WK',bat:85,bowl:5,avg:42,sr:148},
-        {id:'kk',name:'K. Khosla',role:'BOWL',bat:8,bowl:80,avg:7,sr:65},
-        {id:'mk4',name:'M. Karthik',role:'WK',bat:78,bowl:5,avg:34,sr:152},
-        {id:'as4',name:'A. Shankar',role:'ALL',bat:72,bowl:68,avg:30,sr:132},
-        {id:'ra3',name:'R. Ashwin',role:'ALL',bat:50,bowl:82,avg:20,sr:112},
-        {id:'bk',name:'B. Kumar',role:'BOWL',bat:15,bowl:82,avg:9,sr:72},
-        {id:'kw2',name:'K. Williamson',role:'BAT',bat:88,bowl:15,avg:48,sr:128},
-        {id:'sc',name:'S. Chahal',role:'BOWL',bat:8,bowl:82,avg:7,sr:65},
-        {id:'ab2',name:'A. Billings',role:'WK',bat:72,bowl:5,avg:30,sr:138},
-        {id:'rg',name:'R. Garg',role:'ALL',bat:62,bowl:68,avg:24,sr:125},
-        {id:'ns3',name:'N. Samarth',role:'BAT',bat:68,bowl:5,avg:28,sr:128},
-        {id:'vn',name:'V. Nayar',role:'ALL',bat:62,bowl:65,avg:24,sr:122},
-        {id:'pk',name:'P. Kunder',role:'BOWL',bat:6,bowl:75,avg:6,sr:58},
-        {id:'tj2',name:'T. Johan',role:'ALL',bat:60,bowl:68,avg:23,sr:120},
-      ]
-    },
+    MI: {name:'Mumbai Indians',flag:'🌊',squad:[
+      {id:'rs3',name:'R. Sharma',role:'BAT',bat:90,bowl:15},{id:'iq',name:'I. Kishan',role:'WK',bat:80,bowl:5},
+      {id:'st',name:'S. Tendulkar',role:'BAT',bat:72,bowl:10},{id:'sya',name:'S. Yadav',role:'ALL',bat:82,bowl:40},
+      {id:'tj',name:'T. Stubbs',role:'ALL',bat:75,bowl:60},{id:'hp2',name:'H. Pandya',role:'ALL',bat:72,bowl:75},
+      {id:'kp3',name:'K. Pollard',role:'ALL',bat:78,bowl:68},{id:'dl',name:'D. Lasith',role:'BOWL',bat:8,bowl:82},
+      {id:'jb3',name:'J. Bumrah',role:'BOWL',bat:10,bowl:95},{id:'rb',name:'R. Boult',role:'BOWL',bat:8,bowl:85},
+      {id:'pj',name:'P. Jalaj',role:'BOWL',bat:6,bowl:78},{id:'ak',name:'A. Khan',role:'ALL',bat:55,bowl:72},
+      {id:'nm',name:'N. Morkel',role:'BOWL',bat:8,bowl:80},{id:'vs',name:'V. Suryakumar',role:'BAT',bat:88,bowl:20},
+      {id:'dn',name:'D. Naik',role:'WK',bat:60,bowl:5}
+    ]},
+    CSK: {name:'Chennai Super Kings',flag:'🏜️',squad:[
+      {id:'md',name:'MS Dhoni',role:'WK',bat:82,bowl:5},{id:'fdp',name:'F. du Plessis',role:'BAT',bat:85,bowl:10},
+      {id:'dr',name:'D. Ruturaj',role:'BAT',bat:82,bowl:5},{id:'at',name:'A. Tilak',role:'ALL',bat:70,bowl:65},
+      {id:'mj2',name:'M. Jadeja',role:'ALL',bat:68,bowl:82},{id:'ru',name:'R. Uthappa',role:'WK',bat:75,bowl:5},
+      {id:'dc4',name:'D. Conway',role:'BAT',bat:82,bowl:5},{id:'dch',name:'D. Chahar',role:'BOWL',bat:18,bowl:82},
+      {id:'mb',name:'M. Bravo',role:'ALL',bat:62,bowl:78},{id:'ms5',name:'M. Santner',role:'ALL',bat:55,bowl:75},
+      {id:'tp2',name:'T. Pathirana',role:'BOWL',bat:8,bowl:82},{id:'st2',name:'S. Thakur',role:'ALL',bat:58,bowl:75},
+      {id:'mu',name:'M. Uchenna',role:'BOWL',bat:6,bowl:75},{id:'sm2',name:'S. Moeen',role:'ALL',bat:70,bowl:72},
+      {id:'ra',name:'R. Ashwin',role:'ALL',bat:50,bowl:82}
+    ]},
+    RCB: {name:'Royal Challengers',flag:'🔴',squad:[
+      {id:'vk2',name:'V. Kohli',role:'BAT',bat:95,bowl:20},{id:'ga',name:'G. Anand',role:'WK',bat:78,bowl:5},
+      {id:'fa',name:'F. Allen',role:'ALL',bat:78,bowl:65},{id:'gm2',name:'G. Maxwell',role:'ALL',bat:80,bowl:70},
+      {id:'cb3',name:'C. Broad',role:'BOWL',bat:8,bowl:80},{id:'mm2',name:'M. Morris',role:'ALL',bat:68,bowl:72},
+      {id:'yw',name:'Y. Wankhede',role:'BOWL',bat:6,bowl:78},{id:'as2',name:'A. Sams',role:'ALL',bat:62,bowl:75},
+      {id:'sp',name:'S. Padikkal',role:'BAT',bat:78,bowl:10},{id:'re',name:'R. Elgar',role:'BAT',bat:72,bowl:12},
+      {id:'hk2',name:'H. Khan',role:'BOWL',bat:8,bowl:80},{id:'mk4',name:'M. Kirmani',role:'WK',bat:60,bowl:5},
+      {id:'sg3',name:'S. Gopal',role:'BOWL',bat:10,bowl:78},{id:'mr4',name:'M. Rao',role:'ALL',bat:58,bowl:70},
+      {id:'km5',name:'K. Morris',role:'BAT',bat:68,bowl:10}
+    ]},
+    KKR: {name:'Kolkata Knight Riders',flag:'👑',squad:[
+      {id:'si2',name:'S. Iyer',role:'BAT',bat:85,bowl:15},{id:'va',name:'V. Arora',role:'WK',bat:72,bowl:5},
+      {id:'rn',name:'R. Narine',role:'ALL',bat:75,bowl:82},{id:'ar2',name:'A. Russell',role:'ALL',bat:82,bowl:72},
+      {id:'ns',name:'N. Rana',role:'ALL',bat:75,bowl:62},{id:'su',name:'S. Umesh',role:'BOWL',bat:10,bowl:82},
+      {id:'pc',name:'P. Chakravarthy',role:'BOWL',bat:8,bowl:82},{id:'sr2',name:'S. Rashid',role:'ALL',bat:60,bowl:80},
+      {id:'tk',name:'T. Kohli',role:'BAT',bat:75,bowl:10},{id:'mp4',name:'M. Pant',role:'WK',bat:78,bowl:5},
+      {id:'dk4',name:'D. Kaul',role:'BOWL',bat:8,bowl:78},{id:'lf2',name:'L. Ferguson',role:'BOWL',bat:6,bowl:80},
+      {id:'vg',name:'V. Gill',role:'BAT',bat:68,bowl:8},{id:'an',name:'A. Nath',role:'ALL',bat:58,bowl:68},
+      {id:'js3',name:'J. Sini',role:'WK',bat:55,bowl:5}
+    ]},
+    DC: {name:'Delhi Capitals',flag:'🏛️',squad:[
+      {id:'pd',name:'P. Dhawan',role:'BAT',bat:85,bowl:10},{id:'ds2',name:'D. Shaw',role:'BAT',bat:80,bowl:5},
+      {id:'rp2',name:'R. Pant',role:'WK',bat:82,bowl:5},{id:'la',name:'L. Axar',role:'ALL',bat:65,bowl:80},
+      {id:'mj3',name:'M. Jayadev',role:'ALL',bat:68,bowl:68},{id:'as3',name:'A. Stoinis',role:'ALL',bat:75,bowl:65},
+      {id:'rk4',name:'R. Khan',role:'BOWL',bat:8,bowl:85},{id:'ia3',name:'I. Ansari',role:'ALL',bat:60,bowl:72},
+      {id:'ap',name:'A. Prithvi',role:'BAT',bat:78,bowl:5},{id:'ns2',name:'N. Saini',role:'BOWL',bat:8,bowl:80},
+      {id:'hn',name:'H. Negi',role:'ALL',bat:58,bowl:70},{id:'rs6',name:'R. Singh',role:'BOWL',bat:6,bowl:75},
+      {id:'ks3',name:'K. Shimron',role:'BAT',bat:70,bowl:10},{id:'mv',name:'M. Vohra',role:'BAT',bat:68,bowl:8},
+      {id:'dt',name:'D. Taylor',role:'WK',bat:58,bowl:5}
+    ]},
+    PBKS: {name:'Punjab Kings',flag:'🦅',squad:[
+      {id:'kr',name:'K. L. Rahul',role:'WK',bat:85,bowl:5},{id:'ma',name:'M. Agarwal',role:'BAT',bat:80,bowl:10},
+      {id:'ch',name:'C. Henriques',role:'ALL',bat:70,bowl:65},{id:'sh5',name:'S. Hetmyer',role:'BAT',bat:80,bowl:5},
+      {id:'kp4',name:'K. Pollard',role:'ALL',bat:78,bowl:68},{id:'ra3',name:'R. Arshdeep',role:'BOWL',bat:10,bowl:85},
+      {id:'rb2',name:'R. Bishnoi',role:'BOWL',bat:12,bowl:82},{id:'sh6',name:'S. Harpreet',role:'BOWL',bat:8,bowl:78},
+      {id:'rk5',name:'R. Kotak',role:'BAT',bat:72,bowl:8},{id:'ds3',name:'D. Sams',role:'ALL',bat:60,bowl:75},
+      {id:'ln',name:'L. Nathan',role:'ALL',bat:62,bowl:68},{id:'mb2',name:'M. Bairstow',role:'WK',bat:82,bowl:5},
+      {id:'ji',name:'J. Ingram',role:'BAT',bat:70,bowl:10},{id:'ss2',name:'S. Sidhu',role:'ALL',bat:58,bowl:70},
+      {id:'ps',name:'P. Sandeep',role:'BOWL',bat:6,bowl:75}
+    ]},
+    RR: {name:'Rajasthan Royals',flag:'🎪',squad:[
+      {id:'ss3',name:'S. Samson',role:'WK',bat:80,bowl:5},{id:'jb6',name:'J. Buttler',role:'WK',bat:90,bowl:5},
+      {id:'dg',name:'D. Goyal',role:'BOWL',bat:8,bowl:80},{id:'ybs',name:'Y. B. Singh',role:'BAT',bat:78,bowl:10},
+      {id:'sh7',name:'S. Hetmyer',role:'BAT',bat:78,bowl:5},{id:'rp3',name:'R. Parag',role:'ALL',bat:72,bowl:65},
+      {id:'jk',name:'J. Kumar',role:'ALL',bat:65,bowl:72},{id:'tb',name:'T. Boult',role:'BOWL',bat:8,bowl:85},
+      {id:'rk6',name:'R. Kartik',role:'BOWL',bat:10,bowl:78},{id:'np3',name:'N. Pooran',role:'WK',bat:88,bowl:5},
+      {id:'an2',name:'A. Nabi',role:'ALL',bat:68,bowl:72},{id:'dp',name:'D. Parag',role:'ALL',bat:65,bowl:60},
+      {id:'mk6',name:'M. Kartik',role:'BOWL',bat:8,bowl:75},{id:'lv',name:'L. Vivek',role:'BAT',bat:68,bowl:8},
+      {id:'rs7',name:'R. Sanga',role:'BAT',bat:72,bowl:10}
+    ]},
+    SRH: {name:'Sunrisers Hyderabad',flag:'🌅',squad:[
+      {id:'dw3',name:'D. Warner',role:'BAT',bat:88,bowl:10},{id:'jba',name:'J. Bairstow',role:'WK',bat:85,bowl:5},
+      {id:'kk2',name:'K. Khosla',role:'BOWL',bat:8,bowl:80},{id:'mk7',name:'M. Karthik',role:'WK',bat:78,bowl:5},
+      {id:'as4',name:'A. Shankar',role:'ALL',bat:72,bowl:68},{id:'ra4',name:'R. Ashwin',role:'ALL',bat:50,bowl:82},
+      {id:'bk2',name:'B. Kumar',role:'BOWL',bat:15,bowl:82},{id:'kw2',name:'K. Williamson',role:'BAT',bat:88,bowl:15},
+      {id:'sc',name:'S. Chahal',role:'BOWL',bat:8,bowl:82},{id:'ab3',name:'A. Billings',role:'WK',bat:72,bowl:5},
+      {id:'rg',name:'R. Garg',role:'ALL',bat:62,bowl:68},{id:'ns3',name:'N. Samarth',role:'BAT',bat:68,bowl:5},
+      {id:'vn',name:'V. Nayar',role:'ALL',bat:62,bowl:65},{id:'pk',name:'P. Kunder',role:'BOWL',bat:6,bowl:75},
+      {id:'tj3',name:'T. Johan',role:'ALL',bat:60,bowl:68}
+    ]}
   }
 };
 
-// ============================================================
-// GAME STATE
-// ============================================================
-let G = {};
-
-function resetGame() {
-  G = {
-    mode: null,
-    team: null,         // selected team object
-    opp: null,          // opponent team
-    userXI: [],         // 11 player objects (user)
-    oppXI: [],          // 11 player objects (opponent)
-    userBatOrder: [],   // indices into userXI
-    oppBatOrder: [],    // indices into oppXI
-    userBowlers: [],    // subset of userXI who can bowl
-    oppBowlers: [],     // subset of oppXI who can bowl
-
-    inning: 1,          // 1 = user batting, 2 = user bowling
-    totalOvers: 10,
-
-    // Inning 1 (user batting)
-    i1: { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, currentBowlerIdx:0, fow:[], scores:[], bowlerFigs:{} },
-    // Inning 2 (user bowling)
-    i2: { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, currentBowlerIdx:0, fow:[], scores:[], bowlerFigs:{} },
-
-    // Current batter's session
-    curBatRuns: 0,
-    curBatBalls: 0,
-
-    // Current bowler (user picks when bowling)
-    selectedBowlerIdx: null,
-
-    overBalls: [],  // balls in current over for display
-
-    phase: 'idle',  // idle | face | shot | bowlerPick | bowl | done
-  };
-}
-
-// ============================================================
-// PAGE MANAGEMENT
-// ============================================================
+// ============ PAGE MANAGEMENT ============
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if (id === 'pgGame') resizeCanvas();
 }
 
-// ============================================================
-// MODE & TEAM SELECT
-// ============================================================
 function startMode(mode) {
-  resetGame();
   G.mode = mode;
   G.totalOvers = (mode === 'friendly') ? 5 : 10;
   const pool = mode === 'ipl' ? TEAMS.ipl : TEAMS.worldcup;
-  document.getElementById('teamSelectTitle').textContent =
-    mode === 'ipl' ? 'SELECT YOUR IPL FRANCHISE' :
-    mode === 'worldcup' ? 'SELECT YOUR TEAM' : 'SELECT A TEAM';
-
+  document.getElementById('teamSelectTitle').textContent = `SELECT YOUR TEAM`;
   const list = document.getElementById('teamList');
   list.innerHTML = '';
   Object.values(pool).forEach(t => {
@@ -785,54 +446,60 @@ function startMode(mode) {
 
 function goToSquadSelect() {
   if (!G.team) { alert('Select a team first!'); return; }
-
-  // Pick random opponent
   const pool = G.mode === 'ipl' ? TEAMS.ipl : TEAMS.worldcup;
   const opps = Object.values(pool).filter(t => t.name !== G.team.name);
   G.opp = opps[Math.floor(Math.random() * opps.length)];
 
-  buildSquadUI();
+  xiOrder = [];
+  renderSquadUI();
   showPage('pgSquad');
 }
 
-function roleColor(role) {
-  return role==='BAT'?'#1a4a1a':role==='BOWL'?'#4a1a1a':role==='ALL'?'#4a3a1a':'#1a1a4a';
-}
-function roleTagClass(role) {
-  return role==='BAT'?'tag-bat':role==='BOWL'?'tag-bowl':role==='ALL'?'tag-all':'tag-wk';
-}
-function roleIcon(role) {
-  return role==='BAT'?'🏏':role==='BOWL'?'🎳':role==='ALL'?'⭐':'🧤';
-}
+let xiOrder = [];
 
-// userXI order list
-let xiOrder = []; // array of player objects in batting order
-
-function buildSquadUI() {
-  xiOrder = [];
-  renderSquadPool();
-  renderXIOrder();
-}
-
-function renderSquadPool() {
+function renderSquadUI() {
   const pool = document.getElementById('squadPool');
   pool.innerHTML = '';
   G.team.squad.forEach(p => {
     const inXI = xiOrder.some(x => x.id === p.id);
     const row = document.createElement('div');
     row.className = 'player-row' + (inXI ? ' in-xi' : '');
+    const roleEmoji = p.role==='BAT'?'🏏':p.role==='BOWL'?'🎳':p.role==='ALL'?'⭐':'🧤';
     row.innerHTML = `
-      <div class="player-avatar" style="background:${roleColor(p.role)}">${roleIcon(p.role)}</div>
+      <div class="player-avatar" style="background:${p.role==='BAT'?'#1a4a1a':p.role==='BOWL'?'#4a1a1a':p.role==='ALL'?'#4a3a1a':'#1a1a4a'}">${roleEmoji}</div>
       <div class="player-info">
         <div class="player-name">${p.name}</div>
         <div class="player-role">${p.role} • Bat:${p.bat} Bowl:${p.bowl}</div>
       </div>
-      <div class="player-stats">Avg ${p.avg}<br>SR ${p.sr}</div>
     `;
     row.onclick = () => toggleXI(p, row);
     pool.appendChild(row);
   });
-  document.getElementById('xiCount').textContent = `${xiOrder.length}/11 selected`;
+
+  const xiList = document.getElementById('xiOrderList');
+  xiList.innerHTML = '';
+  if (xiOrder.length === 0) {
+    xiList.innerHTML = '<div style="color:#aaa;padding:15px;font-size:0.9em;">Click players to add to XI</div>';
+  } else {
+    xiOrder.forEach((p, i) => {
+      const slot = document.createElement('div');
+      slot.className = 'xi-slot filled';
+      const roleTag = p.role==='BAT'?'tag-bat':p.role==='BOWL'?'tag-bowl':p.role==='ALL'?'tag-all':'tag-wk';
+      slot.innerHTML = `
+        <div class="xi-num">${i+1}</div>
+        <div class="xi-name">${p.name}</div>
+        <span class="xi-role-tag ${roleTag}">${p.role}</span>
+        <div class="order-arrows">
+          <button onclick="moveOrder(${i},-1)">▲</button>
+          <button onclick="moveOrder(${i},1)">▼</button>
+        </div>
+        <button onclick="removeXI('${p.id}')" style="padding:2px 8px;font-size:0.75em;background:#2a1a1a;color:#ff6b6b;border:1px solid #555;border-radius:4px;cursor:pointer;">✕</button>
+      `;
+      xiList.appendChild(slot);
+    });
+  }
+
+  document.getElementById('xiCount').textContent = `${xiOrder.length}/11`;
 }
 
 function toggleXI(p, row) {
@@ -840,545 +507,576 @@ function toggleXI(p, row) {
   if (idx >= 0) {
     xiOrder.splice(idx, 1);
   } else {
-    if (xiOrder.length >= 11) { alert('Already 11 selected! Remove one first.'); return; }
+    if (xiOrder.length >= 11) { alert('Max 11 players!'); return; }
     xiOrder.push(p);
   }
-  renderSquadPool();
-  renderXIOrder();
-}
-
-function renderXIOrder() {
-  const list = document.getElementById('xiOrderList');
-  list.innerHTML = '';
-  if (xiOrder.length === 0) {
-    list.innerHTML = '<div style="color:#aaa;padding:10px;font-size:0.85em;">Click players from the squad to add them here.</div>';
-    return;
-  }
-  xiOrder.forEach((p, i) => {
-    const slot = document.createElement('div');
-    slot.className = 'xi-slot filled';
-    slot.innerHTML = `
-      <div class="xi-num">${i+1}</div>
-      <div class="xi-name">${p.name}</div>
-      <span class="xi-role-tag ${roleTagClass(p.role)}">${p.role}</span>
-      <div class="order-arrows">
-        <button onclick="moveOrder(${i},-1)">▲</button>
-        <button onclick="moveOrder(${i},1)">▼</button>
-      </div>
-      <button onclick="removeFromXI('${p.id}')" style="padding:2px 8px;font-size:0.75em;border:1px solid #555;background:#2a1a1a;color:#ff6b6b;border-radius:4px;cursor:pointer;">✕</button>
-    `;
-    list.appendChild(slot);
-  });
-  // Empty slots
-  for (let i = xiOrder.length; i < 11; i++) {
-    const slot = document.createElement('div');
-    slot.className = 'xi-slot';
-    slot.innerHTML = `<div class="xi-num">${i+1}</div><div class="xi-name" style="color:#555;">Empty slot</div>`;
-    list.appendChild(slot);
-  }
+  renderSquadUI();
 }
 
 function moveOrder(idx, dir) {
   const ni = idx + dir;
   if (ni < 0 || ni >= xiOrder.length) return;
   [xiOrder[idx], xiOrder[ni]] = [xiOrder[ni], xiOrder[idx]];
-  renderXIOrder();
+  renderSquadUI();
 }
 
-function removeFromXI(id) {
+function removeXI(id) {
   xiOrder = xiOrder.filter(p => p.id !== id);
-  renderSquadPool();
-  renderXIOrder();
+  renderSquadUI();
 }
 
-// ============================================================
-// START MATCH
-// ============================================================
+// ============ MATCH START ============
 function startMatch() {
-  if (xiOrder.length < 11) { alert(`Select all 11 players! (${xiOrder.length}/11)`); return; }
+  if (xiOrder.length < 11) { alert(`Select 11 players! (${xiOrder.length}/11)`); return; }
 
   G.userXI = [...xiOrder];
+  G.userBowlers = G.userXI.filter(p => p.role === 'BOWL' || p.role === 'ALL');
+  if (G.userBowlers.length < 2) { alert('Need at least 2 bowlers!'); return; }
 
-  // Check we have at least 4 bowlers
-  const canBowl = G.userXI.filter(p => p.role === 'BOWL' || p.role === 'ALL');
-  if (canBowl.length < 2) { alert('Select at least 2 bowlers or all-rounders!'); return; }
+  G.oppXI = G.opp.squad.slice(0, 11);
+  G.oppBowlers = G.oppXI.filter(p => p.role === 'BOWL' || p.role === 'ALL');
 
-  G.userBowlers = canBowl;
-
-  // Auto-select opponent XI (best 11 by role balance)
-  G.oppXI = selectAutoXI(G.opp.squad);
-  G.oppBowlers = G.oppXI.filter(p => p.role==='BOWL'||p.role==='ALL');
-
-  // Reset innings
-  G.i1 = { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, currentBowlerIdx:0, fow:[], scores:G.userXI.map(()=>({r:0,b:0,out:''})), bowlerFigs:{} };
-  G.i2 = { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, currentBowlerIdx:0, fow:[], scores:G.oppXI.map(()=>({r:0,b:0,out:''})), bowlerFigs:{} };
+  const initScores = (xi) => xi.map(() => ({r:0, b:0, out:''}));
+  G.i1 = { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, bowlerIdx:0, fow:[], scores:initScores(G.userXI), bowlerFigs:{} };
+  G.i2 = { runs:0, wkts:0, balls:0, batIdx:0, nonStrikerIdx:1, bowlerIdx:0, fow:[], scores:initScores(G.oppXI), bowlerFigs:{} };
 
   G.inning = 1;
-  G.curBatRuns = 0;
-  G.curBatBalls = 0;
-  G.overBalls = [];
-  G.selectedBowlerIdx = null;
+  G.phase = 'idle';
+  G.selectedBowler = null;
 
-  // Assign random bowlers for opponent
-  G.i1.currentBowlerIdx = 0; // opponent's bowlers bowl in inning 1
+  // Animation state
+  ballAnim = { active: false, x: 0, y: 0, px: 0, py: 0, t: 0, runs: 0, delivery: '' };
+  timingAnim = { active: false, t: 0 };
 
   showPage('pgGame');
-  drawField();
   updateGameUI();
-  setPhase('face');
-  speakComm(`${G.team.name} vs ${G.opp.name}. ${G.team.name} bat first. ${G.totalOvers} overs match. Let's go!`);
+  beginDelivery();
 }
 
-function selectAutoXI(squad) {
-  // Pick: 4 batters, 2 WK-quality, 3 bowlers, 2 all-rounders (prioritize)
-  const sorted = [...squad].sort((a,b)=>{
-    const aScore = a.bat*0.5 + a.bowl*0.5;
-    const bScore = b.bat*0.5 + b.bowl*0.5;
-    return bScore - aScore;
-  });
-  return sorted.slice(0,11);
+// ============ GAME LOOP & CANVAS ============
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+
+function resizeCanvas() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+  drawField();
 }
 
-// ============================================================
-// GAME UI
-// ============================================================
-function cur() { return G.inning === 1 ? G.i1 : G.i2; }
+window.addEventListener('resize', resizeCanvas);
 
-function updateGameUI() {
-  const inn = cur();
-  const isBatting = G.inning === 1;
+let ballAnim = { active: false, x: 0, y: 0, px: 0, py: 0, t: 0, runs: 0, delivery: '' };
+let timingAnim = { active: false, t: 0 };
 
-  const battingTeam = isBatting ? G.team : G.opp;
-  const xi = isBatting ? G.userXI : G.oppXI;
+function drawField() {
+  if (!canvas.getContext) return;
+  const ctx = canvas.getContext('2d');
 
-  document.getElementById('battingTeamName').textContent = battingTeam.name;
-  document.getElementById('scoreRuns').textContent = `${inn.runs}/${inn.wkts}`;
-  document.getElementById('scoreOvers').textContent = `${Math.floor(inn.balls/6)}.${inn.balls%6} overs`;
-  document.getElementById('inningLabel').textContent = `${G.inning === 1 ? '1st' : '2nd'} Innings`;
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, H*0.4);
+  sky.addColorStop(0, '#1a3a6a');
+  sky.addColorStop(1, '#4a6a8a');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H*0.4);
 
-  if (G.inning === 2) {
-    const need = G.i1.runs + 1 - G.i2.runs;
-    const ballsLeft = G.totalOvers*6 - G.i2.balls;
-    document.getElementById('targetLine').textContent = `Need ${need} off ${ballsLeft} balls`;
-  } else {
-    document.getElementById('targetLine').textContent = '';
+  // Crowd
+  ctx.fillStyle = 'rgba(20,20,40,0.9)';
+  ctx.fillRect(0, 0, W, H*0.2);
+  for (let i = 0; i < 150; i++) {
+    const cx = Math.sin(i*0.5)*W + W*0.5;
+    const cy = Math.cos(i*0.3)*H*0.1 + H*0.1;
+    ctx.fillStyle = ['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6','#ff6b35'][i%6];
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI*2);
+    ctx.fill();
   }
 
-  // Batter/bowler meta
-  const batter = xi[inn.batIdx];
-  const sc = inn.scores[inn.batIdx];
-  const sr = sc.b > 0 ? ((sc.r/sc.b)*100).toFixed(0) : '0';
+  // Ground
+  const grd = ctx.createLinearGradient(0, H*0.4, 0, H);
+  grd.addColorStop(0, '#3a7a3a');
+  grd.addColorStop(1, '#1a3a1a');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, H*0.4, W, H*0.6);
 
-  document.getElementById('metaBatter').textContent = batter ? batter.name.split(' ').pop() : '-';
-  document.getElementById('metaBatterScore').textContent = sc ? `${sc.r}(${sc.b})` : '-';
-  document.getElementById('metaSR').textContent = sr;
+  // Pitch
+  const px = W*0.3, py = H*0.3, pw = W*0.4, ph = H*0.4;
+  const pgrd = ctx.createLinearGradient(px, py, px+pw, py+ph);
+  pgrd.addColorStop(0, '#d4b896');
+  pgrd.addColorStop(0.5, '#e0c8a8');
+  pgrd.addColorStop(1, '#c4a878');
+  ctx.fillStyle = pgrd;
+  ctx.fillRect(px, py, pw, ph);
+
+  // Crease lines (white)
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(px-10, H*0.5); ctx.lineTo(px+pw+10, H*0.5); ctx.stroke(); // batting crease
+  ctx.beginPath(); ctx.moveTo(px-10, H*0.35); ctx.lineTo(px+pw+10, H*0.35); ctx.stroke(); // bowling crease
+
+  // Stumps - batting
+  drawStumps(ctx, W*0.5-8, H*0.5);
+  // Stumps - bowling
+  drawStumps(ctx, W*0.5-8, H*0.35);
+
+  // Fielders
+  const fieldPositions = [
+    [0.1, 0.6], [0.9, 0.6], [0.15, 0.75], [0.85, 0.75], [0.05, 0.45], [0.95, 0.45],
+    [0.5, 0.2], [0.25, 0.35], [0.75, 0.35], [0.3, 0.55], [0.7, 0.55]
+  ];
+  fieldPositions.forEach(([fx, fy]) => drawPlayer(ctx, W*fx, H*fy, '#e74c3c', 'F'));
+
+  // Batter
+  drawPlayer(ctx, W*0.5 + 25, H*0.5, '#f39c12', 'BATTER');
 
   // Bowler
-  let bowlerName = '-', bowlerFig = '-';
-  if (isBatting) {
-    // Opponent bowling
-    const ob = G.oppBowlers[inn.currentBowlerIdx % G.oppBowlers.length];
-    if (ob) {
-      bowlerName = ob.name.split(' ').pop();
-      const fig = inn.bowlerFigs[ob.id] || {w:0,r:0,b:0};
-      bowlerFig = `${fig.w}/${fig.r} (${Math.floor(fig.b/6)}.${fig.b%6})`;
-    }
-  } else {
-    // User bowling - show selected
-    if (G.selectedBowlerIdx !== null) {
-      const ub = G.userBowlers[G.selectedBowlerIdx];
-      if (ub) {
-        bowlerName = ub.name.split(' ').pop();
-        const fig = inn.bowlerFigs[ub.id] || {w:0,r:0,b:0};
-        bowlerFig = `${fig.w}/${fig.r} (${Math.floor(fig.b/6)}.${fig.b%6})`;
-      }
-    }
+  if (ballAnim.active && ballAnim.t < 0.3) {
+    // Running up
+    const rt = ballAnim.t / 0.3;
+    const bowlerX = W*0.5 + Math.sin(rt*Math.PI*2)*10;
+    drawPlayer(ctx, bowlerX, H*0.32, '#e74c3c', 'BOWLER');
+  } else if (!ballAnim.active) {
+    drawPlayer(ctx, W*0.5, H*0.32, '#e74c3c', 'BOWLER');
   }
-  document.getElementById('metaBowler').textContent = bowlerName;
-  document.getElementById('metaBowlerFig').textContent = bowlerFig;
 
-  // Sidebar batting
-  renderSidebarBatters();
-  renderSidebarBowlers();
-  renderFOW();
-  renderOverDots();
-  updateBallIndicator();
-  drawField();
-}
+  // Ball animation
+  if (ballAnim.active) {
+    const t = Math.min(ballAnim.t, 1);
+    const bx = ballAnim.x + (ballAnim.px - ballAnim.x)*t;
+    const by = ballAnim.y + (ballAnim.py - ballAnim.y)*t;
 
-function updateBallIndicator() {
-  const inn = cur();
-  const ov = Math.floor(inn.balls/6);
-  const bl = inn.balls%6;
-  document.getElementById('ballIndicator').textContent = `Over ${ov+1}, Ball ${bl+1}`;
-}
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(bx, by+5, 8, 4, 0, 0, Math.PI*2);
+    ctx.fill();
 
-function renderSidebarBatters() {
-  const inn = cur();
-  const xi = G.inning === 1 ? G.userXI : G.oppXI;
-  let html = '';
-  // Show current pair + dismissed
-  for (let i = 0; i < xi.length; i++) {
-    const p = xi[i];
-    const sc = inn.scores[i];
-    if (!sc) continue;
-    if (i < inn.batIdx && sc.out) {
-      // Dismissed
-      html += `<div class="bat-card">
-        <span class="bat-name" style="color:#888;text-decoration:line-through">${p.name.split(' ').pop()}</span>
-        <span class="bat-score" style="color:#888">${sc.r}(${sc.b}) ${sc.out}</span>
-      </div>`;
-    } else if (i === inn.batIdx || i === inn.nonStrikerIdx) {
-      const isSt = (i === inn.batIdx);
-      html += `<div class="bat-card">
-        <span class="bat-name ${isSt?'bat-on-strike':''}">${isSt?'*':''}${p.name.split(' ').pop()}</span>
-        <span class="bat-score">${sc.r}(${sc.b})</span>
-      </div>`;
-    }
+    // Ball
+    const radius = 8 + Math.sin(t*Math.PI)*4;
+    ctx.fillStyle = '#cc3300';
+    ctx.beginPath();
+    ctx.arc(bx, by, radius, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#ff8866';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Seam lines
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(bx, by, radius, -Math.PI*0.3, Math.PI*0.3);
+    ctx.stroke();
   }
-  document.getElementById('sideBarBatters').innerHTML = html || '<div style="color:#555;font-size:0.8em;">No data</div>';
+
+  // Timing indicator flash
+  if (timingAnim.active) {
+    const alpha = Math.sin(timingAnim.t*Math.PI)*0.3;
+    ctx.fillStyle = `rgba(255,200,0,${alpha})`;
+    ctx.fillRect(W*0.35, H*0.42, W*0.3, H*0.16);
+  }
 }
 
-function renderSidebarBowlers() {
-  const inn = cur();
-  const isBatting = G.inning === 1;
-  const bowlers = isBatting ? G.oppBowlers : G.userBowlers;
-  let html = '';
-  bowlers.forEach(b => {
-    const fig = inn.bowlerFigs[b.id] || {w:0,r:0,b:0};
-    const ov = `${Math.floor(fig.b/6)}.${fig.b%6}`;
-    const eco = fig.b > 0 ? ((fig.r/(fig.b/6))).toFixed(1) : '-';
-    html += `<div class="bat-card">
-      <span class="bat-name">${b.name.split(' ').pop()}</span>
-      <span class="bat-score">${fig.w}/${fig.r} (${ov}) eco:${eco}</span>
-    </div>`;
+function drawStumps(ctx, x, y) {
+  [0,9,18].forEach((dx, i) => {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x+dx, y-20, 3, 20);
+    // Bail
+    if (i < 2) {
+      ctx.fillStyle = '#ffdd00';
+      ctx.fillRect(x+dx+1, y-20, 5, 3);
+    }
   });
-  document.getElementById('sideBarBowlers').innerHTML = html || '<div style="color:#555;font-size:0.8em;">-</div>';
 }
 
-function renderFOW() {
-  const inn = cur();
-  if (!inn.fow.length) {
-    document.getElementById('sideBarFOW').innerHTML = '<span style="color:#555;">None yet</span>';
-    return;
-  }
-  document.getElementById('sideBarFOW').innerHTML = inn.fow.map(f =>
-    `${f.wkt}/${f.runs} (${f.name}, ${Math.floor(f.balls/6)}.${f.balls%6})`
-  ).join('<br>');
+function drawPlayer(ctx, x, y, color, label) {
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x, y+20, 12, 5, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = color;
+  ctx.fillRect(x-10, y+2, 20, 20);
+
+  // Head
+  ctx.fillStyle = '#f4c5a0';
+  ctx.beginPath();
+  ctx.arc(x, y-2, 10, 0, Math.PI*2);
+  ctx.fill();
+
+  // Helmet
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y-4, 10, Math.PI, 0);
+  ctx.fill();
+
+  // Label
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x, y+18);
 }
 
-function renderOverDots() {
-  const dots = document.getElementById('overDots');
-  dots.innerHTML = G.overBalls.map(b => {
-    let cls = 'dot-0', lbl = b===0?'·':b===-1?'W':b+'';
-    if (b === -1) cls = 'dot-W';
-    else if (b === 6) cls = 'dot-6';
-    else if (b === 4) cls = 'dot-4';
-    else if (b >= 2) cls = 'dot-2';
-    else if (b === 1) cls = 'dot-1';
-    return `<div class="dot-ball ${cls}">${lbl}</div>`;
-  }).join('');
-}
+function animateBall() {
+  ballAnim.active = true;
+  ballAnim.x = W*0.5;
+  ballAnim.y = H*0.3;
+  ballAnim.px = W*0.5;
+  ballAnim.py = H*0.47;
+  ballAnim.t = 0;
 
-// ============================================================
-// PHASE CONTROL
-// ============================================================
-function setPhase(phase) {
-  G.phase = phase;
-  hide('btnFace'); hide('shotBtns'); hide('btnBowl'); hide('bowlBtns');
-  hide('sideBarBowlerPick');
-  const label = document.getElementById('ctrlLabel');
-
-  if (phase === 'face') {
-    show('btnFace');
-    label.textContent = G.inning === 1 ? 'Ready to bat?' : 'Ready to bowl?';
-    if (G.inning === 2) {
-      document.getElementById('btnFace').textContent = '🎳 BOWL NEXT DELIVERY';
-      document.getElementById('btnFace').onclick = openBowlSelect;
+  const updateAnim = () => {
+    ballAnim.t += 0.02;
+    drawField();
+    if (ballAnim.t <= 1) {
+      requestAnimationFrame(updateAnim);
     } else {
-      document.getElementById('btnFace').textContent = '⚾ FACE BALL';
-      document.getElementById('btnFace').onclick = faceBall;
+      ballAnim.active = false;
+      drawField();
+      showShotButtons();
     }
-  } else if (phase === 'shot') {
-    show('shotBtns');
-    label.textContent = 'Choose your shot!';
-  } else if (phase === 'bowlerPick') {
-    show('sideBarBowlerPick');
-    show('bowlBtns');
-    label.textContent = 'Select delivery type:';
-    renderBowlerPicker();
-  } else if (phase === 'done') {
-    label.textContent = 'Match complete!';
+  };
+  updateAnimFrame(updateAnim);
+}
+
+function updateAnimFrame(fn) {
+  fn();
+  if (ballAnim.active || timingAnim.active) {
+    requestAnimationFrame(() => updateAnimFrame(fn));
   }
 }
 
-function renderBowlerPicker() {
-  const inn = cur();
-  const list = document.getElementById('bowlerPickList');
-  list.innerHTML = '';
-  G.userBowlers.forEach((b, i) => {
-    const fig = inn.bowlerFigs[b.id] || {w:0,r:0,b:0};
-    const ov = Math.floor(fig.b/6);
-    const maxOv = Math.ceil(G.totalOvers / 5);
-    const exhausted = ov >= maxOv;
-    const row = document.createElement('div');
-    row.className = 'bowler-row' + (i === G.selectedBowlerIdx ? ' selected' : '') + (exhausted?' disabled':'');
-    row.innerHTML = `
-      <div class="b-name">${b.name}</div>
-      <div class="b-stats">${b.role} • Skill:${b.bowl}</div>
-      <div class="b-overs">${ov}/${maxOv} ov ${exhausted?'(MAX)':''}</div>
-    `;
-    if (!exhausted) row.onclick = () => { G.selectedBowlerIdx = i; renderBowlerPicker(); };
-    list.appendChild(row);
-  });
-  document.getElementById('sideBarBowlerPick').style.display = 'block';
+// ============ DELIVERY FLOW ============
+function beginDelivery() {
+  document.getElementById('statusLine').textContent = 'Ball coming...';
+  document.getElementById('deliveryInfo').textContent = '';
+
+  const inn = G.inning === 1 ? G.i1 : G.i2;
+  const bowler = G.inning === 1 ? G.oppBowlers[inn.bowlerIdx % G.oppBowlers.length] : G.userBowlers[G.selectedBowler];
+
+  if (!bowler) return;
+
+  const deliveries = ['fast', 'bouncer', 'yorker', 'spin'];
+  ballAnim.delivery = deliveries[Math.floor(Math.random()*deliveries.length)];
+
+  document.getElementById('deliveryInfo').textContent = `${bowler.name} - ${ballAnim.delivery.toUpperCase()}`;
+
+  hideShotButtons();
+  animateBall();
 }
 
-function show(id) { const el=document.getElementById(id); if(el){el.classList.remove('hidden');el.style.display='';} }
-function hide(id) { const el=document.getElementById(id); if(el){el.classList.add('hidden');el.style.display='none';} }
+function showShotButtons() {
+  document.querySelectorAll('.shot-button').forEach(b => b.disabled = false);
+  document.getElementById('statusLine').textContent = 'SELECT YOUR SHOT!';
+  timingAnim.active = true;
+  timingAnim.t = 0;
 
-// ============================================================
-// GAME PLAY
-// ============================================================
-function faceBall() {
-  // Opponent bowls (inning 1). Show shot buttons.
-  const ob = G.oppBowlers[cur().currentBowlerIdx % G.oppBowlers.length];
-  if (ob) {
-    document.getElementById('deliveryType').textContent = ob.name.split(' ').pop() + ' bowling';
-  }
-  setPhase('shot');
+  const timerID = setInterval(() => {
+    timingAnim.t += 0.02;
+    if (timingAnim.t >= 1) {
+      timingAnim.active = false;
+      clearInterval(timerID);
+    }
+    drawField();
+  }, 20);
 }
 
-function openBowlSelect() {
-  // User must pick a bowler first
-  if (G.selectedBowlerIdx === null) {
-    G.selectedBowlerIdx = 0; // default first available
-  }
-  setPhase('bowlerPick');
+function hideShotButtons() {
+  document.querySelectorAll('.shot-button').forEach(b => b.disabled = true);
 }
 
-function playShot(shot) {
-  if (G.phase !== 'shot') return;
-  const inn = cur();
-  const ob = G.oppBowlers[inn.currentBowlerIdx % G.oppBowlers.length];
+// ============ SHOT TIMING ============
+function playShot(shotType) {
+  if (G.inning !== 1) return;
+
+  hideShotButtons();
+
+  const inn = G.i1;
   const batter = G.userXI[inn.batIdx];
+  const bowler = G.oppBowlers[inn.bowlerIdx % G.oppBowlers.length];
 
-  const outcome = simulateDelivery(shot, ob);
+  // Timing-based outcome
+  const timing = timingAnim.t; // 0=early, 1=late, 0.5=perfect
+  const timingQuality = 1 - Math.abs(timing - 0.5)*2; // 1 at 0.5, 0 at edges
+
+  const outcome = simulateDelivery(shotType, ballAnim.delivery, bowler, batter, timingQuality);
   const runs = outcome.runs;
+  const desc = outcome.desc;
 
-  processDelivery(runs, outcome.desc, inn, G.userXI, batter, ob, true);
+  processDelivery(runs, desc, inn, G.userXI, batter, bowler, true);
 }
 
-function playBowl(bowlType) {
-  if (G.phase !== 'bowlerPick') return;
-  if (G.selectedBowlerIdx === null) { alert('Pick a bowler!'); return; }
-  const inn = cur();
-  const ub = G.userBowlers[G.selectedBowlerIdx];
-  const batter = G.oppXI[inn.batIdx];
+function simulateDelivery(shot, delivery, bowler, batter, timingQ) {
+  const r = Math.random();
+  let w, s6, s4, s2, s1;
 
-  document.getElementById('deliveryType').textContent = `${bowlType.toUpperCase()} by ${ub.name.split(' ').pop()}`;
+  // Timing quality boosts/penalizes based on good/bad contact
+  const timingBoost = (timingQ - 0.5) * 0.1; // -0.05 to +0.05
 
-  const outcome = simulateOpponentBat(bowlType, ub, batter);
-  const runs = outcome.runs;
+  if (shot === 'defend') {
+    w = 0.08; s6 = 0.02; s4 = 0.05; s2 = 0.20; s1 = 0.35;
+  } else if (shot === 'drive') {
+    if (delivery === 'full') { w = 0.04 - timingBoost; s6 = 0.12; s4 = 0.35 + timingBoost*2; s2 = 0.22; s1 = 0.17; }
+    else if (delivery === 'short') { w = 0.14; s6 = 0.05; s4 = 0.08; s2 = 0.15; s1 = 0.20; }
+    else if (delivery === 'yorker') { w = 0.18; s6 = 0.02; s4 = 0.05; s2 = 0.10; s1 = 0.18; }
+    else { w = 0.10; s6 = 0.08; s4 = 0.14; s2 = 0.18; s1 = 0.20; }
+  } else if (shot === 'cut') {
+    if (delivery === 'short') { w = 0.05; s6 = 0.10; s4 = 0.35 + timingBoost*2; s2 = 0.20; s1 = 0.18; }
+    else if (delivery === 'full') { w = 0.20; s6 = 0.02; s4 = 0.06; s2 = 0.12; s1 = 0.18; }
+    else if (delivery === 'yorker') { w = 0.24; s6 = 0.01; s4 = 0.04; s2 = 0.08; s1 = 0.14; }
+    else { w = 0.08; s6 = 0.10; s4 = 0.22; s2 = 0.22; s1 = 0.20; }
+  } else if (shot === 'loft') {
+    w = 0.14 + (1-timingQ)*0.06; // More risky if poorly timed
+    s6 = 0.16 + timingBoost*2; s4 = 0.12; s2 = 0.16; s1 = 0.20;
+  }
 
-  processDelivery(runs, outcome.desc, inn, G.oppXI, batter, ub, false);
+  const bowlerSkill = bowler.bowl / 100;
+  const batterSkill = batter.bat / 100;
+  w = Math.min(0.25, w * (0.8 + bowlerSkill*0.4));
+
+  if (r < w) return { runs: -1, desc: 'bowled!' };
+  if (r < w+s6) return { runs: 6, desc: 'perfect timing! Six!' };
+  if (r < w+s6+s4) return { runs: 4, desc: 'timed beautifully! Four!' };
+  if (r < w+s6+s4+s2) return { runs: 2, desc: 'nice running' };
+  if (r < w+s6+s4+s2+s1) return { runs: 1, desc: 'single taken' };
+  return { runs: 0, desc: 'defended' };
 }
 
-function processDelivery(runs, desc, inn, xi, batter, bowler, userIsBatting) {
-  // Update bowler figures
-  if (!inn.bowlerFigs[bowler.id]) inn.bowlerFigs[bowler.id] = {w:0,r:0,b:0};
+function processDelivery(runs, desc, inn, xi, batter, bowler, userBatting) {
+  if (!inn.bowlerFigs[bowler.id]) inn.bowlerFigs[bowler.id] = {w:0, r:0, b:0};
   const bf = inn.bowlerFigs[bowler.id];
 
-  G.overBalls.push(runs);
-
   if (runs === -1) {
-    // WICKET
     bf.w++;
     bf.b++;
-    inn.scores[inn.batIdx].out = getWicketType(bowler);
     inn.wkts++;
-    inn.balls++;
+    inn.scores[inn.batIdx].out = 'Bowled';
     inn.fow.push({wkt:inn.wkts, runs:inn.runs, balls:inn.balls, name:batter.name});
+    commBox(`OUT! ${batter.name} is bowled by ${bowler.name}!`);
+    speakComm(`Wicket! ${batter.name} bowled!`);
 
-    const commText = getWicketComm(batter, bowler, inn.scores[inn.batIdx].out);
-    commBox(commText);
-    speakComm(commText);
-
-    animateWicket();
-
-    // Next batter
-    const nextBat = inn.wkts + 1; // (batIdx advances)
-    if (inn.wkts >= 10 || !xi[nextBat]) {
+    if (inn.wkts >= 10 || inn.batIdx + 1 >= xi.length) {
       endInning();
       return;
     }
     inn.batIdx++;
-    if (inn.batIdx >= xi.length) { endInning(); return; }
-    // Ensure non-striker is valid
-    if (inn.nonStrikerIdx === inn.batIdx) inn.nonStrikerIdx++;
-    G.curBatRuns = 0; G.curBatBalls = 0;
   } else {
-    // Runs
     bf.r += runs;
     bf.b++;
     inn.runs += runs;
-    inn.balls++;
     inn.scores[inn.batIdx].r += runs;
     inn.scores[inn.batIdx].b++;
 
-    const commText = getRunComm(runs, desc, batter);
+    const commText = runs === 6 ? `SIX! ${desc}` : runs === 4 ? `FOUR! ${desc}` : runs === 2 ? `Two runs - ${desc}` : runs === 1 ? `Single - ${desc}` : `Dot - ${desc}`;
     commBox(commText);
     speakComm(commText);
-
-    animateBall(runs);
-
-    // Rotate strike on odd runs
-    if (runs % 2 === 1) {
-      const tmp = inn.batIdx;
-      // Only rotate within valid range
-    }
   }
 
-  // Check over
+  inn.balls++;
+
   if (inn.balls % 6 === 0) {
-    G.overBalls = [];
-    inn.currentBowlerIdx++;
-    // If user is bowling, prompt to pick bowler again
-    if (!userIsBatting) {
-      G.selectedBowlerIdx = null;
-    }
+    inn.bowlerIdx++;
   }
 
-  // Check end
-  const maxBalls = G.totalOvers * 6;
-  if (inn.balls >= maxBalls || inn.wkts >= 10) {
+  if (inn.balls >= G.totalOvers * 6 || inn.wkts >= 10) {
     endInning();
     return;
   }
 
   updateGameUI();
-
-  if (userIsBatting) {
-    setPhase('face');
-  } else {
-    setPhase('face'); // will go to bowlerPick
-  }
+  setTimeout(() => beginDelivery(), 800);
 }
 
 function endInning() {
-  updateGameUI();
   if (G.inning === 1) {
     G.inning = 2;
-    G.curBatRuns = 0; G.curBatBalls = 0;
-    G.overBalls = [];
-    G.selectedBowlerIdx = null;
-    const msg = `End of ${G.team.name}'s innings! Score: ${G.i1.runs}/${G.i1.wkts}. ${G.opp.name} need ${G.i1.runs+1} to win!`;
-    commBox(msg);
-    speakComm(msg);
+    commBox(`${G.team.name} scored ${G.i1.runs}/${G.i1.wkts}. ${G.opp.name} needs ${G.i1.runs+1} to win!`);
+    speakComm(`${G.team.name} scored ${G.i1.runs} for ${G.i1.wkts}. ${G.opp.name} to bat. They need ${G.i1.runs+1} runs.`);
     setTimeout(() => {
+      G.i2.bowlerIdx = 0;
+      G.selectedBowler = 0;
       updateGameUI();
-      setPhase('face'); // user is now bowling
-    }, 1500);
+      beginOpponentInning();
+    }, 2000);
   } else {
     showResult();
   }
 }
 
-// ============================================================
-// SIMULATION
-// ============================================================
-function simulateDelivery(shot, bowler) {
-  const balls = ['full','short','yorker','spin'];
-  const ball = balls[Math.floor(Math.random() * balls.length)];
+function beginOpponentInning() {
+  // Opponent auto-plays
+  const playOpponentBall = () => {
+    const inn = G.i2;
+    if (inn.balls >= G.totalOvers * 6 || inn.wkts >= 10) {
+      endInning();
+      return;
+    }
+
+    const batter = G.oppXI[inn.batIdx];
+    const bowler = G.userBowlers[inn.bowlerIdx % G.userBowlers.length];
+
+    const outcome = simulateOpponentBat(bowler, batter);
+    const runs = outcome.runs;
+
+    if (!inn.bowlerFigs[bowler.id]) inn.bowlerFigs[bowler.id] = {w:0, r:0, b:0};
+    const bf = inn.bowlerFigs[bowler.id];
+
+    if (runs === -1) {
+      bf.w++;
+      bf.b++;
+      inn.wkts++;
+      inn.scores[inn.batIdx].out = 'Wicket';
+      inn.fow.push({wkt:inn.wkts, runs:inn.runs, balls:inn.balls, name:batter.name});
+      commBox(`WICKET! ${batter.name} bowled by ${bowler.name}!`);
+      if (inn.wkts >= 10) { endInning(); return; }
+      inn.batIdx++;
+    } else {
+      bf.r += runs;
+      bf.b++;
+      inn.runs += runs;
+      inn.scores[inn.batIdx].r += runs;
+      inn.scores[inn.batIdx].b++;
+      const msg = runs === 6 ? 'SIX!' : runs === 4 ? 'FOUR!' : runs === 2 ? 'Two' : runs === 1 ? 'One' : 'Dot';
+      commBox(`${msg} - ${batter.name.split(' ').pop()} (${G.opp.name} ${inn.runs}/${inn.wkts})`);
+    }
+
+    inn.balls++;
+    if (inn.balls % 6 === 0) inn.bowlerIdx++;
+
+    updateGameUI();
+
+    if (inn.balls >= G.totalOvers * 6 || inn.wkts >= 10 || inn.runs > G.i1.runs) {
+      endInning();
+    } else {
+      setTimeout(playOpponentBall, 600);
+    }
+  };
+
+  playOpponentBall();
+}
+
+function simulateOpponentBat(bowler, batter) {
   const r = Math.random();
-  const batterSkill = 0.8; // user is always decent
+  const bowlerSkill = bowler.bowl / 100;
+  const batterSkill = batter.bat / 100;
+
+  const deliveries = ['fast', 'bouncer', 'yorker', 'spin'];
+  const delivery = deliveries[Math.floor(Math.random()*deliveries.length)];
 
   let w, s6, s4, s2, s1;
 
-  if (shot === 'drive') {
-    if (ball === 'full')   { w=0.04; s6=0.14; s4=0.32; s2=0.20; s1=0.18; }
-    else if (ball === 'short') { w=0.14; s6=0.04; s4=0.08; s2=0.15; s1=0.20; }
-    else if (ball === 'yorker'){ w=0.17; s6=0.02; s4=0.05; s2=0.10; s1=0.18; }
-    else /* spin */         { w=0.10; s6=0.08; s4=0.14; s2=0.18; s1=0.20; }
-  } else if (shot === 'cut') {
-    if (ball === 'short')  { w=0.05; s6=0.10; s4=0.32; s2=0.22; s1=0.20; }
-    else if (ball === 'full')  { w=0.18; s6=0.02; s4=0.07; s2=0.12; s1=0.18; }
-    else if (ball === 'yorker'){ w=0.22; s6=0.01; s4=0.04; s2=0.09; s1=0.15; }
-    else /* spin */         { w=0.08; s6=0.09; s4=0.20; s2=0.22; s1=0.22; }
-  } else if (shot === 'sweep') {
-    if (ball === 'spin')   { w=0.07; s6=0.16; s4=0.28; s2=0.24; s1=0.18; }
-    else if (ball === 'full')  { w=0.12; s6=0.05; s4=0.12; s2=0.20; s1=0.22; }
-    else if (ball === 'short') { w=0.10; s6=0.09; s4=0.15; s2=0.20; s1=0.22; }
-    else /* yorker */       { w=0.26; s6=0.01; s4=0.04; s2=0.08; s1=0.12; }
-  } else { // loft
-    if (ball === 'short')  { w=0.10; s6=0.20; s4=0.14; s2=0.18; s1=0.20; }
-    else if (ball === 'full')  { w=0.16; s6=0.12; s4=0.12; s2=0.16; s1=0.20; }
-    else if (ball === 'yorker'){ w=0.24; s6=0.03; s4=0.05; s2=0.10; s1=0.15; }
-    else /* spin */         { w=0.18; s6=0.14; s4=0.10; s2=0.14; s1=0.20; }
-  }
+  if (delivery === 'fast') { w = 0.12 * bowlerSkill; s6 = 0.07 * batterSkill; s4 = 0.15; s2 = 0.20; s1 = 0.24; }
+  else if (delivery === 'bouncer') { w = 0.15 * bowlerSkill; s6 = 0.18 * batterSkill; s4 = 0.09; s2 = 0.14; s1 = 0.18; }
+  else if (delivery === 'yorker') { w = 0.18 * bowlerSkill; s6 = 0.03; s4 = 0.08; s2 = 0.14; s1 = 0.20; }
+  else { w = 0.11 * bowlerSkill; s6 = 0.10 * batterSkill; s4 = 0.16; s2 = 0.20; s1 = 0.22; }
 
-  if (r < w) return { runs:-1, desc:`bowled/caught on ${ball}`, ball };
-  if (r < w+s6) return { runs:6, desc:`over mid-on from ${ball}`, ball };
-  if (r < w+s6+s4) return { runs:4, desc:`through the covers from ${ball}`, ball };
-  if (r < w+s6+s4+s2) return { runs:2, desc:`good running`, ball };
-  if (r < w+s6+s4+s2+s1) return { runs:1, desc:`pushed for one`, ball };
-  return { runs:0, desc:`defended on ${ball}`, ball };
+  if (r < w) return { runs: -1 };
+  if (r < w+s6) return { runs: 6 };
+  if (r < w+s6+s4) return { runs: 4 };
+  if (r < w+s6+s4+s2) return { runs: 2 };
+  if (r < w+s6+s4+s2+s1) return { runs: 1 };
+  return { runs: 0 };
 }
 
-function simulateOpponentBat(bowlType, bowler, batter) {
-  const r = Math.random();
-  const skill = (bowler.bowl / 100);
-  const batStrength = (batter.bat / 100);
+function updateGameUI() {
+  const inn = G.inning === 1 ? G.i1 : G.i2;
+  const xi = G.inning === 1 ? G.userXI : G.oppXI;
+  const batter = xi[inn.batIdx];
+  const sc = inn.scores[inn.batIdx];
 
-  let w, s6, s4, s2, s1;
+  document.getElementById('scoreRuns').textContent = `${inn.runs}/${inn.wkts}`;
+  document.getElementById('scoreOvers').textContent = `${Math.floor(inn.balls/6)}.${inn.balls%6}`;
+  document.getElementById('scoreBatter').textContent = batter ? batter.name.split(' ').pop() : '-';
+  document.getElementById('scoreSR').textContent = sc && sc.b > 0 ? ((sc.r/sc.b)*100).toFixed(0) : '0';
 
-  if (bowlType === 'fast') {
-    w=0.13*skill; s6=0.07*batStrength; s4=0.14*batStrength; s2=0.20; s1=0.24;
-  } else if (bowlType === 'bouncer') {
-    w=0.16*skill; s6=0.18*batStrength; s4=0.09*batStrength; s2=0.14; s1=0.18;
-  } else if (bowlType === 'yorker') {
-    w=0.20*skill; s6=0.03*batStrength; s4=0.08*batStrength; s2=0.14; s1=0.20;
-  } else { // spin
-    w=0.12*skill; s6=0.10*batStrength; s4=0.16*batStrength; s2=0.20; s1=0.22;
-  }
-
-  if (r < w) return { runs:-1, desc:'great delivery' };
-  if (r < w+s6) return { runs:6, desc:'slog over the boundary' };
-  if (r < w+s6+s4) return { runs:4, desc:'timing and placement' };
-  if (r < w+s6+s4+s2) return { runs:2, desc:'good running' };
-  if (r < w+s6+s4+s2+s1) return { runs:1, desc:'worked away' };
-  return { runs:0, desc:'beaten' };
+  drawField();
 }
 
-// ============================================================
-// COMMENTARY
-// ============================================================
-const COMM_LINES = {
-  wicket: ['OUT! What a delivery!', 'WICKET! The stumps are rattled!', 'CAUGHT! What a catch!', 'BOWLED! Clean bowled!', 'LBW! Plumb in front!'],
-  six: ['SIX! Into the crowd!', 'SIX! Massive blow! What a shot!', 'SIX! Cleared the boundary with ease!', 'MAXIMUM! The crowd goes wild!'],
-  four: ['FOUR! Racing to the boundary!', 'FOUR! Beautifully timed!', 'FOUR! Finds the gap perfectly!', 'FOUR! Nothing the fielder can do!'],
-  two: ['Two runs! Good running between the wickets.', 'A couple of runs there.', 'They run two — good cricket!'],
-  one: ['Single taken.', 'Worked away for one.', 'Rotates the strike.'],
-  dot: ['Dot ball! Good bowling.', 'Beaten! Excellent delivery.', 'Defended well.', 'No run there — tight cricket.'],
-};
+// ============ RESULT ============
+function showResult() {
+  const win = G.i1.runs > G.i2.runs;
+  const winMsg = win ? `${G.team.name} WINS!` : `${G.opp.name} WINS!`;
+  const margin = win ? G.i1.runs - G.i2.runs : G.i2.runs - G.i1.runs;
 
-function getRunComm(runs, desc, batter) {
-  const pool = runs===6?COMM_LINES.six:runs===4?COMM_LINES.four:runs===2?COMM_LINES.two:runs===1?COMM_LINES.one:COMM_LINES.dot;
-  const base = pool[Math.floor(Math.random()*pool.length)];
-  return `${base} ${desc ? '— '+desc : ''}`;
+  document.getElementById('resultBanner').innerHTML = `
+    <h1>${winMsg}</h1>
+    <p>by ${margin} run${margin===1?'':'s'}</p>
+    <p style="margin-top:10px;font-size:1em;">${G.team.name} ${G.i1.runs}/${G.i1.wkts} vs ${G.opp.name} ${G.i2.runs}/${G.i2.wkts}</p>
+  `;
+
+  // MOTM
+  let best = null, bestScore = -1;
+  G.userXI.forEach((p, i) => {
+    const sc = G.i1.scores[i];
+    const score = sc.r + (sc.r >= 50 ? 30 : 0);
+    if (score > bestScore) { bestScore = score; best = {p, sc, team: G.team.name}; }
+  });
+  G.userBowlers.forEach(b => {
+    const fig = G.i2.bowlerFigs[b.id] || {w:0};
+    const score = fig.w * 40;
+    if (score > bestScore) { bestScore = score; best = {p: b, team: G.team.name}; }
+  });
+
+  const motmEmoji = best.p.role === 'BAT' ? '🏏' : best.p.role === 'BOWL' ? '🎳' : '⭐';
+  document.getElementById('motmBox').innerHTML = `
+    <h3>🏆 MAN OF THE MATCH</h3>
+    <div class="motm-avatar" style="background:#ffb300;color:#000;">${motmEmoji}</div>
+    <h2>${best.p.name}</h2>
+    <p>${best.team}</p>
+  `;
+
+  // Scorecards
+  const wrap = document.getElementById('scorecardWrap');
+  wrap.innerHTML = '';
+
+  // Inning 1
+  let html1 = `<div class="scorecard">
+    <div class="sc-header">${G.team.name} - ${G.i1.runs}/${G.i1.wkts} (${Math.floor(G.i1.balls/6)}.${G.i1.balls%6} ov)</div>
+    <table class="sc-table">
+      <tr><th>Player</th><th>Dismissal</th><th>R</th><th>B</th><th>SR</th></tr>`;
+  G.userXI.forEach((p, i) => {
+    const sc = G.i1.scores[i];
+    const sr = sc.b > 0 ? ((sc.r/sc.b)*100).toFixed(0) : '-';
+    html1 += `<tr>
+      <td>${p.name}</td>
+      <td class="sc-out">${sc.out || 'not out'}</td>
+      <td class="sc-runs">${sc.r}</td>
+      <td>${sc.b}</td>
+      <td>${sr}</td>
+    </tr>`;
+  });
+  html1 += `<tr><td colspan="2"><strong>TOTAL</strong></td><td colspan="3" class="sc-runs"><strong>${G.i1.runs}/${G.i1.wkts}</strong></td></tr>`;
+  html1 += `</table></div>`;
+  wrap.innerHTML += html1;
+
+  // Inning 2
+  let html2 = `<div class="scorecard">
+    <div class="sc-header">${G.opp.name} - ${G.i2.runs}/${G.i2.wkts} (${Math.floor(G.i2.balls/6)}.${G.i2.balls%6} ov)</div>
+    <table class="sc-table">
+      <tr><th>Player</th><th>Dismissal</th><th>R</th><th>B</th><th>SR</th></tr>`;
+  G.oppXI.forEach((p, i) => {
+    const sc = G.i2.scores[i];
+    const sr = sc.b > 0 ? ((sc.r/sc.b)*100).toFixed(0) : '-';
+    html2 += `<tr>
+      <td>${p.name}</td>
+      <td class="sc-out">${sc.out || 'not out'}</td>
+      <td class="sc-runs">${sc.r}</td>
+      <td>${sc.b}</td>
+      <td>${sr}</td>
+    </tr>`;
+  });
+  html2 += `<tr><td colspan="2"><strong>TOTAL</strong></td><td colspan="3" class="sc-runs"><strong>${G.i2.runs}/${G.i2.wkts}</strong></td></tr>`;
+  html2 += `</table></div>`;
+  wrap.innerHTML += html2;
+
+  showPage('pgResult');
 }
 
-function getWicketComm(batter, bowler, wicketType) {
-  const base = COMM_LINES.wicket[Math.floor(Math.random()*COMM_LINES.wicket.length)];
-  return `${base} ${batter.name} is ${wicketType}! Bowled by ${bowler.name.split(' ').pop()}.`;
-}
-
-function getWicketType(bowler) {
-  const r = Math.random();
-  if (bowler.role === 'BOWL' && bowler.bowl > 85) return r<0.4?'Bowled':r<0.7?'LBW':'Caught';
-  return r<0.3?'Bowled':r<0.6?'Caught':r<0.8?'LBW':'Run Out';
-}
-
+// ============ UI ============
 function commBox(text) {
   document.getElementById('commBox').textContent = text;
 }
@@ -1386,333 +1084,11 @@ function commBox(text) {
 function speakComm(text) {
   try {
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.05; u.pitch = 1.1;
+    u.rate = 1.1;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
-  } catch(e){}
+  } catch(e) {}
 }
-
-// ============================================================
-// CANVAS DRAWING
-// ============================================================
-let animFrame = null;
-let ballAnim = { active:false, x:0, y:0, tx:0, ty:0, t:0, runs:0 };
-let wicketAnim = { active:false, t:0 };
-
-function drawField() {
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-
-  // Sky gradient
-  const sky = ctx.createLinearGradient(0,0,0,H*0.45);
-  sky.addColorStop(0,'#1a2a4a');
-  sky.addColorStop(1,'#2a4a6a');
-  ctx.fillStyle = sky;
-  ctx.fillRect(0,0,W,H*0.45);
-
-  // Crowd stands
-  ctx.fillStyle = 'rgba(30,30,60,0.8)';
-  ctx.fillRect(0, H*0.0, W, H*0.18);
-  // Crowd dots
-  for (let i=0; i<80; i++) {
-    const cx = 20+Math.sin(i*73)*W*0.48+W*0.5;
-    const cy = 10+Math.cos(i*37)*H*0.06+H*0.09;
-    ctx.fillStyle = ['#e74c3c','#3498db','#f1c40f','#2ecc71','#9b59b6'][i%5];
-    ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.fill();
-  }
-
-  // Ground
-  const ground = ctx.createLinearGradient(0,H*0.45,0,H);
-  ground.addColorStop(0,'#2d6a2d');
-  ground.addColorStop(1,'#1a4a1a');
-  ctx.fillStyle = ground;
-  ctx.fillRect(0,H*0.45,W,H*0.55);
-
-  // Outfield ring
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.ellipse(W/2,H*0.72,W*0.46,H*0.26,0,0,Math.PI*2);
-  ctx.stroke();
-
-  // Pitch
-  const px = W*0.38, py = H*0.38, pw = W*0.24, ph = H*0.34;
-  const pitchGrad = ctx.createLinearGradient(px,py,px+pw,py+ph);
-  pitchGrad.addColorStop(0,'#c8a96a');
-  pitchGrad.addColorStop(0.5,'#d4b472');
-  pitchGrad.addColorStop(1,'#b89050');
-  ctx.fillStyle = pitchGrad;
-  ctx.fillRect(px,py,pw,ph);
-
-  // Pitch cracks
-  ctx.strokeStyle = 'rgba(100,70,30,0.4)';
-  ctx.lineWidth = 1;
-  [[0.44,0.5,0.55,0.52],[0.5,0.55,0.52,0.65],[0.6,0.6,0.55,0.7]].forEach(([x1,y1,x2,y2])=>{
-    ctx.beginPath();
-    ctx.moveTo(W*x1,H*y1);ctx.lineTo(W*x2,H*y2);ctx.stroke();
-  });
-
-  // Crease lines
-  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-  ctx.lineWidth = 2;
-  // Batting crease
-  ctx.beginPath(); ctx.moveTo(px-5,H*0.62); ctx.lineTo(px+pw+5,H*0.62); ctx.stroke();
-  // Bowling crease
-  ctx.beginPath(); ctx.moveTo(px-5,H*0.44); ctx.lineTo(px+pw+5,H*0.44); ctx.stroke();
-
-  // Stumps - batting end (bottom)
-  drawStumps(ctx, W*0.5-6, H*0.62, wicketAnim.active && G.inning===1);
-  // Stumps - bowling end (top)
-  drawStumps(ctx, W*0.5-6, H*0.44, wicketAnim.active && G.inning===2);
-
-  // Fielders based on inning
-  const fielderPositions = [
-    [0.15, 0.60], [0.85, 0.60], [0.20, 0.80], [0.80, 0.80],
-    [0.10, 0.45], [0.90, 0.45], [0.50, 0.25], [0.30, 0.38], [0.70, 0.38]
-  ];
-  const fieldColor = G.inning === 1 ? '#e74c3c' : '#3498db';
-  fielderPositions.forEach(([fx,fy]) => drawPlayer(ctx, W*fx, H*fy, fieldColor, 'F'));
-
-  // Batter (bottom)
-  drawPlayer(ctx, W*0.5+15, H*0.60, '#f39c12', 'BAT');
-
-  // Bowler (top)
-  drawPlayer(ctx, W*0.5, H*0.40, '#e74c3c', 'BWL');
-
-  // Ball animation
-  if (ballAnim.active) {
-    const t = Math.min(ballAnim.t, 1);
-    const bx = ballAnim.x + (ballAnim.tx - ballAnim.x)*t;
-    const by = ballAnim.y + (ballAnim.ty - ballAnim.y)*t;
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(bx,by+4,6,3,0,0,Math.PI*2); ctx.fill();
-    // Ball
-    const r = 7 - Math.sin(t*Math.PI)*3;
-    ctx.fillStyle = '#cc3300';
-    ctx.beginPath(); ctx.arc(bx,by,r,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle = '#ff8866';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(bx,by,r,0,Math.PI*2); ctx.stroke();
-  }
-
-  // Wicket flash
-  if (wicketAnim.active) {
-    const alpha = Math.sin(wicketAnim.t * Math.PI);
-    ctx.fillStyle = `rgba(255,100,0,${alpha*0.3})`;
-    ctx.fillRect(0,0,W,H);
-  }
-}
-
-function drawStumps(ctx, x, y, flash) {
-  const colors = flash ? ['#ff4400','#ff6600','#ff8800'] : ['#fff','#ddd','#fff'];
-  [0,8,16].forEach((dx,i) => {
-    ctx.fillStyle = colors[i];
-    ctx.fillRect(x+dx, y-18, 3, 18);
-    // Bails
-    if (i < 2) {
-      ctx.fillStyle = '#ffcc00';
-      ctx.fillRect(x+dx+2, y-18, 5, 3);
-    }
-  });
-}
-
-function drawPlayer(ctx, x, y, color, label) {
-  // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.beginPath(); ctx.ellipse(x,y+16,10,4,0,0,Math.PI*2); ctx.fill();
-
-  // Body
-  ctx.fillStyle = color;
-  ctx.fillRect(x-8, y+2, 16, 18);
-
-  // Head
-  ctx.fillStyle = '#f4c5a0';
-  ctx.beginPath(); ctx.arc(x, y-2, 8, 0, Math.PI*2); ctx.fill();
-
-  // Helmet
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(x, y-4, 8, Math.PI, 0); ctx.fill();
-
-  // Number/label
-  ctx.fillStyle = 'rgba(0,0,0,0.7)';
-  ctx.font = 'bold 8px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText(label, x, y+14);
-}
-
-function animateBall(runs) {
-  const canvas = document.getElementById('gameCanvas');
-  const W = canvas.width, H = canvas.height;
-  ballAnim = {
-    active: true,
-    x: W*0.5, y: H*0.44,
-    tx: runs >= 4 ? (Math.random()<0.5?10:W-10) : W*0.5 + (Math.random()-0.5)*W*0.4,
-    ty: runs >= 4 ? H*0.75 : H*0.60 + (Math.random()-0.5)*H*0.2,
-    t: 0, runs
-  };
-
-  const anim = () => {
-    ballAnim.t += 0.05;
-    drawField();
-    if (ballAnim.t < 1) requestAnimationFrame(anim);
-    else { ballAnim.active = false; drawField(); }
-  };
-  requestAnimationFrame(anim);
-}
-
-function animateWicket() {
-  wicketAnim = { active:true, t:0 };
-  const anim = () => {
-    wicketAnim.t += 0.08;
-    drawField();
-    if (wicketAnim.t < 1) requestAnimationFrame(anim);
-    else { wicketAnim.active = false; drawField(); }
-  };
-  requestAnimationFrame(anim);
-}
-
-// ============================================================
-// RESULT + SCORECARD
-// ============================================================
-function showResult() {
-  setPhase('done');
-  showPage('pgResult');
-
-  const userWin = G.i2.wkts >= 10 || G.i2.runs <= G.i1.runs;
-  // Win by runs (user batted first and opp didn't chase)
-  // or win by wickets (user chased)
-  let winMsg, resultSubtitle;
-  if (G.i2.wkts >= 10 || G.i2.balls >= G.totalOvers*6) {
-    if (G.i2.runs > G.i1.runs) {
-      winMsg = `${G.opp.name} WINS!`;
-      resultSubtitle = `by ${G.i2.runs - G.i1.runs} runs`;
-    } else if (G.i2.runs === G.i1.runs) {
-      winMsg = 'MATCH TIED!'; resultSubtitle = '';
-    } else {
-      winMsg = `${G.team.name} WINS!`;
-      resultSubtitle = `by ${G.i1.runs - G.i2.runs} runs`;
-    }
-  } else {
-    winMsg = `${G.opp.name} WINS!`;
-    resultSubtitle = `by ${10 - G.i2.wkts} wickets`;
-  }
-
-  document.getElementById('resultBanner').innerHTML = `
-    <h1>${winMsg}</h1>
-    <p>${resultSubtitle}</p>
-    <p style="margin-top:10px;font-size:1em;">${G.team.name}: ${G.i1.runs}/${G.i1.wkts} (${Math.floor(G.i1.balls/6)}.${G.i1.balls%6} ov) vs ${G.opp.name}: ${G.i2.runs}/${G.i2.wkts} (${Math.floor(G.i2.balls/6)}.${G.i2.balls%6} ov)</p>
-  `;
-
-  // MOTM
-  const motm = findMOTM();
-  document.getElementById('motmBox').innerHTML = `
-    <h3>🏆 MAN OF THE MATCH</h3>
-    <div class="motm-avatar" style="background:${roleColor(motm.player.role)}">${roleIcon(motm.player.role)}</div>
-    <h2>${motm.player.name}</h2>
-    <p>${motm.team}</p>
-    <div class="motm-stat">${motm.reason}</div>
-  `;
-
-  // Scorecards
-  const wrap = document.getElementById('scorecardWrap');
-  wrap.innerHTML = '';
-  wrap.appendChild(buildScorecard(G.team.name, G.userXI, G.i1, G.oppBowlers));
-  wrap.appendChild(buildScorecard(G.opp.name, G.oppXI, G.i2, G.userBowlers));
-
-  speakComm(`${winMsg}. ${resultSubtitle}. Man of the match: ${motm.player.name}. ${motm.reason}.`);
-}
-
-function findMOTM() {
-  let best = null, bestScore = -1, bestTeam = '', bestReason = '';
-
-  // Check user batters (inning 1)
-  G.userXI.forEach((p,i) => {
-    const sc = G.i1.scores[i];
-    const impact = sc.r + (sc.r >= 50 ? 20 : 0) + (sc.r >= 100 ? 30 : 0);
-    if (impact > bestScore) { bestScore = impact; best = p; bestTeam = G.team.name; bestReason = `${sc.r}(${sc.b}) runs`; }
-  });
-
-  // Check user bowlers (inning 2)
-  G.userBowlers.forEach(b => {
-    const fig = G.i2.bowlerFigs[b.id] || {w:0,r:0,b:0};
-    const impact = fig.w * 25 + (6 - fig.r/(fig.b/6||1)) * 5;
-    if (impact > bestScore) { bestScore = impact; best = b; bestTeam = G.team.name; bestReason = `${fig.w}/${fig.r} in ${Math.floor(fig.b/6)}.${fig.b%6} overs`; }
-  });
-
-  // Check opp batters
-  G.oppXI.forEach((p,i) => {
-    const sc = G.i2.scores[i];
-    if (!sc) return;
-    const impact = sc.r + (sc.r >= 50 ? 20 : 0);
-    if (impact > bestScore) { bestScore = impact; best = p; bestTeam = G.opp.name; bestReason = `${sc.r}(${sc.b}) runs`; }
-  });
-
-  return { player: best || G.userXI[0], team: bestTeam, reason: bestReason };
-}
-
-function buildScorecard(teamName, xi, inn, bowlersUsed) {
-  const div = document.createElement('div');
-  div.className = 'scorecard';
-  div.innerHTML = `<h3>${teamName} — ${inn.runs}/${inn.wkts} (${Math.floor(inn.balls/6)}.${inn.balls%6} ov)</h3>`;
-
-  // Batting table
-  let batHTML = `<table class="sc-table">
-    <tr><th>Batter</th><th>Dismissal</th><th>R</th><th>B</th><th>SR</th></tr>`;
-  xi.forEach((p,i) => {
-    const sc = inn.scores[i];
-    if (!sc) return;
-    const sr = sc.b > 0 ? ((sc.r/sc.b)*100).toFixed(0) : '-';
-    const isPlaying = i === inn.batIdx && !sc.out;
-    batHTML += `<tr>
-      <td>${p.name}${isPlaying?' *':''}</td>
-      <td class="sc-out">${sc.out || (i < inn.batIdx ? 'not out' : i === inn.batIdx ? 'not out' : 'did not bat')}</td>
-      <td class="sc-runs">${sc.r}</td>
-      <td>${sc.b}</td>
-      <td>${sr}</td>
-    </tr>`;
-  });
-  batHTML += `<tr style="border-top:1px solid #555"><td colspan="2"><strong>Extras</strong></td><td colspan="3" class="sc-runs">0</td></tr>`;
-  batHTML += `<tr><td colspan="2"><strong>TOTAL</strong></td><td colspan="3" class="sc-runs"><strong>${inn.runs}/${inn.wkts}</strong></td></tr>`;
-  batHTML += '</table>';
-
-  // Bowling table
-  let bowlHTML = `<table class="sc-table" style="margin-top:10px;">
-    <tr><th>Bowler</th><th>O</th><th>R</th><th>W</th><th>Eco</th></tr>`;
-  bowlersUsed.forEach(b => {
-    const fig = inn.bowlerFigs[b.id];
-    if (!fig || fig.b === 0) return;
-    const eco = ((fig.r/(fig.b/6))).toFixed(1);
-    bowlHTML += `<tr>
-      <td>${b.name}</td>
-      <td>${Math.floor(fig.b/6)}.${fig.b%6}</td>
-      <td class="sc-economy">${fig.r}</td>
-      <td class="sc-wickets">${fig.w}</td>
-      <td>${eco}</td>
-    </tr>`;
-  });
-  bowlHTML += '</table>';
-
-  // FOW
-  let fowHTML = '';
-  if (inn.fow.length) {
-    fowHTML = `<div style="padding:8px 10px;border-top:1px solid #333;font-size:0.78em;color:#aaa;">
-      <strong style="color:#777;">FOW:</strong> ` +
-      inn.fow.map(f=>`${f.wkt}/${f.runs} (${f.name.split(' ').pop()}, ${Math.floor(f.balls/6)}.${f.balls%6})`).join(', ') +
-      '</div>';
-  }
-
-  div.innerHTML += batHTML + bowlHTML + fowHTML;
-  return div;
-}
-
-function confirmBack() {
-  if (confirm('Leave match? Progress will be lost.')) showPage('pgHome');
-}
-
-// Init
-drawField();
 </script>
 </body>
 </html>
