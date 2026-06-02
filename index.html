@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket Championship 24</title>
+    <title>Cricket Championship 24 - Realistic</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -27,8 +27,7 @@
 
         .header h1 { font-size: 2.5em; margin-bottom: 10px; }
 
-        /* HOME PAGE */
-        #homePage { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        #homePage { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; }
 
         .card {
             background: linear-gradient(135deg, rgba(255,179,0,0.2), rgba(255,107,53,0.2));
@@ -46,23 +45,46 @@
         .card p { color: #ccc; }
         .card .icon { font-size: 3em; }
 
-        /* GAME PAGE */
-        #gamePage { display: none; }
+        #teamSelectPage, #gamePage, #resultPage { display: none; }
+
+        .show { display: block !important; }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .team-card {
+            background: rgba(255,179,0,0.1);
+            border: 2px solid #ffb300;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .team-card:hover { background: rgba(255,179,0,0.3); }
+        .team-card.selected { background: rgba(0,255,0,0.3); border-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .team-card .flag { font-size: 2.5em; }
+        .team-card .name { color: #ffb300; font-weight: bold; margin-top: 10px; }
 
         .hud {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
             padding: 15px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border: 2px solid #ffb300;
             border-radius: 8px;
         }
 
         .hud-item { text-align: center; }
-        .hud-label { font-size: 0.8em; color: #999; margin-bottom: 5px; }
-        .hud-value { font-size: 1.6em; color: #ffb300; font-weight: bold; }
+        .hud-label { font-size: 0.75em; color: #999; margin-bottom: 5px; text-transform: uppercase; }
+        .hud-value { font-size: 1.8em; color: #ffb300; font-weight: bold; }
 
         .canvas-container {
             background: linear-gradient(180deg, #4a8cc8 0%, #90ee90 50%, #2d5a2d 100%);
@@ -75,14 +97,12 @@
             min-height: 400px;
         }
 
-        canvas { display: block; max-width: 100%; }
-
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
             padding: 15px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border: 2px solid #ff6b35;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -104,45 +124,40 @@
 
         button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(255,179,0,0.5); }
         button:disabled { opacity: 0.4; cursor: not-allowed; }
-        button.hidden { display: none; }
+        button.hidden { display: none !important; }
 
-        .shot-section { grid-column: 1 / -1; }
-        .shot-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .bowl-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .shot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-column: 1 / -1; }
+        .bowl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; grid-column: 1 / -1; }
 
         .commentary {
             padding: 15px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border-left: 4px solid #ffb300;
             border-radius: 5px;
             color: #ffd700;
             font-style: italic;
             margin-bottom: 20px;
-            min-height: 40px;
+            min-height: 60px;
             display: flex;
             align-items: center;
+            font-size: 1.05em;
+            line-height: 1.4;
         }
 
-        .team-select {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .team-option {
-            background: rgba(255,179,0,0.1);
+        .stats {
+            background: rgba(0,0,0,0.8);
             border: 2px solid #ffb300;
             border-radius: 8px;
             padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
 
-        .team-option:hover { background: rgba(255,179,0,0.3); }
-        .team-option.selected { background: rgba(0,255,0,0.3); border-color: #00ff00; }
-        .team-option-name { font-weight: bold; color: #ffb300; margin-top: 10px; }
+        .stat-item { text-align: center; }
+        .stat-label { font-size: 0.9em; color: #999; margin-bottom: 5px; }
+        .stat-value { font-size: 1.5em; color: #00ff00; font-weight: bold; }
 
         .result {
             background: linear-gradient(135deg, #ffb300, #ff6b35);
@@ -168,183 +183,144 @@
 
         .btn-back:hover { background: linear-gradient(135deg, #888, #555); }
 
-        .hidden { display: none !important; }
-
-        .status-text { color: #ffb300; font-weight: bold; padding: 10px; text-align: center; }
+        .status { color: #ffb300; font-weight: bold; text-align: center; padding: 10px; font-size: 1.1em; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🏏 CRICKET CHAMPIONSHIP 24 🏏</h1>
-            <p>World Cup • IPL • International Matches</p>
+            <p>Realistic Cricket Simulation - World Cup • IPL • International</p>
         </div>
 
-        <!-- HOME PAGE -->
+        <!-- HOME -->
         <div id="homePage">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color: #ffb300;">SELECT GAME MODE</h2>
-            </div>
             <div class="card" onclick="startMode('worldcup')">
                 <div class="icon">🌍</div>
                 <h2>World Cup</h2>
-                <p>Play as India in World Cup cricket. Face international teams!</p>
+                <p>Play as India in international cricket. Face world-class teams with realistic gameplay!</p>
             </div>
             <div class="card" onclick="startMode('ipl')">
                 <div class="icon">🏟️</div>
                 <h2>IPL</h2>
-                <p>Pick your favorite IPL team and win the championship!</p>
+                <p>Select your IPL franchise and compete to win the championship!</p>
             </div>
             <div class="card" onclick="startMode('friendly')">
                 <div class="icon">⚾</div>
                 <h2>Friendly</h2>
-                <p>Quick match to practice your skills!</p>
+                <p>Quick practice match to test your batting and bowling skills!</p>
             </div>
         </div>
 
-        <!-- TEAM SELECTION -->
-        <div id="teamSelectPage" class="hidden">
+        <!-- TEAM SELECT -->
+        <div id="teamSelectPage">
             <div style="background: rgba(0,0,0,0.7); padding: 30px; border-radius: 10px;">
-                <h2 style="color: #ffb300; text-align: center; margin-bottom: 20px; font-size: 2em;">SELECT YOUR TEAM</h2>
-                <p style="text-align: center; color: #ccc; margin-bottom: 30px; font-size: 1.1em;">👇 Click a team card below, then press START MATCH 👇</p>
-                <div class="team-select" id="teamList"></div>
-                <button style="width: 100%; padding: 20px; font-size: 1.3em; margin-top: 30px; background: linear-gradient(135deg, #ffb300, #ff6b35); border: 3px solid #ffb300; font-weight: bold; cursor: pointer; border-radius: 8px;" onclick="confirmTeam()">🏏 START MATCH 🏏</button>
+                <h2 style="color: #ffb300; text-align: center; margin-bottom: 20px;">SELECT YOUR TEAM</h2>
+                <div class="team-grid" id="teamList"></div>
+                <button style="width: 100%; padding: 15px; font-size: 1.2em; margin-top: 20px;" onclick="startMatch()">🏏 START MATCH</button>
+                <button class="btn-back" style="width: 100%; margin-top: 10px;" onclick="backHome()">⬅ Back</button>
             </div>
         </div>
 
-        <!-- GAME PAGE -->
-        <div id="gamePage" class="hidden">
-            <div class="hud">
-                <div class="hud-item">
-                    <div class="hud-label">Inning</div>
-                    <div class="hud-value" id="hudInn">1/2</div>
-                </div>
-                <div class="hud-item">
-                    <div class="hud-label">Runs/Wkts</div>
-                    <div class="hud-value" id="hudScore">0/0</div>
-                </div>
-                <div class="hud-item">
-                    <div class="hud-label">Overs</div>
-                    <div class="hud-value" id="hudOv">0.0</div>
-                </div>
-                <div class="hud-item">
-                    <div class="hud-label">Batter</div>
-                    <div class="hud-value" id="hudBat">--</div>
-                </div>
-                <div class="hud-item">
-                    <div class="hud-label">Bowler</div>
-                    <div class="hud-value" id="hudBow">--</div>
-                </div>
-                <div class="hud-item">
-                    <div class="hud-label">Target</div>
-                    <div class="hud-value" id="hudTgt">--</div>
-                </div>
-            </div>
-
+        <!-- GAME -->
+        <div id="gamePage">
+            <div class="hud" id="hud"></div>
             <div class="canvas-container">
-                <canvas id="gameCanvas" width="800" height="400"></canvas>
+                <canvas id="canvas" width="900" height="420"></canvas>
             </div>
-
-            <div class="commentary" id="commentary">Game starting...</div>
-
-            <div class="status-text" id="status"></div>
-
+            <div class="commentary" id="commentary">Match starting...</div>
+            <div class="stats" id="stats"></div>
+            <div class="status" id="status"></div>
             <div class="controls">
-                <button id="btnFace" class="hidden" onclick="startBatting()">⚾ FACE BALL</button>
-                <button id="btnBowl" class="hidden" onclick="startBowling()">🎳 BOWL</button>
-
-                <div id="shotDiv" class="shot-section hidden">
-                    <div class="shot-buttons">
-                        <button onclick="playShot('drive')">🎯 DRIVE</button>
-                        <button onclick="playShot('cut')">🔄 CUT</button>
-                        <button onclick="playShot('sweep')">➡️ SWEEP</button>
-                        <button onclick="playShot('loft')">⬆️ LOFT</button>
-                    </div>
+                <button id="btnFace" class="hidden" onclick="faceBall()">⚾ FACE BALL</button>
+                <button id="btnBowl" class="hidden" onclick="bowlBall()">🎳 BOWL</button>
+                <div id="shotDiv" class="shot-grid hidden">
+                    <button onclick="playShot('drive')">🎯 DRIVE</button>
+                    <button onclick="playShot('cut')">🔄 CUT</button>
+                    <button onclick="playShot('sweep')">➡️ SWEEP</button>
+                    <button onclick="playShot('loft')">⬆️ LOFT</button>
                 </div>
-
-                <div id="bowlDiv" class="shot-section hidden">
-                    <div class="bowl-buttons">
-                        <button onclick="playBowl('fast')">⚡ FAST</button>
-                        <button onclick="playBowl('bouncer')">💥 BOUNCER</button>
-                        <button onclick="playBowl('yorker')">📍 YORKER</button>
-                        <button onclick="playBowl('spin')">🌀 SPIN</button>
-                    </div>
+                <div id="bowlDiv" class="bowl-grid hidden">
+                    <button onclick="playBowl('fast')">⚡ FAST</button>
+                    <button onclick="playBowl('bouncer')">💥 BOUNCER</button>
+                    <button onclick="playBowl('yorker')">📍 YORKER</button>
+                    <button onclick="playBowl('spin')">🌀 SPIN</button>
                 </div>
             </div>
-
             <button class="btn-back" onclick="backHome()">⬅ Back to Home</button>
         </div>
 
-        <!-- RESULT PAGE -->
-        <div id="resultPage" class="hidden">
-            <div class="result" id="resultBox"></div>
-            <button style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="backHome()">Play Again</button>
+        <!-- RESULT -->
+        <div id="resultPage">
+            <div style="background: rgba(0,0,0,0.7); padding: 30px; border-radius: 10px;">
+                <div class="result" id="resultBox"></div>
+                <button style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="backHome()">Play Again</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // TEAMS DATA
-        const WORLD_CUP_TEAMS = {
-            IND: { name: 'India', code: 'IND', flag: '🇮🇳', color: '#004ba8' },
-            AUS: { name: 'Australia', code: 'AUS', flag: '🇦🇺', color: '#006a4e' },
-            ENG: { name: 'England', code: 'ENG', flag: '🏴', color: '#003580' },
-            PAK: { name: 'Pakistan', code: 'PAK', flag: '🇵🇰', color: '#006600' },
-            NZ: { name: 'New Zealand', code: 'NZ', flag: '🇳🇿', color: '#1a1a1a' },
-            SA: { name: 'South Africa', code: 'SA', flag: '🇿🇦', color: '#007749' },
-            WI: { name: 'West Indies', code: 'WI', flag: '🌴', color: '#7b0040' },
-            SL: { name: 'Sri Lanka', code: 'SL', flag: '🇱🇰', color: '#1f3a93' },
+        // TEAMS
+        const WORLD_CUP = {
+            IND: { name: 'India', flag: '🇮🇳', code: 'IND' },
+            AUS: { name: 'Australia', flag: '🇦🇺', code: 'AUS' },
+            ENG: { name: 'England', flag: '🏴', code: 'ENG' },
+            PAK: { name: 'Pakistan', flag: '🇵🇰', code: 'PAK' },
+            NZ: { name: 'New Zealand', flag: '🇳🇿', code: 'NZ' },
+            SA: { name: 'South Africa', flag: '🇿🇦', code: 'SA' },
+            WI: { name: 'West Indies', flag: '🌴', code: 'WI' },
+            SL: { name: 'Sri Lanka', flag: '🇱🇰', code: 'SL' },
         };
 
-        const IPL_TEAMS = {
-            CSK: { name: 'Chennai Super Kings', code: 'CSK', flag: '🏜️', color: '#ffb300' },
-            MI: { name: 'Mumbai Indians', code: 'MI', flag: '🌊', color: '#004ba8' },
-            RCB: { name: 'Royal Challengers', code: 'RCB', flag: '🔴', color: '#ff0000' },
-            KKR: { name: 'Kolkata Knight Riders', code: 'KKR', flag: '👑', color: '#663399' },
-            DC: { name: 'Delhi Capitals', code: 'DC', flag: '🏛️', color: '#002e7e' },
-            PBKS: { name: 'Punjab Kings', code: 'PBKS', flag: '🦁', color: '#ff0000' },
-            RR: { name: 'Rajasthan Royals', code: 'RR', flag: '🎪', color: '#ff69b4' },
-            SRH: { name: 'Sunrisers Hyderabad', code: 'SRH', flag: '🌅', color: '#ff6b35' },
+        const IPL = {
+            MI: { name: 'Mumbai Indians', flag: '🌊', code: 'MI' },
+            CSK: { name: 'Chennai Super Kings', flag: '🏜️', code: 'CSK' },
+            RCB: { name: 'Royal Challengers', flag: '🔴', code: 'RCB' },
+            KKR: { name: 'Kolkata Knight Riders', flag: '👑', code: 'KKR' },
+            DC: { name: 'Delhi Capitals', flag: '🏛️', code: 'DC' },
+            PBKS: { name: 'Punjab Kings', flag: '🦁', code: 'PBKS' },
+            RR: { name: 'Rajasthan Royals', flag: '🎪', code: 'RR' },
+            SRH: { name: 'Sunrisers Hyderabad', flag: '🌅', code: 'SRH' },
         };
 
-        const BATTERS = ['Virat Kohli', 'Rohit Sharma', 'Shubman Gill', 'KL Rahul', 'Rishabh Pant'];
-        const BOWLERS = ['Jasprit Bumrah', 'Mohammed Siraj', 'Yuzvendra Chahal', 'Hardik Pandya'];
+        const BATTERS = ['Virat Kohli', 'Rohit Sharma', 'Shubman Gill', 'KL Rahul', 'Rishabh Pant', 'Surya Kumar'];
+        const BOWLERS = ['Bumrah', 'Siraj', 'Chahal', 'Hardik', 'Axar', 'Sundar'];
 
-        // GAME STATE
         let game = {
             mode: null,
-            userTeam: null,
-            opponent: null,
+            team: null,
+            opp: null,
             inning: 1,
             batting: true,
             runs: 0,
-            wickets: 0,
+            wkts: 0,
             balls: 0,
             oppRuns: 0,
             oppWkts: 0,
             oppBalls: 0,
-            batter: 'Batsman',
-            bowler: 'Bowler',
+            batter: null,
+            bowler: null,
+            batBalls: 0,
+            batRuns: 0,
+            oppBatBalls: 0,
+            oppBatRuns: 0,
             canvas: null,
             ctx: null,
         };
 
-        const COMMENTARY = [
-            "What a ball! Brilliant!",
-            "Oh! What a catch!",
-            "Magnificent shot!",
-            "FOUR! Racing away!",
-            "SIX! Into the stands!",
-            "Dot ball. Good bowling.",
-            "Superb batting!",
-            "Wicket! Breakthrough!",
-            "What intensity!",
-            "This is world-class cricket!",
-            "Coming at a crucial time!",
-            "Fantastic effort!",
-            "The crowd is on their feet!",
-            "WHAT A MATCH THIS IS!",
-            "And INDIA WINS!",
-        ];
+        const COMM = {
+            wicket: ['OUT! What a ball!', 'WICKET! Breakthrough!', 'Bowled! Clean bowled!', 'LBW! Plumb in front!', 'CAUGHT! What a catch!'],
+            six: ['SIX! Over the boundary!', 'SIX! Into the stands!', 'SIX! Massive blow!'],
+            four: ['FOUR! Beautifully timed!', 'FOUR! Cracking shot!', 'FOUR! Racing away!'],
+            two: ['Two runs!', 'Nice running!', 'Good partnership building!'],
+            one: ['Single!', 'A run taken!', 'One run!'],
+            dot: ['Dot ball!', 'Good bowling!', 'Tight delivery!', 'Excellent line!'],
+        };
+
+        function comm(text) {
+            document.getElementById('commentary').textContent = text;
+            speak(text);
+        }
 
         function speak(text) {
             try {
@@ -355,252 +331,386 @@
             } catch (e) {}
         }
 
-        function comm(msg) {
-            document.getElementById('commentary').textContent = msg;
-            speak(msg);
-        }
-
-        function setStatus(msg) {
-            document.getElementById('status').textContent = msg;
-        }
-
-        // PAGE NAVIGATION
         function startMode(mode) {
             game.mode = mode;
-            const teams = mode === 'worldcup' ? WORLD_CUP_TEAMS : mode === 'ipl' ? IPL_TEAMS : WORLD_CUP_TEAMS;
+            const teams = mode === 'ipl' ? IPL : WORLD_CUP;
 
-            document.getElementById('homePage').classList.add('hidden');
-            document.getElementById('teamSelectPage').classList.remove('hidden');
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('teamSelectPage').style.display = 'block';
 
             const list = document.getElementById('teamList');
             list.innerHTML = '';
 
             Object.values(teams).forEach(t => {
                 const card = document.createElement('div');
-                card.className = 'team-option';
-                card.innerHTML = `<div>${t.flag}</div><div class="team-option-name">${t.name}</div>`;
+                card.className = 'team-card';
+                card.innerHTML = `<div class="flag">${t.flag}</div><div class="name">${t.name}</div>`;
                 card.onclick = () => {
-                    document.querySelectorAll('.team-option').forEach(c => c.classList.remove('selected'));
+                    document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    game.userTeam = t;
+                    game.team = t;
                 };
                 list.appendChild(card);
             });
         }
 
-        function confirmTeam() {
-            if (!game.userTeam) { alert('Select a team!'); return; }
-
-            const teams = game.mode === 'worldcup' ? Object.values(WORLD_CUP_TEAMS) : Object.values(IPL_TEAMS);
-            const opponents = teams.filter(t => t.code !== game.userTeam.code);
-            game.opponent = opponents[Math.floor(Math.random() * opponents.length)];
-
-            document.getElementById('teamSelectPage').classList.add('hidden');
-            document.getElementById('gamePage').classList.remove('hidden');
-
-            startMatch();
-        }
-
         function startMatch() {
+            if (!game.team) { alert('Select a team!'); return; }
+
+            const teams = game.mode === 'ipl' ? Object.values(IPL) : Object.values(WORLD_CUP);
+            const opps = teams.filter(t => t.code !== game.team.code);
+            game.opp = opps[Math.floor(Math.random() * opps.length)];
+
+            game.canvas = document.getElementById('canvas');
+            game.ctx = game.canvas.getContext('2d');
+
             game.inning = 1;
             game.batting = true;
             game.runs = 0;
-            game.wickets = 0;
+            game.wkts = 0;
             game.balls = 0;
             game.batter = BATTERS[0];
             game.bowler = BOWLERS[0];
+            game.batRuns = 0;
+            game.batBalls = 0;
+
+            document.getElementById('teamSelectPage').style.display = 'none';
+            document.getElementById('gamePage').style.display = 'block';
 
             updateHUD();
-            drawGame();
-
-            comm(`Welcome! ${game.userTeam.name} vs ${game.opponent.name}. Click FACE BALL to start!`);
-            showFaceButton();
+            drawPitch();
+            comm(`Welcome! ${game.team.name} vs ${game.opp.name}. Click FACE BALL!`);
+            document.getElementById('btnFace').classList.remove('hidden');
+            document.getElementById('btnBowl').classList.add('hidden');
         }
 
         function updateHUD() {
-            document.getElementById('hudInn').textContent = `${game.inning}/2`;
-            document.getElementById('hudScore').textContent = game.batting ? `${game.runs}/${game.wickets}` : `${game.oppRuns}/${game.oppWkts}`;
-            const ov = Math.floor(game.balls / 6);
-            const bl = game.balls % 6;
-            document.getElementById('hudOv').textContent = `${ov}.${bl}`;
-            document.getElementById('hudBat').textContent = game.batter.split(' ')[0];
-            document.getElementById('hudBow').textContent = game.bowler.split(' ')[0];
+            let hud = `
+                <div class="hud-item"><div class="hud-label">Inning</div><div class="hud-value">${game.inning}/2</div></div>
+                <div class="hud-item"><div class="hud-label">Runs/Wickets</div><div class="hud-value">${game.batting ? game.runs : game.oppRuns}/${game.batting ? game.wkts : game.oppWkts}</div></div>
+                <div class="hud-item"><div class="hud-label">Overs</div><div class="hud-value">${Math.floor(game.balls/6)}.${game.balls%6}</div></div>
+                <div class="hud-item"><div class="hud-label">Batter</div><div class="hud-value">${game.batter}</div></div>
+                <div class="hud-item"><div class="hud-label">Bowler</div><div class="hud-value">${game.bowler}</div></div>
+                <div class="hud-item"><div class="hud-label">Strike Rate</div><div class="hud-value">${game.batBalls > 0 ? ((game.batRuns/game.batBalls)*100).toFixed(1) : 0}</div></div>
+            `;
+
             if (game.inning === 2) {
-                document.getElementById('hudTgt').textContent = `Need ${Math.max(0, game.runs + 1 - game.oppRuns)}`;
+                hud += `<div class="hud-item"><div class="hud-label">Need</div><div class="hud-value">${Math.max(0, game.runs + 1 - game.oppRuns)}</div></div>`;
             }
+
+            document.getElementById('hud').innerHTML = hud;
+
+            let stats = `
+                <div class="stat-item">
+                    <div class="stat-label">${game.batter}</div>
+                    <div class="stat-value">${game.batRuns}(${game.batBalls})</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">${game.bowler}</div>
+                    <div class="stat-value">${game.batting ? game.oppRuns + '/' + game.oppWkts : game.runs + '/' + game.wkts}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Overs Bowled</div>
+                    <div class="stat-value">${Math.floor(game.balls/6)}.${game.balls%6}</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = stats;
         }
 
-        function drawGame() {
-            const c = game.canvas;
-            const w = c.width;
-            const h = c.height;
-
-            // Sky
-            game.ctx.fillStyle = '#4a8cc8';
-            game.ctx.fillRect(0, 0, w, h * 0.5);
-
-            // Ground
-            game.ctx.fillStyle = '#2d5a2d';
-            game.ctx.fillRect(0, h * 0.5, w, h * 0.5);
-
-            // Pitch
-            game.ctx.fillStyle = '#c9a961';
-            game.ctx.fillRect(w * 0.2, h * 0.35, w * 0.6, h * 0.2);
-
-            // Players
-            drawPlayer(game.ctx, w * 0.75, h * 0.4, game.batter);
-            drawPlayer(game.ctx, w * 0.25, h * 0.4, game.bowler);
-
-            // Fielders
-            [[0.3, 0.25], [0.7, 0.25], [0.15, 0.5], [0.85, 0.5], [0.5, 0.2]].forEach(([x, y]) => {
-                drawPlayer(game.ctx, w * x, h * y, 'Fielder');
-            });
-        }
-
-        function drawPlayer(ctx, x, y, name) {
-            ctx.fillStyle = '#d4a574';
-            ctx.beginPath();
-            ctx.arc(x, y, 8, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#333';
-            ctx.beginPath();
-            ctx.arc(x, y, 10, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#004ba8';
-            ctx.fillRect(x - 10, y + 10, 20, 25);
-
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 10px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(name.split(' ')[0], x, y + 50);
-        }
-
-        function showFaceButton() {
-            document.getElementById('btnFace').classList.remove('hidden');
-            document.getElementById('btnBowl').classList.add('hidden');
-            document.getElementById('shotDiv').classList.add('hidden');
-            document.getElementById('bowlDiv').classList.add('hidden');
-            setStatus('Click FACE BALL to receive the delivery!');
-        }
-
-        function showBowlButton() {
-            document.getElementById('btnBowl').classList.remove('hidden');
-            document.getElementById('btnFace').classList.add('hidden');
-            document.getElementById('shotDiv').classList.add('hidden');
-            document.getElementById('bowlDiv').classList.add('hidden');
-            setStatus('Click BOWL to deliver the ball!');
-        }
-
-        function startBatting() {
+        function faceBall() {
             document.getElementById('btnFace').classList.add('hidden');
             document.getElementById('shotDiv').classList.remove('hidden');
-            setStatus('SELECT YOUR SHOT!');
-            comm('Select your shot: Drive, Cut, Sweep, or Loft!');
+            document.getElementById('status').textContent = 'Select your shot!';
         }
 
-        function startBowling() {
+        function bowlBall() {
             document.getElementById('btnBowl').classList.add('hidden');
             document.getElementById('bowlDiv').classList.remove('hidden');
-            setStatus('SELECT YOUR BOWLING!');
-            comm('Select your bowling variation!');
+            document.getElementById('status').textContent = 'Select your bowling!';
         }
 
+        // REALISTIC SHOT vs DELIVERY MATCHING
         function playShot(shot) {
-            const rand = Math.random();
-            let runs = 0;
-            if (rand < 0.08) runs = -1;
-            else if (rand < 0.15) runs = 6;
-            else if (rand < 0.30) runs = 4;
-            else if (rand < 0.50) runs = 2;
-            else if (rand < 0.75) runs = 1;
+            let outcome = simulateDelivery(shot);
+            let runs = outcome.runs;
+            let desc = outcome.desc;
 
             if (runs === -1) {
-                game.wickets++;
-                comm(`OUT! Wicket! ${game.userTeam.name} ${game.runs}/${game.wickets}`);
+                game.wkts++;
                 game.batter = BATTERS[Math.floor(Math.random() * BATTERS.length)];
+                game.batRuns = 0;
+                game.batBalls = 0;
+                comm(COMM.wicket[Math.floor(Math.random() * COMM.wicket.length)] + ' ' + desc);
             } else {
                 game.runs += runs;
-                const c = COMMENTARY[Math.floor(Math.random() * COMMENTARY.length)];
-                comm(`${shot.toUpperCase()}: ${runs} runs! ${c}`);
+                game.batRuns += runs;
+                game.batBalls += 1;
+
+                const commType = runs === 6 ? 'six' : runs === 4 ? 'four' : runs === 2 ? 'two' : runs === 1 ? 'one' : 'dot';
+                comm((COMM[commType][Math.floor(Math.random() * COMM[commType].length)]) + ' ' + desc);
             }
 
             game.balls++;
-            if (game.balls >= 60 || game.wickets >= 10) endInning();
+            if (game.balls >= 60 || game.wkts >= 10) switchInning();
             else {
+                document.getElementById('shotDiv').classList.add('hidden');
+                document.getElementById('btnFace').classList.remove('hidden');
                 updateHUD();
-                drawGame();
-                showFaceButton();
+                drawPitch();
             }
         }
 
-        function playBowl(type) {
-            const rand = Math.random();
-            let runs = 0;
-            if (rand < 0.10) runs = -1;
-            else if (rand < 0.18) runs = 6;
-            else if (rand < 0.32) runs = 4;
-            else if (rand < 0.48) runs = 2;
-            else if (rand < 0.72) runs = 1;
+        function playBowl(bowlType) {
+            let outcome = simulateOpponentShot(bowlType);
+            let runs = outcome.runs;
+            let desc = outcome.desc;
 
             if (runs === -1) {
                 game.oppWkts++;
-                comm(`OUT! Your bowling is deadly!`);
                 game.batter = BATTERS[Math.floor(Math.random() * BATTERS.length)];
+                game.oppBatRuns = 0;
+                game.oppBatBalls = 0;
+                comm(COMM.wicket[Math.floor(Math.random() * COMM.wicket.length)] + ' ' + desc);
             } else {
                 game.oppRuns += runs;
-                comm(`${type.toUpperCase()}: ${runs} runs!`);
+                game.oppBatRuns += runs;
+                game.oppBatBalls += 1;
+
+                const commType = runs === 6 ? 'six' : runs === 4 ? 'four' : runs === 2 ? 'two' : runs === 1 ? 'one' : 'dot';
+                comm((COMM[commType][Math.floor(Math.random() * COMM[commType].length)]) + ' ' + desc);
             }
 
             game.oppBalls++;
-            if (game.oppBalls >= 60 || game.oppWkts >= 10) endInning();
+            if (game.oppBalls >= 60 || game.oppWkts >= 10) switchInning();
             else {
+                document.getElementById('bowlDiv').classList.add('hidden');
+                document.getElementById('btnBowl').classList.remove('hidden');
                 updateHUD();
-                drawGame();
-                showBowlButton();
+                drawPitch();
             }
         }
 
-        function endInning() {
+        // REALISTIC OUTCOMES
+        function simulateDelivery(shot) {
+            // Randomly generate a ball type
+            const ballTypes = ['full', 'short', 'yorker', 'spin'];
+            const ball = ballTypes[Math.floor(Math.random() * ballTypes.length)];
+            const r = Math.random();
+
+            let wicketChance, sixChance, fourChance, twoChance, oneChance;
+
+            // Match shot to ball type
+            switch(shot) {
+                case 'drive': // Works on full, risky on short
+                    if (ball === 'full') {
+                        wicketChance = 0.03; sixChance = 0.15; fourChance = 0.35; twoChance = 0.20; oneChance = 0.17;
+                    } else if (ball === 'short') {
+                        wicketChance = 0.12; sixChance = 0.04; fourChance = 0.08; twoChance = 0.15; oneChance = 0.20;
+                    } else if (ball === 'yorker') {
+                        wicketChance = 0.15; sixChance = 0.02; fourChance = 0.05; twoChance = 0.10; oneChance = 0.18;
+                    } else { // spin
+                        wicketChance = 0.10; sixChance = 0.06; fourChance = 0.12; twoChance = 0.18; oneChance = 0.20;
+                    }
+                    break;
+                case 'cut': // Works on short, bad on full
+                    if (ball === 'short') {
+                        wicketChance = 0.05; sixChance = 0.12; fourChance = 0.32; twoChance = 0.22; oneChance = 0.19;
+                    } else if (ball === 'full') {
+                        wicketChance = 0.18; sixChance = 0.02; fourChance = 0.08; twoChance = 0.10; oneChance = 0.18;
+                    } else if (ball === 'yorker') {
+                        wicketChance = 0.20; sixChance = 0.01; fourChance = 0.03; twoChance = 0.08; oneChance = 0.15;
+                    } else { // spin
+                        wicketChance = 0.08; sixChance = 0.08; fourChance = 0.18; twoChance = 0.20; oneChance = 0.22;
+                    }
+                    break;
+                case 'sweep': // Works on spin, bad on fast
+                    if (ball === 'spin') {
+                        wicketChance = 0.08; sixChance = 0.14; fourChance = 0.28; twoChance = 0.24; oneChance = 0.18;
+                    } else if (ball === 'full') {
+                        wicketChance = 0.12; sixChance = 0.04; fourChance = 0.10; twoChance = 0.18; oneChance = 0.22;
+                    } else if (ball === 'short') {
+                        wicketChance = 0.10; sixChance = 0.09; fourChance = 0.14; twoChance = 0.20; oneChance = 0.22;
+                    } else { // yorker
+                        wicketChance = 0.25; sixChance = 0.01; fourChance = 0.04; twoChance = 0.08; oneChance = 0.12;
+                    }
+                    break;
+                case 'loft': // Risky, works on short
+                    if (ball === 'short') {
+                        wicketChance = 0.08; sixChance = 0.18; fourChance = 0.16; twoChance = 0.18; oneChance = 0.20;
+                    } else if (ball === 'full') {
+                        wicketChance = 0.15; sixChance = 0.10; fourChance = 0.12; twoChance = 0.15; oneChance = 0.20;
+                    } else if (ball === 'yorker') {
+                        wicketChance = 0.22; sixChance = 0.02; fourChance = 0.06; twoChance = 0.12; oneChance = 0.16;
+                    } else { // spin
+                        wicketChance = 0.16; sixChance = 0.12; fourChance = 0.10; twoChance = 0.14; oneChance = 0.20;
+                    }
+                    break;
+            }
+
+            const dotChance = 1 - (wicketChance + sixChance + fourChance + twoChance + oneChance);
+
+            if (r < wicketChance) return { runs: -1, desc: `(Bowled! ${ball})` };
+            if (r < wicketChance + sixChance) return { runs: 6, desc: `(Six! Nice ${shot}!)` };
+            if (r < wicketChance + sixChance + fourChance) return { runs: 4, desc: `(Four! ${shot} works!)` };
+            if (r < wicketChance + sixChance + fourChance + twoChance) return { runs: 2, desc: '(Two runs)' };
+            if (r < wicketChance + sixChance + fourChance + twoChance + oneChance) return { runs: 1, desc: '(Single)' };
+            return { runs: 0, desc: `(Dot - tight ${ball})` };
+        }
+
+        function simulateOpponentShot(bowlType) {
+            const r = Math.random();
+
+            let wicketChance, sixChance, fourChance, twoChance, oneChance;
+
+            switch(bowlType) {
+                case 'fast': // Harder to hit, more wickets
+                    wicketChance = 0.12; sixChance = 0.08; fourChance = 0.14; twoChance = 0.18; oneChance = 0.22;
+                    break;
+                case 'bouncer': // Risky, can go for six
+                    wicketChance = 0.15; sixChance = 0.18; fourChance = 0.10; twoChance = 0.12; oneChance = 0.18;
+                    break;
+                case 'yorker': // Hard to hit
+                    wicketChance = 0.18; sixChance = 0.04; fourChance = 0.08; twoChance = 0.12; oneChance = 0.20;
+                    break;
+                case 'spin': // Hard to predict
+                    wicketChance = 0.10; sixChance = 0.12; fourChance = 0.16; twoChance = 0.20; oneChance = 0.22;
+                    break;
+            }
+
+            const dotChance = 1 - (wicketChance + sixChance + fourChance + twoChance + oneChance);
+
+            if (r < wicketChance) return { runs: -1, desc: `(Wicket! Great ${bowlType}!)` };
+            if (r < wicketChance + sixChance) return { runs: 6, desc: '(Boundary!)' };
+            if (r < wicketChance + sixChance + fourChance) return { runs: 4, desc: '(Four!)' };
+            if (r < wicketChance + sixChance + fourChance + twoChance) return { runs: 2, desc: '(Two)' };
+            if (r < wicketChance + sixChance + fourChance + twoChance + oneChance) return { runs: 1, desc: '(One)' };
+            return { runs: 0, desc: `(Maiden - good ${bowlType})` };
+        }
+
+        function switchInning() {
             if (game.inning === 1) {
                 game.inning = 2;
                 game.batting = false;
                 game.oppRuns = 0;
                 game.oppWkts = 0;
                 game.oppBalls = 0;
-                updateHUD();
-                drawGame();
-                comm(`Inning 1 over! ${game.userTeam.name} scored ${game.runs}/${game.wickets}. Now ${game.opponent.name} need ${game.runs + 1} to win!`);
-                showBowlButton();
+                game.bowler = game.bowler;
+
+                document.getElementById('shotDiv').classList.add('hidden');
+                document.getElementById('btnFace').classList.add('hidden');
+                document.getElementById('btnBowl').classList.remove('hidden');
+
+                comm(`Inning 1 complete! ${game.team.name}: ${game.runs}/${game.wkts}. Now ${game.opp.name} need ${game.runs + 1}!`);
             } else {
                 endMatch();
             }
+            updateHUD();
+            drawPitch();
         }
 
         function endMatch() {
             const win = game.inning === 2 ? game.oppRuns < game.runs + 1 : game.runs > game.oppRuns;
-            const res = win ?
-                `🎉 ${game.userTeam.name} WINS! 🎉<br>${game.runs}/${game.wickets} vs ${game.oppRuns}/${game.oppWkts}` :
-                `😢 ${game.opponent.name} WINS!<br>${game.oppRuns}/${game.oppWkts} vs ${game.runs}/${game.wickets}`;
+            const result = win ?
+                `🎉 ${game.team.name} WINS! 🎉<br><br>${game.team.name}: ${game.runs}/${game.wkts}<br>${game.opp.name}: ${game.oppRuns}/${game.oppWkts}` :
+                `😢 ${game.opp.name} WINS!<br><br>${game.opp.name}: ${game.oppRuns}/${game.oppWkts}<br>${game.team.name}: ${game.runs}/${game.wkts}`;
 
-            document.getElementById('resultBox').innerHTML = `<h2>${win ? 'VICTORY!' : 'DEFEAT!'}</h2><p>${res}</p>`;
-            document.getElementById('gamePage').classList.add('hidden');
-            document.getElementById('resultPage').classList.remove('hidden');
+            document.getElementById('resultBox').innerHTML = `<h2>${win ? 'VICTORY!' : 'DEFEAT!'}</h2><p>${result}</p>`;
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
 
-            speak(win ? 'You won! Fantastic cricket!' : 'You lost. Better luck next time!');
+            speak(win ? `${game.team.name} wins! Fantastic cricket!` : `${game.opp.name} wins!`);
+        }
+
+        function drawPitch() {
+            const c = game.canvas;
+            const w = c.width;
+            const h = c.height;
+            const ctx = game.ctx;
+
+            // Sky
+            ctx.fillStyle = '#4a8cc8';
+            ctx.fillRect(0, 0, w, h * 0.5);
+
+            // Ground
+            ctx.fillStyle = '#2d5a2d';
+            ctx.fillRect(0, h * 0.5, w, h * 0.5);
+
+            // Pitch
+            ctx.fillStyle = '#c9a961';
+            ctx.fillRect(w * 0.15, h * 0.3, w * 0.7, h * 0.25);
+
+            // Pitch lines
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.15, h * 0.42);
+            ctx.lineTo(w * 0.85, h * 0.42);
+            ctx.stroke();
+
+            // Crease
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(w * 0.15, h * 0.35);
+            ctx.lineTo(w * 0.85, h * 0.35);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(w * 0.15, h * 0.49);
+            ctx.lineTo(w * 0.85, h * 0.49);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Stumps
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(w * 0.2, h * 0.32, 40, 6);
+            ctx.fillRect(w * 0.8, h * 0.5, 40, 6);
+
+            // Bowler
+            drawPlayer(ctx, w * 0.25, h * 0.35, 'BOWLER');
+
+            // Batter
+            drawPlayer(ctx, w * 0.75, h * 0.35, 'BATTER');
+
+            // Fielders
+            [[0.4, 0.2], [0.6, 0.2], [0.15, 0.45], [0.85, 0.45], [0.5, 0.15]].forEach(([x, y]) => {
+                drawPlayer(ctx, w * x, h * y, 'F');
+            });
+
+            // Crowd
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.3)';
+            ctx.fillRect(0, h * 0.5, w, h * 0.08);
+        }
+
+        function drawPlayer(ctx, x, y, label) {
+            ctx.fillStyle = '#d4a574';
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(x, y, 9, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#004ba8';
+            ctx.fillRect(x - 9, y + 8, 18, 22);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, x, y + 40);
         }
 
         function backHome() {
-            document.getElementById('gamePage').classList.add('hidden');
-            document.getElementById('resultPage').classList.add('hidden');
-            document.getElementById('teamSelectPage').classList.add('hidden');
-            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('homePage').style.display = 'flex';
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('teamSelectPage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'none';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            game.canvas = document.getElementById('gameCanvas');
-            game.ctx = game.canvas.getContext('2d');
+            backHome();
         });
     </script>
 </body>
