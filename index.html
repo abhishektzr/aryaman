@@ -204,9 +204,12 @@
 
         <!-- TEAM SELECTION -->
         <div id="teamSelectPage" class="hidden">
-            <h2 style="color: #ffb300; text-align: center; margin-bottom: 30px;">SELECT YOUR TEAM</h2>
-            <div class="team-select" id="teamList"></div>
-            <button style="width: 100%; padding: 15px; font-size: 1.1em; margin-top: 20px;" onclick="confirmTeam()">START MATCH</button>
+            <div style="background: rgba(0,0,0,0.7); padding: 30px; border-radius: 10px;">
+                <h2 style="color: #ffb300; text-align: center; margin-bottom: 20px; font-size: 2em;">SELECT YOUR TEAM</h2>
+                <p style="text-align: center; color: #ccc; margin-bottom: 30px; font-size: 1.1em;">👇 Click a team card below, then press START MATCH 👇</p>
+                <div class="team-select" id="teamList"></div>
+                <button style="width: 100%; padding: 20px; font-size: 1.3em; margin-top: 30px; background: linear-gradient(135deg, #ffb300, #ff6b35); border: 3px solid #ffb300; font-weight: bold; cursor: pointer; border-radius: 8px;" onclick="confirmTeam()">🏏 START MATCH 🏏</button>
+            </div>
         </div>
 
         <!-- GAME PAGE -->
