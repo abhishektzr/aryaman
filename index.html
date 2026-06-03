@@ -81,6 +81,7 @@ td.r,th.r{text-align:right;}
 <div class="card mode-card" onclick="selectMode('ipl')"><div class="flag">🏆</div><div class="nm">IPL</div><div class="full">Franchise battle</div></div>
 <div class="card mode-card" onclick="selectMode('friendly')"><div class="flag">🤝</div><div class="nm">FRIENDLY</div><div class="full">Just for fun</div></div>
 </div>
+<button class="btn ghost" onclick="show('howtoScreen')" style="margin-top:20px;">❓ HOW TO PLAY</button>
 </div>
 
 <div class="screen" id="teamScreen">
@@ -122,6 +123,48 @@ td.r,th.r{text-align:right;}
 <button class="btn" id="startMatchBtn" style="display:none" onclick="startMatch()">START MATCH ▶</button>
 </div>
 
+<div class="screen" id="howtoScreen">
+<h1>🏏 HOW TO PLAY</h1>
+<div style="max-width:600px;margin:0 auto;padding:10px 0 20px;">
+  <div style="background:#181d27;border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid #ffb300;">
+    <h3 style="color:#ffb300;margin-bottom:12px;">🏏 BATTING (when your team bats)</h3>
+    <p style="color:#ccc;line-height:1.8;font-size:14px;">
+      1. Watch the bowler run up — the ball is coming!<br>
+      2. A <span style="color:#22c55e;font-weight:700;">green timing bar</span> slides left-right at the top. A moving white marker bounces back and forth.<br>
+      3. Hit a shot button <span style="color:#ffb300;font-weight:700;">when the white marker is inside the green zone</span> for perfect timing → more runs, fewer wickets.<br>
+      4. Hit it outside the green zone → mistimed → risk of wicket or dot ball.<br><br>
+      <b style="color:#ffb300;">DEFEND</b> 🛡️ — Safe block. Low risk, 0–1 runs. Good against any delivery.<br>
+      <b style="color:#ffb300;">DRIVE</b> 🏏 — Straight/covers. Best on full-length balls. Risky on short balls.<br>
+      <b style="color:#ffb300;">CUT</b> ✂️ — Point/third man. Best on short balls outside off stump.<br>
+      <b style="color:#ffb300;">LOFT</b> 🚀 — Aerial shot. High risk, can score 4 or 6. Risky on yorkers.
+    </p>
+  </div>
+  <div style="background:#181d27;border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid #ff6b35;">
+    <h3 style="color:#ff6b35;margin-bottom:12px;">🎳 BOWLING (when you bowl)</h3>
+    <p style="color:#ccc;line-height:1.8;font-size:14px;">
+      1. Pick your <span style="color:#ffb300;font-weight:700;">bowler</span> from the sidebar at the start of each over.<br>
+      2. <span style="color:#ffb300;font-weight:700;">Click on the pitch</span> to aim where you want the ball to land — a target marker appears!<br>
+      3. Then choose your <span style="color:#ffb300;font-weight:700;">delivery type</span> from the buttons.<br><br>
+      <b style="color:#ff6b35;">PACE BOWLERS get:</b> Fast · Bouncer · Yorker · Inswing · Outswing<br>
+      <b style="color:#ff6b35;">SPIN BOWLERS get:</b> Off-break · Leg-spin · Googly · Doosra · Flipper<br><br>
+      Aim for the stumps with a Yorker = high wicket chance.<br>
+      Aim outside off stump with a bouncer = force the cut shot risk.<br>
+      A Googly on a wrong-foot batter = spin surprise!
+    </p>
+  </div>
+  <div style="background:#181d27;border-radius:14px;padding:20px;border:1px solid #2c3445;">
+    <h3 style="color:#9aa3b2;margin-bottom:12px;">📊 READING THE GAME</h3>
+    <p style="color:#ccc;line-height:1.8;font-size:14px;">
+      Top-left: Score / Wickets / Overs<br>
+      Top-right: Target (2nd innings) / Batter name and runs(balls)<br>
+      Gold text at bottom: Commentary<br>
+      Green flash = Catch! Yellow flash = Boundary dive!
+    </p>
+  </div>
+  <button class="btn" onclick="show('homeScreen')">◀ Back to Menu</button>
+</div>
+</div>
+
 <div class="screen" id="gameScreen">
 <canvas id="cv"></canvas>
 <div class="hud" id="hudTL"><div id="hudScore">0/0</div><div id="hudOvers">0.0 ov</div></div>
@@ -130,6 +173,10 @@ td.r,th.r{text-align:right;}
 <div id="commentary">Welcome to the match!</div>
 <div id="timingWrap"><div id="timingZone"></div><div id="timingMark"></div></div>
 <div id="controls"></div>
+<!-- Bowling aim instructions overlay -->
+<div id="aimInstr" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);border:2px solid #ffb300;border-radius:12px;padding:18px 24px;color:#ffb300;font-weight:700;text-align:center;z-index:20;pointer-events:none;font-size:15px;">
+  👆 TAP THE PITCH TO AIM YOUR DELIVERY
+</div>
 </div>
 
 <div class="screen" id="resultScreen">
@@ -144,7 +191,7 @@ function mk(name,role,bat,bowl){return{name,role,bat,bowl};}
 function gen(a){return a.map(n=>mk(n[0],n[1],n[2],n[3]));}
 const TEAMS={
 worldcup:{
-IND:{name:"India",flag:"🇮🇳",players:gen([["Rohit Sharma","BAT",90,15],["Shubman Gill","BAT",84,10],["Virat Kohli","BAT",95,20],["Shreyas Iyer","BAT",80,12],["KL Rahul","WK",82,5],["Hardik Pandya","ALL",78,72],["Ravindra Jadeja","ALL",70,85],["R Ashwin","BOWL",45,88],["Jasprit Bumrah","BOWL",20,95],["Mohammed Shami","BOWL",25,90],["Kuldeep Yadav","BOWL",30,84],["Suryakumar Yadav","BAT",86,8],["Ishan Kishan","WK",78,5],["Mohammed Siraj","BOWL",22,86],["Axar Patel","ALL",65,80]])},
+IND:{name:"India",flag:"🇮🇳",players:gen([["Rohit Sharma","BAT",92,15],["Shubman Gill","BAT",91,10],["Virat Kohli","BAT",96,20],["Shreyas Iyer","BAT",82,12],["KL Rahul","WK",84,5],["Rishabh Pant","WK",88,5],["Hardik Pandya","ALL",80,74],["Ravindra Jadeja","ALL",72,86],["R Ashwin","BOWL",46,89],["Jasprit Bumrah","BOWL",22,97],["Mohammed Shami","BOWL",26,91],["Kuldeep Yadav","BOWL",32,85],["Suryakumar Yadav","BAT",89,8],["Mohammed Siraj","BOWL",23,86],["Axar Patel","ALL",66,81]])},
 AUS:{name:"Australia",flag:"🇦🇺",players:gen([["David Warner","BAT",88,8],["Travis Head","BAT",85,40],["Steve Smith","BAT",92,30],["Marnus Labuschagne","BAT",83,35],["Glenn Maxwell","ALL",84,68],["Marcus Stoinis","ALL",76,70],["Alex Carey","WK",75,5],["Pat Cummins","BOWL",40,92],["Mitchell Starc","BOWL",30,93],["Adam Zampa","BOWL",35,85],["Josh Hazlewood","BOWL",22,90],["Mitchell Marsh","ALL",80,65],["Cameron Green","ALL",74,75],["Sean Abbott","BOWL",45,80],["Josh Inglis","WK",77,5]])},
 ENG:{name:"England",flag:"🏴",players:gen([["Jos Buttler","WK",90,5],["Jonny Bairstow","WK",84,5],["Joe Root","BAT",91,45],["Ben Stokes","ALL",85,78],["Harry Brook","BAT",83,20],["Moeen Ali","ALL",72,80],["Liam Livingstone","ALL",80,70],["Chris Woakes","BOWL",55,85],["Mark Wood","BOWL",30,90],["Adil Rashid","BOWL",35,86],["Jofra Archer","BOWL",28,91],["Dawid Malan","BAT",82,10],["Sam Curran","ALL",68,80],["Reece Topley","BOWL",20,84],["Phil Salt","WK",80,5]])},
 PAK:{name:"Pakistan",flag:"🇵🇰",players:gen([["Babar Azam","BAT",93,15],["Fakhar Zaman","BAT",82,20],["Imam-ul-Haq","BAT",80,5],["Mohammad Rizwan","WK",85,5],["Saud Shakeel","BAT",78,10],["Iftikhar Ahmed","ALL",74,60],["Shadab Khan","ALL",65,82],["Mohammad Nawaz","ALL",62,78],["Shaheen Afridi","BOWL",30,93],["Haris Rauf","BOWL",25,88],["Naseem Shah","BOWL",28,89],["Agha Salman","ALL",70,65],["Usama Mir","BOWL",35,80],["Mohammad Wasim","BOWL",40,82],["Abdullah Shafique","BAT",79,5]])},
@@ -157,7 +204,7 @@ ipl:{
 MI:{name:"Mumbai Indians",flag:"🔵",players:gen([["Rohit Sharma","BAT",90,15],["Ishan Kishan","WK",82,5],["Suryakumar Yadav","BAT",88,8],["Tilak Varma","BAT",80,30],["Hardik Pandya","ALL",80,75],["Tim David","ALL",82,20],["Cameron Green","ALL",76,76],["Jasprit Bumrah","BOWL",20,96],["Piyush Chawla","BOWL",35,80],["Gerald Coetzee","BOWL",35,84],["Akash Madhwal","BOWL",25,80],["Nehal Wadhera","BAT",75,10],["Romario Shepherd","ALL",70,76],["Mohammad Nabi","ALL",68,78],["Dewald Brevis","BAT",78,20]])},
 CSK:{name:"Chennai Super Kings",flag:"🟡",players:gen([["Ruturaj Gaikwad","BAT",86,10],["Devon Conway","BAT",85,5],["Ajinkya Rahane","BAT",80,5],["Shivam Dube","ALL",80,55],["MS Dhoni","WK",82,5],["Ravindra Jadeja","ALL",72,86],["Moeen Ali","ALL",72,80],["Deepak Chahar","BOWL",45,84],["Tushar Deshpande","BOWL",30,82],["Maheesh Theekshana","BOWL",40,84],["Matheesha Pathirana","BOWL",26,86],["Daryl Mitchell","ALL",82,60],["Rachin Ravindra","ALL",78,70],["Mukesh Choudhary","BOWL",25,80],["Mitchell Santner","ALL",60,83]])},
 RCB:{name:"Royal Challengers Bangalore",flag:"🔴",players:gen([["Virat Kohli","BAT",95,20],["Faf du Plessis","BAT",86,8],["Glenn Maxwell","ALL",84,68],["Rajat Patidar","BAT",80,10],["Dinesh Karthik","WK",80,5],["Cameron Green","ALL",76,76],["Mahipal Lomror","ALL",72,60],["Wanindu Hasaranga","ALL",68,86],["Mohammed Siraj","BOWL",22,88],["Harshal Patel","BOWL",40,84],["Yash Dayal","BOWL",25,80],["Anuj Rawat","WK",74,5],["Karn Sharma","BOWL",40,80],["Reece Topley","BOWL",20,84],["Will Jacks","ALL",80,62]])},
-KKR:{name:"Kolkata Knight Riders",flag:"🟣",players:gen([["Shubman Gill","BAT",84,10],["Rahmanullah Gurbaz","WK",82,5],["Nitish Rana","BAT",80,40],["Venkatesh Iyer","ALL",80,55],["Andre Russell","ALL",82,80],["Rinku Singh","BAT",81,10],["Sunil Narine","ALL",75,86],["Varun Chakaravarthy","BOWL",35,85],["Mitchell Starc","BOWL",30,93],["Harshit Rana","BOWL",26,80],["Suyash Sharma","BOWL",30,80],["Anukul Roy","ALL",65,72],["Vaibhav Arora","BOWL",24,80],["Phil Salt","WK",80,5],["Ramandeep Singh","ALL",70,60]])},
+KKR:{name:"Kolkata Knight Riders",flag:"🟣",players:gen([["Shubman Gill","BAT",91,10],["Rahmanullah Gurbaz","WK",82,5],["Nitish Rana","BAT",80,40],["Venkatesh Iyer","ALL",80,55],["Andre Russell","ALL",82,80],["Rinku Singh","BAT",81,10],["Sunil Narine","ALL",75,86],["Varun Chakaravarthy","BOWL",35,85],["Mitchell Starc","BOWL",30,93],["Harshit Rana","BOWL",26,80],["Suyash Sharma","BOWL",30,80],["Anukul Roy","ALL",65,72],["Vaibhav Arora","BOWL",24,80],["Phil Salt","WK",80,5],["Ramandeep Singh","ALL",70,60]])},
 DC:{name:"Delhi Capitals",flag:"🟦",players:gen([["David Warner","BAT",88,8],["Prithvi Shaw","BAT",80,5],["Mitchell Marsh","ALL",80,65],["Rishabh Pant","WK",86,5],["Axar Patel","ALL",65,82],["Tristan Stubbs","BAT",78,10],["Abishek Porel","WK",74,5],["Kuldeep Yadav","BOWL",30,86],["Anrich Nortje","BOWL",28,89],["Khaleel Ahmed","BOWL",25,82],["Mukesh Kumar","BOWL",24,80],["Lalit Yadav","ALL",68,62],["Ishant Sharma","BOWL",22,80],["Jake Fraser-McGurk","BAT",80,10],["Kumar Kushagra","WK",72,5]])},
 PBKS:{name:"Punjab Kings",flag:"🟥",players:gen([["Shikhar Dhawan","BAT",84,5],["Jonny Bairstow","WK",84,5],["Prabhsimran Singh","WK",76,5],["Liam Livingstone","ALL",80,70],["Sam Curran","ALL",68,80],["Jitesh Sharma","WK",78,5],["Shashank Singh","BAT",75,10],["Harpreet Brar","ALL",62,78],["Kagiso Rabada","BOWL",30,92],["Arshdeep Singh","BOWL",30,86],["Rahul Chahar","BOWL",35,82],["Atharva Taide","BAT",74,10],["Harshal Patel","BOWL",40,84],["Nathan Ellis","BOWL",30,82],["Rishi Dhawan","ALL",66,72]])},
 RR:{name:"Rajasthan Royals",flag:"🌸",players:gen([["Jos Buttler","WK",90,5],["Yashasvi Jaiswal","BAT",85,10],["Sanju Samson","WK",84,5],["Riyan Parag","ALL",78,55],["Shimron Hetmyer","BAT",83,15],["Dhruv Jurel","WK",76,5],["Ravichandran Ashwin","BOWL",45,86],["Trent Boult","BOWL",30,90],["Yuzvendra Chahal","BOWL",35,87],["Sandeep Sharma","BOWL",25,82],["Avesh Khan","BOWL",26,82],["Rovman Powell","ALL",80,55],["Donovan Ferreira","ALL",74,40],["Prasidh Krishna","BOWL",24,84],["Kuldeep Sen","BOWL",24,80]])},
@@ -314,6 +361,14 @@ function loop(ts){
   drawBall();
   if(timing.active)stepTiming(dt);
   if(anim.phase==='shot')anim.shotAnim+=dt*0.02;
+  // Draw aim target
+  if(aimTarget.set&&(anim.phase==='waitDelivery'||anim.phase==='waitAim')){
+    const pulse=0.6+Math.sin(Date.now()*0.006)*0.4;
+    ctx.strokeStyle=`rgba(255,179,0,${pulse})`;ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(aimTarget.x,aimTarget.y,12,0,7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(aimTarget.x-18,aimTarget.y);ctx.lineTo(aimTarget.x+18,aimTarget.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(aimTarget.x,aimTarget.y-18);ctx.lineTo(aimTarget.x,aimTarget.y+18);ctx.stroke();
+  }
   requestAnimationFrame(loop);
 }
 // drawFielders() defined below with full animation support
@@ -379,13 +434,31 @@ function timingQuality(){
 }
 function stopTiming(){timing.active=false;document.getElementById('timingWrap').style.display='none';}
 
+// PACER deliveries vs SPINNER deliveries
+const PACER_DELIVERIES=[
+  ['⚡','FAST','Good length'],['💥','BOUNCER','Short pitch'],
+  ['🎯','YORKER','At toes'],['↙️','INSWING','Swings in'],['↗️','OUTSWING','Swings out']
+];
+const SPIN_DELIVERIES=[
+  ['🔄','OFF-BREAK','Turns away'],['🌀','LEG-SPIN','Turns in'],
+  ['🎭','GOOGLY','Wrong un!'],['🔀','DOOSRA','Other way'],['⬇️','FLIPPER','Skids on']
+];
+
+function isSpin(p){return p&&(p.role==='BOWL'||p.role==='ALL')&&p.bowl>=70&&['Kuldeep','Ashwin','Jadeja','Chahal','Patel','Narine','Santner','Hasaranga','Theekshana','Zampa','Sodhi','Rashid','Maharaj','Shamsi','Chakravarthy','Markande'].some(n=>p.name.includes(n));}
+
 function buildControls(){
   const c=document.getElementById('controls');c.innerHTML='';
   if(G.userBatting){
     [['🛡️','DEFEND','Safe block'],['🏏','DRIVE','Straight'],['✂️','CUT','Point/3rd'],['🚀','LOFT','Go big!']].forEach((d,i)=>c.appendChild(ctlBtn(d,()=>playShot(['DEFEND','DRIVE','CUT','LOFT'][i]))));
   }else{
-    [['⚡','FAST','Pace on'],['💥','BOUNCER','Short'],['🎯','YORKER','At toes'],['🌀','SPIN','Turn it']].forEach((d,i)=>c.appendChild(ctlBtn(d,()=>bowlDelivery(['FAST','BOUNCER','YORKER','SPIN'][i]))));
+    buildBowlingControls();
   }
+}
+function buildBowlingControls(){
+  const c=document.getElementById('controls');c.innerHTML='';
+  const bowler=G.curBowler;
+  const deliveries=isSpin(bowler)?SPIN_DELIVERIES:PACER_DELIVERIES;
+  deliveries.forEach(d=>c.appendChild(ctlBtn(d,()=>bowlDelivery(d[1]))));
 }
 function ctlBtn(d,fn){const b=document.createElement('div');b.className='ctl dis';b.innerHTML=`<div class="em">${d[0]}</div><div class="cn">${d[1]}</div><div class="ch">${d[2]}</div>`;b.onclick=fn;return b;}
 function setControls(on){document.querySelectorAll('.ctl').forEach(b=>b.classList.toggle('dis',!on));}
@@ -407,25 +480,67 @@ function updateHUD(){
 }
 
 let deliveryType=null;
+let aimTarget={x:null,y:null,set:false}; // where user aimed on the pitch
+
 function nextBall(){
   if(G.balls>=G.maxOvers*6||G.wkts>=10||(G.inning===2&&G.score>=G.target)){endInning();return;}
   if(G.balls>0&&G.balls%6===0&&G.lastBallOver!==G.balls){
     G.lastBallOver=G.balls;[G.striker,G.nonstriker]=[G.nonstriker,G.striker];
-    if(G.userBatting)chooseBowlerAuto();else{commentary('Choose your bowler for the over.');showBowlerBar();}
+    if(G.userBatting)chooseBowlerAuto();
+    else{commentary('Choose your bowler for the over.');showBowlerBar();}
   }
+  aimTarget={x:null,y:null,set:false};
   updateHUD();
-  if(!G.userBatting){setControls(true);commentary(`${G.curBowler.name} ready to bowl. Choose delivery.`);anim.phase='waitDelivery';}
-  else{
+  if(!G.userBatting){
+    // Show aim instruction, then wait for canvas click + delivery button
+    setControls(false);
+    anim.phase='waitAim';
+    document.getElementById('aimInstr').style.display='block';
+    commentary(`${G.curBowler.name} — tap the pitch to aim, then choose your delivery.`);
+    buildBowlingControls(); // build correct spinner/pacer buttons but keep disabled
+  }else{
     deliveryType=pickAIDelivery();
     startRunup(()=>{setControls(true);startTiming();anim.shot=null;
       clearTimeout(G._shotTimer);G._shotTimer=setTimeout(()=>{if(!anim.shot)playShot('DEFEND',true);},2600);});
   }
 }
-function pickAIDelivery(){const arr=['FAST','BOUNCER','YORKER','SPIN'];if(G.curBowler.bowl>78&&G.curBowler.role==='BOWL')return arr[Math.floor(Math.random()*3)];return arr[Math.floor(Math.random()*4)];}
+
+function pickAIDelivery(){
+  const spin=isSpin(G.curBowler);
+  if(spin){const a=['OFF-BREAK','LEG-SPIN','GOOGLY','DOOSRA','FLIPPER'];return a[Math.floor(Math.random()*a.length)];}
+  const a=['FAST','BOUNCER','YORKER','INSWING','OUTSWING'];
+  // smart selection: late in chase, bowl yorkers more
+  if(G.inning===2&&G.target-G.score<12)return Math.random()<0.45?'YORKER':'FAST';
+  return a[Math.floor(Math.random()*a.length)];
+}
+
+// Canvas click — set aim target when bowling
+cv.addEventListener('click',function(e){
+  if(anim.phase!=='waitAim')return;
+  const rect=cv.getBoundingClientRect();
+  const cx=(e.clientX-rect.left)*(cv.width/(cv.style.width?parseFloat(cv.style.width):cv.width));
+  const cy=(e.clientY-rect.top)*(cv.height/(cv.style.height?parseFloat(cv.style.height):cv.height));
+  const dpr=window.devicePixelRatio||1;
+  const ax=e.clientX-rect.left, ay=e.clientY-rect.top;
+  // Only accept clicks within the pitch area
+  const pt=pitchTop(),pb=pitchBot(),pw=W*0.12;
+  if(ax>W*0.5-pw&&ax<W*0.5+pw&&ay>pt&&ay<pb){
+    aimTarget={x:ax,y:ay,set:true};
+    document.getElementById('aimInstr').style.display='none';
+    setControls(true);
+    anim.phase='waitDelivery';
+    commentary(`Aimed! Now choose your delivery type.`);
+  }
+});
 
 function bowlDelivery(type){
   if(anim.phase!=='waitDelivery')return;
+  // If no aim set yet, use a default random aim
+  if(!aimTarget.set){
+    aimTarget={x:W*0.5+(Math.random()-0.5)*W*0.08,y:pitchTop()+(pitchBot()-pitchTop())*0.6,set:true};
+  }
   deliveryType=type;setControls(false);document.getElementById('bowlerBar').style.display='none';
+  document.getElementById('aimInstr').style.display='none';
   startRunup(()=>aiBat(type));
 }
 
@@ -455,24 +570,28 @@ function deliveryPhase(onArrive){
   requestAnimationFrame(dstep);
 }
 function releaseBall(onArrive){
-  // Ball released from bowler hand, travels down pitch to batsman
   const sx=W*0.5,sy=pitchTop()+18;
-  // Batsman is slightly off-center
-  const tx=W*0.5+W*0.04,ty=pitchBot()-18;
+  // Use aim target if set, otherwise default batsman position
+  const tx=aimTarget.set?aimTarget.x:W*0.5+W*0.04;
+  const ty=aimTarget.set?aimTarget.y:pitchBot()-18;
   ball.active=true;ball.trail=[];ball.x=sx;ball.y=sy;
 
-  // Bounce position: where ball hits pitch
+  // Bounce position varies by delivery type
   let bounceFrac=0.60;
-  if(deliveryType==='YORKER') bounceFrac=0.91;
-  else if(deliveryType==='BOUNCER') bounceFrac=0.40;
-  else if(deliveryType==='SPIN') bounceFrac=0.58;
+  if(deliveryType==='YORKER') bounceFrac=0.92;
+  else if(deliveryType==='BOUNCER') bounceFrac=0.38;
+  else if(deliveryType==='FLIPPER') bounceFrac=0.55;
+  else if(deliveryType==='DOOSRA'||deliveryType==='GOOGLY') bounceFrac=0.62;
+  else if(deliveryType==='OFF-BREAK'||deliveryType==='LEG-SPIN') bounceFrac=0.64;
 
   const bounceX=sx+(tx-sx)*bounceFrac;
   const bounceY=sy+(ty-sy)*bounceFrac;
 
-  // Flight times
-  const flightT=deliveryType==='SPIN'?950:deliveryType==='BOUNCER'?580:660;
-  const arcMult=deliveryType==='BOUNCER'?0.13:deliveryType==='SPIN'?0.07:0.05;
+  // Flight times and arcs by delivery type
+  const spinTypes=['OFF-BREAK','LEG-SPIN','GOOGLY','DOOSRA','FLIPPER'];
+  const isSpinDel=spinTypes.includes(deliveryType);
+  const flightT=isSpinDel?940:deliveryType==='BOUNCER'?560:deliveryType==='YORKER'?630:660;
+  const arcMult=deliveryType==='BOUNCER'?0.14:isSpinDel?0.08:0.05;
 
   const t0=performance.now();
   function fstep(){
@@ -521,27 +640,68 @@ function playShot(shot,timeout){
   setTimeout(()=>commitBall(outcome,st,bowlStat,shot,q),900);
 }
 
+// Aim accuracy bonus: how close did the bowler aim to the ideal zone?
+function aimAccuracy(){
+  if(!aimTarget.set)return 0.5;
+  const pitchMidX=W*0.5,pitchH=pitchBot()-pitchTop();
+  const offX=Math.abs(aimTarget.x-pitchMidX)/(W*0.06); // 0=on stump, 1=wide
+  const lengthY=(aimTarget.y-pitchTop())/pitchH; // 0=top(short),1=bottom(full)
+  // Accuracy based on distance from stump line
+  return Math.max(0,1-offX*0.4);
+}
+
+// Delivery traits: each delivery behaves differently vs each shot
+const DELIVERY_TRAITS={
+  'FAST':       {vsDefend:0.8,vsDrive:0.55,vsCut:0.45,vsLoft:0.40,wicketBase:0.08,bouncer:false,spinner:false},
+  'BOUNCER':    {vsDefend:0.5,vsDrive:0.25,vsCut:0.75,vsLoft:0.45,wicketBase:0.12,bouncer:true,spinner:false},
+  'YORKER':     {vsDefend:0.6,vsDrive:0.20,vsCut:0.15,vsLoft:0.10,wicketBase:0.18,bouncer:false,spinner:false},
+  'INSWING':    {vsDefend:0.7,vsDrive:0.60,vsCut:0.30,vsLoft:0.35,wicketBase:0.10,spinner:false},
+  'OUTSWING':   {vsDefend:0.7,vsDrive:0.50,vsCut:0.60,vsLoft:0.38,wicketBase:0.09,spinner:false},
+  'OFF-BREAK':  {vsDefend:0.7,vsDrive:0.45,vsCut:0.35,vsLoft:0.55,wicketBase:0.10,spinner:true},
+  'LEG-SPIN':   {vsDefend:0.65,vsDrive:0.40,vsCut:0.50,vsLoft:0.60,wicketBase:0.11,spinner:true},
+  'GOOGLY':     {vsDefend:0.55,vsDrive:0.30,vsCut:0.25,vsLoft:0.40,wicketBase:0.16,surprise:true,spinner:true},
+  'DOOSRA':     {vsDefend:0.60,vsDrive:0.32,vsCut:0.28,vsLoft:0.35,wicketBase:0.15,surprise:true,spinner:true},
+  'FLIPPER':    {vsDefend:0.65,vsDrive:0.38,vsCut:0.30,vsLoft:0.22,wicketBase:0.14,spinner:true},
+};
+
 function resolveBatOutcome(shot,del,q,player){
-  const skill=player.bat/100;let good=0;
-  if(shot==='DRIVE')good=(del==='FAST'||del==='YORKER')?0.5:0.3;
-  if(shot==='CUT')good=(del==='BOUNCER'||del==='FAST')?0.6:0.25;
-  if(shot==='LOFT')good=(del==='SPIN'||del==='FAST')?0.55:0.25;
-  let qmul={perfect:1.0,good:0.7,ok:0.4,poor:0.1}[q];
-  let wicketChance;
-  if(shot==='LOFT')wicketChance=0.22-(qmul*0.16)-skill*0.05;
-  else if(shot==='CUT')wicketChance=0.12-(qmul*0.09)-skill*0.04;
-  else if(shot==='DRIVE')wicketChance=0.08-(qmul*0.06)-skill*0.03;
-  else wicketChance=0.025-(qmul*0.02);
-  if(del==='YORKER'&&shot!=='DEFEND')wicketChance+=0.08;
-  if(del==='BOUNCER'&&shot==='LOFT')wicketChance+=0.05;
-  if(q==='poor'&&shot!=='DEFEND')wicketChance+=0.1;
-  wicketChance=Math.max(0.01,wicketChance);
-  if(Math.random()<wicketChance)return{runs:0,wicket:true,type:shot==='LOFT'?'c':'b'};
-  let runs=0;const sr=Math.random();const power=good*qmul*skill;
-  if(shot==='DEFEND')runs=sr<0.2?1:0;
-  else if(shot==='LOFT'){if(power>0.4&&sr<0.55)runs=6;else if(power>0.25)runs=sr<0.5?4:2;else runs=sr<0.4?1:0;}
-  else if(shot==='DRIVE'){if(power>0.35&&sr<0.5)runs=4;else if(power>0.2)runs=[1,2,3][Math.floor(sr*3)];else runs=sr<0.5?1:0;}
-  else{if(power>0.4&&sr<0.45)runs=4;else if(power>0.2)runs=[1,1,2][Math.floor(sr*3)];else runs=sr<0.5?1:0;}
+  const skill=player.bat/100;
+  const qmul={perfect:1.0,good:0.72,ok:0.42,poor:0.12}[q];
+  const traits=DELIVERY_TRAITS[del]||DELIVERY_TRAITS['FAST'];
+  const acc=aimAccuracy();
+
+  // Which trait applies
+  const matchGood={'DEFEND':traits.vsDefend,'DRIVE':traits.vsDrive,'CUT':traits.vsCut,'LOFT':traits.vsLoft}[shot]||0.4;
+
+  // Wicket chance: bad trait match + bowler aim + poor timing
+  let wicketChance=traits.wicketBase*(1+acc*0.5)*(1-skill*0.3)*(1+(1-qmul)*0.6);
+  if(traits.surprise)wicketChance*=1.4; // googly/doosra catch batters off guard
+  wicketChance=Math.min(0.55,Math.max(0.01,wicketChance));
+
+  if(Math.random()<wicketChance){
+    // Determine dismissal type
+    const r2=Math.random();
+    const how=traits.bouncer?(r2<0.5?'c':'b'):(shot==='LOFT'||traits.spinner?'c':'b');
+    return{runs:0,wicket:true,type:how};
+  }
+
+  // Run scoring: based on shot quality, timing, delivery matchup
+  const power=matchGood*qmul*skill;
+  const sr=Math.random();let runs=0;
+  if(shot==='DEFEND'){runs=sr<0.18?1:0;}
+  else if(shot==='LOFT'){
+    if(power>0.38&&sr<0.50)runs=6;
+    else if(power>0.22)runs=sr<0.55?4:2;
+    else runs=sr<0.45?1:0;
+  }else if(shot==='DRIVE'){
+    if(power>0.33&&sr<0.48)runs=4;
+    else if(power>0.18)runs=[1,2,2,3][Math.floor(sr*4)];
+    else runs=sr<0.55?1:0;
+  }else{ // CUT
+    if(power>0.38&&sr<0.44)runs=4;
+    else if(power>0.20)runs=[1,1,2][Math.floor(sr*3)];
+    else runs=sr<0.5?1:0;
+  }
   return{runs,wicket:false,type:shot};
 }
 
@@ -551,7 +711,8 @@ function aiBat(del){
   let aggression=skill*0.6+(G.inning===2?(G.target-G.score)/Math.max(1,(G.maxOvers*6-G.balls))/3:0.3);
   let shot=aggression>1.1?'LOFT':(Math.random()<aggression?['DRIVE','CUT','LOFT'][Math.floor(Math.random()*3)]:'DEFEND');
   let wicketChance=0.04+bwl*0.06-skill*0.04;
-  if(del==='YORKER')wicketChance+=0.05;if(del==='BOUNCER'&&shot==='LOFT')wicketChance+=0.05;if(shot==='LOFT')wicketChance+=0.07;
+  const traits2=DELIVERY_TRAITS[del]||DELIVERY_TRAITS['FAST'];
+  wicketChance+=traits2.wicketBase*0.3;if(traits2.surprise)wicketChance+=0.04;if(shot==='LOFT')wicketChance+=0.05;
   wicketChance=Math.max(0.015,wicketChance);
   let outcome;
   if(Math.random()<wicketChance)outcome={runs:0,wicket:true,type:shot==='LOFT'?'c':'b'};
