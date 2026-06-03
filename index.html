@@ -77,11 +77,24 @@ td.r,th.r{text-align:right;}
 <h1>🏏 CRICKET CHAMPIONS</h1>
 <p class="sub">Choose your tournament</p>
 <div class="grid">
-<div class="card mode-card" onclick="selectMode('worldcup')"><div class="flag">🌍</div><div class="nm">WORLD CUP</div><div class="full">International glory</div></div>
-<div class="card mode-card" onclick="selectMode('ipl')"><div class="flag">🏆</div><div class="nm">IPL</div><div class="full">Franchise battle</div></div>
-<div class="card mode-card" onclick="selectMode('friendly')"><div class="flag">🤝</div><div class="nm">FRIENDLY</div><div class="full">Just for fun</div></div>
+<div class="card mode-card" onclick="selectMode('worldcup')"><div class="flag">🌍</div><div class="nm">WORLD CUP</div><div class="full">T20 · 8 nations</div></div>
+<div class="card mode-card" onclick="selectMode('ipl')"><div class="flag">🏆</div><div class="nm">IPL 2026</div><div class="full">10 franchises</div></div>
+<div class="card mode-card" onclick="selectMode('friendly')"><div class="flag">🤝</div><div class="nm">FRIENDLY</div><div class="full">Pick overs · any teams</div></div>
 </div>
 <button class="btn ghost" onclick="show('howtoScreen')" style="margin-top:20px;">❓ HOW TO PLAY</button>
+</div>
+
+<!-- Overs selector (shown before team pick for friendly, or as part of setup) -->
+<div class="screen" id="oversScreen">
+<h2>MATCH FORMAT</h2>
+<p class="sub">How many overs per side?</p>
+<div class="grid" style="max-width:600px;">
+  <div class="card" onclick="setOvers(5)"><div class="flag">⚡</div><div class="nm">5 OVERS</div><div class="full">Super quick</div></div>
+  <div class="card" onclick="setOvers(10)"><div class="flag">🏃</div><div class="nm">10 OVERS</div><div class="full">T10</div></div>
+  <div class="card" onclick="setOvers(20)"><div class="flag">🏏</div><div class="nm">20 OVERS</div><div class="full">T20 — full match</div></div>
+  <div class="card" onclick="setOvers(50)"><div class="flag">☀️</div><div class="nm">50 OVERS</div><div class="full">ODI</div></div>
+</div>
+<button class="btn ghost" onclick="show('homeScreen')">◀ Back</button>
 </div>
 
 <div class="screen" id="teamScreen">
@@ -94,6 +107,15 @@ td.r,th.r{text-align:right;}
 <h2>CHOOSE YOUR OPPONENT</h2>
 <div class="grid" id="oppGrid"></div>
 <button class="btn ghost" onclick="show('teamScreen')">◀ Back</button>
+</div>
+
+<!-- Tournament bracket screen -->
+<div class="screen" id="tourneyScreen">
+<h2 id="tourneyTitle">TOURNAMENT</h2>
+<p class="sub" id="tourneyStatus"></p>
+<div id="tourneyBracket" style="max-width:700px;margin:0 auto;width:100%;"></div>
+<button class="btn" id="tourneyNextBtn" onclick="tourneyNext()" style="display:none;">NEXT MATCH ▶</button>
+<button class="btn ghost" onclick="show('homeScreen')">🏠 Home</button>
 </div>
 
 <div class="screen" id="squadScreen">
@@ -183,7 +205,7 @@ td.r,th.r{text-align:right;}
 <div class="banner" id="resultBanner"></div>
 <div class="motm" id="motm"></div>
 <div class="scwrap" id="scwrap"></div>
-<button class="btn" onclick="location.reload()">🔁 PLAY AGAIN</button>
+<button class="btn" id="playAgainBtn" onclick="location.reload()">🔁 PLAY AGAIN</button>
 </div>
 
 <script>
@@ -200,22 +222,53 @@ SA:{name:"South Africa",flag:"🇿🇦",players:gen([["Quinton de Kock","WK",88,
 WI:{name:"West Indies",flag:"🌴",players:gen([["Shai Hope","WK",84,5],["Brandon King","BAT",80,10],["Nicholas Pooran","WK",85,5],["Shimron Hetmyer","BAT",83,15],["Rovman Powell","ALL",80,55],["Jason Holder","ALL",65,84],["Andre Russell","ALL",82,80],["Akeal Hosein","BOWL",45,82],["Alzarri Joseph","BOWL",30,86],["Jayden Seales","BOWL",25,84],["Gudakesh Motie","BOWL",35,80],["Kyle Mayers","ALL",78,68],["Romario Shepherd","ALL",70,76],["Obed McCoy","BOWL",30,82],["Roston Chase","ALL",72,70]])},
 SL:{name:"Sri Lanka",flag:"🇱🇰",players:gen([["Pathum Nissanka","BAT",82,5],["Kusal Mendis","WK",83,10],["Sadeera Samarawickrama","BAT",78,5],["Charith Asalanka","ALL",80,55],["Dhananjaya de Silva","ALL",76,68],["Dasun Shanaka","ALL",74,70],["Wanindu Hasaranga","ALL",68,86],["Maheesh Theekshana","BOWL",40,84],["Kasun Rajitha","BOWL",25,82],["Dilshan Madushanka","BOWL",28,83],["Matheesha Pathirana","BOWL",26,85],["Dhananjaya Lakshan","BAT",75,8],["Dunith Wellalage","ALL",65,78],["Lahiru Kumara","BOWL",24,82],["Angelo Mathews","ALL",78,65]])}
 },
+// IPL 2026 — updated rosters (10 teams as of 2026 season)
 ipl:{
-MI:{name:"Mumbai Indians",flag:"🔵",players:gen([["Rohit Sharma","BAT",90,15],["Ishan Kishan","WK",82,5],["Suryakumar Yadav","BAT",88,8],["Tilak Varma","BAT",80,30],["Hardik Pandya","ALL",80,75],["Tim David","ALL",82,20],["Cameron Green","ALL",76,76],["Jasprit Bumrah","BOWL",20,96],["Piyush Chawla","BOWL",35,80],["Gerald Coetzee","BOWL",35,84],["Akash Madhwal","BOWL",25,80],["Nehal Wadhera","BAT",75,10],["Romario Shepherd","ALL",70,76],["Mohammad Nabi","ALL",68,78],["Dewald Brevis","BAT",78,20]])},
-CSK:{name:"Chennai Super Kings",flag:"🟡",players:gen([["Ruturaj Gaikwad","BAT",86,10],["Devon Conway","BAT",85,5],["Ajinkya Rahane","BAT",80,5],["Shivam Dube","ALL",80,55],["MS Dhoni","WK",82,5],["Ravindra Jadeja","ALL",72,86],["Moeen Ali","ALL",72,80],["Deepak Chahar","BOWL",45,84],["Tushar Deshpande","BOWL",30,82],["Maheesh Theekshana","BOWL",40,84],["Matheesha Pathirana","BOWL",26,86],["Daryl Mitchell","ALL",82,60],["Rachin Ravindra","ALL",78,70],["Mukesh Choudhary","BOWL",25,80],["Mitchell Santner","ALL",60,83]])},
-RCB:{name:"Royal Challengers Bangalore",flag:"🔴",players:gen([["Virat Kohli","BAT",95,20],["Faf du Plessis","BAT",86,8],["Glenn Maxwell","ALL",84,68],["Rajat Patidar","BAT",80,10],["Dinesh Karthik","WK",80,5],["Cameron Green","ALL",76,76],["Mahipal Lomror","ALL",72,60],["Wanindu Hasaranga","ALL",68,86],["Mohammed Siraj","BOWL",22,88],["Harshal Patel","BOWL",40,84],["Yash Dayal","BOWL",25,80],["Anuj Rawat","WK",74,5],["Karn Sharma","BOWL",40,80],["Reece Topley","BOWL",20,84],["Will Jacks","ALL",80,62]])},
-KKR:{name:"Kolkata Knight Riders",flag:"🟣",players:gen([["Shubman Gill","BAT",91,10],["Rahmanullah Gurbaz","WK",82,5],["Nitish Rana","BAT",80,40],["Venkatesh Iyer","ALL",80,55],["Andre Russell","ALL",82,80],["Rinku Singh","BAT",81,10],["Sunil Narine","ALL",75,86],["Varun Chakaravarthy","BOWL",35,85],["Mitchell Starc","BOWL",30,93],["Harshit Rana","BOWL",26,80],["Suyash Sharma","BOWL",30,80],["Anukul Roy","ALL",65,72],["Vaibhav Arora","BOWL",24,80],["Phil Salt","WK",80,5],["Ramandeep Singh","ALL",70,60]])},
-DC:{name:"Delhi Capitals",flag:"🟦",players:gen([["David Warner","BAT",88,8],["Prithvi Shaw","BAT",80,5],["Mitchell Marsh","ALL",80,65],["Rishabh Pant","WK",86,5],["Axar Patel","ALL",65,82],["Tristan Stubbs","BAT",78,10],["Abishek Porel","WK",74,5],["Kuldeep Yadav","BOWL",30,86],["Anrich Nortje","BOWL",28,89],["Khaleel Ahmed","BOWL",25,82],["Mukesh Kumar","BOWL",24,80],["Lalit Yadav","ALL",68,62],["Ishant Sharma","BOWL",22,80],["Jake Fraser-McGurk","BAT",80,10],["Kumar Kushagra","WK",72,5]])},
-PBKS:{name:"Punjab Kings",flag:"🟥",players:gen([["Shikhar Dhawan","BAT",84,5],["Jonny Bairstow","WK",84,5],["Prabhsimran Singh","WK",76,5],["Liam Livingstone","ALL",80,70],["Sam Curran","ALL",68,80],["Jitesh Sharma","WK",78,5],["Shashank Singh","BAT",75,10],["Harpreet Brar","ALL",62,78],["Kagiso Rabada","BOWL",30,92],["Arshdeep Singh","BOWL",30,86],["Rahul Chahar","BOWL",35,82],["Atharva Taide","BAT",74,10],["Harshal Patel","BOWL",40,84],["Nathan Ellis","BOWL",30,82],["Rishi Dhawan","ALL",66,72]])},
-RR:{name:"Rajasthan Royals",flag:"🌸",players:gen([["Jos Buttler","WK",90,5],["Yashasvi Jaiswal","BAT",85,10],["Sanju Samson","WK",84,5],["Riyan Parag","ALL",78,55],["Shimron Hetmyer","BAT",83,15],["Dhruv Jurel","WK",76,5],["Ravichandran Ashwin","BOWL",45,86],["Trent Boult","BOWL",30,90],["Yuzvendra Chahal","BOWL",35,87],["Sandeep Sharma","BOWL",25,82],["Avesh Khan","BOWL",26,82],["Rovman Powell","ALL",80,55],["Donovan Ferreira","ALL",74,40],["Prasidh Krishna","BOWL",24,84],["Kuldeep Sen","BOWL",24,80]])},
-SRH:{name:"Sunrisers Hyderabad",flag:"🟧",players:gen([["Travis Head","BAT",85,40],["Abhishek Sharma","ALL",80,60],["Mayank Agarwal","BAT",80,5],["Aiden Markram","ALL",82,65],["Heinrich Klaasen","WK",85,5],["Nitish Reddy","ALL",76,62],["Washington Sundar","ALL",68,80],["Pat Cummins","BOWL",40,92],["Bhuvneshwar Kumar","BOWL",40,85],["T Natarajan","BOWL",25,84],["Mayank Markande","BOWL",30,80],["Rahul Tripathi","BAT",80,10],["Marco Jansen","ALL",55,82],["Glenn Phillips","ALL",79,55],["Umran Malik","BOWL",24,85]])}
+MI:{name:"Mumbai Indians",flag:"🔵",players:gen([["Rohit Sharma","BAT",92,15],["Suryakumar Yadav","BAT",90,8],["Tilak Varma","BAT",83,30],["Hardik Pandya","ALL",82,76],["Naman Dhir","ALL",74,58],["Robin Minz","WK",72,5],["Karn Sharma","BOWL",38,80],["Jasprit Bumrah","BOWL",22,97],["Trent Boult","BOWL",28,88],["Deepak Chahar","BOWL",42,83],["Ashwani Kumar","BOWL",22,78],["Raj Angad Bawa","ALL",70,62],["Bevon Jacobs","ALL",68,60],["Reece Topley","BOWL",20,82],["Will Jacks","ALL",80,62]])},
+CSK:{name:"Chennai Super Kings",flag:"🟡",players:gen([["Ruturaj Gaikwad","BAT",88,10],["Rachin Ravindra","ALL",80,72],["Shivam Dube","ALL",82,56],["MS Dhoni","WK",80,5],["Ravindra Jadeja","ALL",73,87],["Sam Curran","ALL",70,81],["Matheesha Pathirana","BOWL",26,87],["Deepak Chahar","BOWL",42,83],["Noor Ahmad","BOWL",30,82],["Khaleel Ahmed","BOWL",26,83],["Nathan Ellis","BOWL",30,82],["Anshul Kamboj","BOWL",24,78],["Devon Conway","BAT",84,5],["Vijay Shankar","ALL",68,62],["Mukesh Choudhary","BOWL",25,80]])},
+RCB:{name:"Royal Challengers Bengaluru",flag:"🔴",players:gen([["Virat Kohli","BAT",96,20],["Phil Salt","WK",82,5],["Rajat Patidar","BAT",82,10],["Liam Livingstone","ALL",82,72],["Jitesh Sharma","WK",78,5],["Krunal Pandya","ALL",70,78],["Swapnil Singh","ALL",66,70],["Bhuvneshwar Kumar","BOWL",40,85],["Josh Hazlewood","BOWL",22,90],["Yash Dayal","BOWL",26,80],["Suyash Sharma","BOWL",30,80],["Jacob Bethell","ALL",76,58],["Lungi Ngidi","BOWL",25,85],["Tim David","ALL",80,22],["Nuwan Thushara","BOWL",26,80]])},
+KKR:{name:"Kolkata Knight Riders",flag:"🟣",players:gen([["Ajinkya Rahane","BAT",80,8],["Quinton de Kock","WK",88,5],["Venkatesh Iyer","ALL",82,56],["Andre Russell","ALL",84,82],["Rinku Singh","BAT",83,10],["Sunil Narine","ALL",76,87],["Angkrish Raghuvanshi","BAT",76,8],["Varun Chakaravarthy","BOWL",35,86],["Harshit Rana","BOWL",28,82],["Spencer Johnson","BOWL",26,82],["Anrich Nortje","BOWL",28,89],["Moeen Ali","ALL",72,80],["Manish Pandey","BAT",76,8],["Rovman Powell","ALL",80,55],["Luvnith Sisodia","WK",70,5]])},
+DC:{name:"Delhi Capitals",flag:"🟦",players:gen([["Jake Fraser-McGurk","BAT",84,10],["Faf du Plessis","BAT",86,8],["Axar Patel","ALL",67,83],["Tristan Stubbs","BAT",80,10],["Rishabh Pant","WK",88,5],["Ashutosh Sharma","ALL",76,55],["Karun Nair","BAT",78,5],["T Natarajan","BOWL",26,84],["Kuldeep Yadav","BOWL",32,87],["Mukesh Kumar","BOWL",25,80],["Mitchell Starc","BOWL",30,93],["Dushmantha Chameera","BOWL",26,80],["Sameer Rizvi","BAT",74,8],["Vipraj Nigam","ALL",64,68],["Mohit Sharma","BOWL",30,82]])},
+PBKS:{name:"Punjab Kings",flag:"🟥",players:gen([["Shashank Singh","BAT",78,10],["Prabhsimran Singh","WK",80,5],["Josh Inglis","WK",78,5],["Nehal Wadhera","BAT",76,10],["Glenn Maxwell","ALL",84,68],["Azmatullah Omarzai","ALL",74,70],["Harpreet Brar","ALL",64,79],["Arshdeep Singh","BOWL",32,87],["Yuzvendra Chahal","BOWL",35,87],["Harshal Patel","BOWL",40,84],["Marco Jansen","ALL",56,83],["Kagiso Rabada","BOWL",30,92],["Musheer Khan","BAT",74,10],["Shreyas Gopal","BOWL",38,78],["Lockie Ferguson","BOWL",28,87]])},
+RR:{name:"Rajasthan Royals",flag:"🌸",players:gen([["Yashasvi Jaiswal","BAT",88,10],["Sanju Samson","WK",86,5],["Riyan Parag","ALL",80,56],["Dhruv Jurel","WK",78,5],["Shimron Hetmyer","BAT",84,15],["Wanindu Hasaranga","ALL",68,86],["Sandeep Sharma","BOWL",26,82],["Trent Boult","BOWL",30,90],["Jofra Archer","BOWL",28,91],["Kumar Kartikeya","BOWL",30,80],["Maheesh Theekshana","BOWL",40,84],["Nitish Rana","BAT",78,40],["Shubham Dubey","ALL",72,60],["Akash Madhwal","BOWL",26,80],["Rovman Powell","ALL",80,55]])},
+SRH:{name:"Sunrisers Hyderabad",flag:"🟧",players:gen([["Travis Head","BAT",87,40],["Abhishek Sharma","ALL",83,62],["Ishan Kishan","WK",82,5],["Heinrich Klaasen","WK",86,5],["Nitish Reddy","ALL",78,63],["Aniket Verma","BAT",72,8],["Harshal Patel","BOWL",40,84],["Pat Cummins","BOWL",40,92],["Mohammed Shami","BOWL",26,91],["Zeeshan Ansari","BOWL",28,78],["Brydon Carse","BOWL",30,80],["Adam Zampa","BOWL",35,85],["Simarjeet Singh","BOWL",24,78],["Rahul Chahar","BOWL",35,82],["Kamindu Mendis","ALL",74,60]])},
+GT:{name:"Gujarat Titans",flag:"🦁",players:gen([["Shubman Gill","BAT",91,10],["Shahrukh Khan","BAT",78,10],["Jos Buttler","WK",90,5],["Sai Sudharsan","BAT",82,10],["Rahul Tewatia","ALL",72,62],["Rashid Khan","ALL",60,93],["Dasun Shanaka","ALL",74,70],["Mohammed Siraj","BOWL",24,87],["Prasidh Krishna","BOWL",26,84],["Noor Ahmad","BOWL",30,82],["R Sai Kishore","BOWL",35,80],["Wriddhiman Saha","WK",74,5],["Vijay Shankar","ALL",68,62],["Umesh Yadav","BOWL",25,80],["Anuj Rawat","WK",72,5]])},
+LSG:{name:"Lucknow Super Giants",flag:"🟢",players:gen([["KL Rahul","WK",86,5],["Quinton de Kock","WK",88,5],["Aiden Markram","ALL",83,66],["Nicholas Pooran","WK",86,5],["Marcus Stoinis","ALL",78,70],["Krunal Pandya","ALL",70,78],["Ayush Badoni","ALL",74,55],["Avesh Khan","BOWL",26,83],["Ravi Bishnoi","BOWL",32,82],["Mohsin Khan","BOWL",24,82],["Shardul Thakur","ALL",56,78],["David Miller","BAT",84,20],["Shahbaz Ahmed","ALL",68,72],["Digvesh Singh Rathi","BOWL",22,78],["Yuvraj Chaudhary","BOWL",20,76]])}
 }};
 
-let G={mode:null,maxOvers:5};
+let G={mode:null,maxOvers:10};
 function pickTeams(){return G.mode==='ipl'?TEAMS.ipl:TEAMS.worldcup;}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function selectMode(m){G.mode=(m==='ipl')?'ipl':'worldcup';buildTeamGrid('teamGrid',pickTeams(),teamPick);show('teamScreen');}
+function setOvers(n){
+  G.maxOvers=n;
+  buildTeamGrid('teamGrid',pickTeams(),teamPick);
+  show('teamScreen');
+}
+
+function selectMode(m){
+  G.mode=(m==='ipl')?'ipl':(m==='friendly'?'friendly':'worldcup');
+  G.tourney=null;
+  // Default overs per mode
+  G.maxOvers=m==='ipl'?20:m==='worldcup'?20:10;
+  if(m==='friendly'){
+    // Let them pick overs
+    show('oversScreen');
+  } else if(m==='worldcup'||m==='ipl'){
+    // Ask: tournament or single match?
+    buildTeamGrid('teamGrid',pickTeams(),teamPick);
+    show('teamScreen');
+    // Show tournament option
+    const grid=document.getElementById('teamGrid');
+    const tourneyCard=document.createElement('div');
+    tourneyCard.className='card mode-card';
+    tourneyCard.style.borderColor='#22c55e';
+    tourneyCard.innerHTML=`<div class="flag">🏆</div><div class="nm">TOURNAMENT</div><div class="full">Play all teams, win the cup</div>`;
+    tourneyCard.onclick=()=>startTournament();
+    grid.insertBefore(tourneyCard,grid.firstChild);
+  }
+}
+
 function buildTeamGrid(gridId,teamsObj,cb,exclude){
   const g=document.getElementById(gridId);g.innerHTML='';
   Object.keys(teamsObj).forEach(k=>{if(k===exclude)return;const t=teamsObj[k];
@@ -225,6 +278,165 @@ function buildTeamGrid(gridId,teamsObj,cb,exclude){
 }
 function teamPick(k){G.myKey=k;G.myTeam=pickTeams()[k];buildTeamGrid('oppGrid',pickTeams(),oppPick,k);show('oppScreen');}
 function oppPick(k){G.oppKey=k;G.oppTeam=pickTeams()[k];buildSquad();show('squadScreen');}
+
+// ---- TOURNAMENT MODE ----
+let T={}; // tournament state
+function startTournament(){
+  const teams=Object.keys(pickTeams());
+  // Pick your team first
+  const grid=document.getElementById('teamGrid');
+  grid.innerHTML='<div style="color:#ffb300;font-size:1em;text-align:center;width:100%;margin-bottom:10px;grid-column:1/-1;">PICK YOUR TEAM FOR THE TOURNAMENT</div>';
+  buildTeamGrid('teamGrid',pickTeams(),(k)=>{
+    G.myKey=k;G.myTeam=pickTeams()[k];
+    T={
+      teams:[...teams],
+      userTeam:k,
+      schedule:[],
+      results:[],
+      pointsTable:{},
+      round:0,
+      phase:'group', // group | semis | final
+      userXI:null,
+    };
+    teams.forEach(t=>{T.pointsTable[t]={p:0,w:0,l:0,nrr:0,played:0};});
+    // Generate round-robin schedule
+    for(let i=0;i<teams.length;i++){
+      for(let j=i+1;j<teams.length;j++){
+        T.schedule.push({a:teams[i],b:teams[j],done:false,winner:null});
+      }
+    }
+    T.schedule.sort(()=>Math.random()-0.5);
+    showTourneyBracket();
+  });
+}
+
+function showTourneyBracket(){
+  show('tourneyScreen');
+  document.getElementById('tourneyTitle').textContent=T.phase==='group'?`${G.mode==='ipl'?'IPL 2026':'World Cup'} — Group Stage`:`${G.mode==='ipl'?'IPL 2026':'World Cup'} — ${T.phase==='semis'?'Semi-Finals':'FINAL'}`;
+  const remaining=T.schedule.filter(m=>!m.done);
+  const status=T.phase==='group'?`${remaining.length} matches remaining`:``;
+  document.getElementById('tourneyStatus').textContent=status;
+  const bracket=document.getElementById('tourneyBracket');
+  bracket.innerHTML='';
+  // Points table
+  const sorted=Object.keys(T.pointsTable).sort((a,b)=>T.pointsTable[b].p-T.pointsTable[a].p||(T.pointsTable[b].nrr-T.pointsTable[a].nrr));
+  let tbl=`<div style="background:#181d27;border-radius:12px;padding:14px;margin-bottom:14px;overflow-x:auto;">
+  <h3 style="color:#ffb300;margin-bottom:10px;">Points Table</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+  <tr style="color:#9aa3b2;"><th style="text-align:left;padding:4px 8px;">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th><th>NRR</th></tr>`;
+  sorted.forEach(k=>{const r=T.pointsTable[k];const t=pickTeams()[k];
+    const isUser=k===T.userTeam?'style="color:#ffb300;"':'';
+    tbl+=`<tr ${isUser}><td style="padding:4px 8px;">${t.flag} ${k}</td><td style="text-align:center">${r.played}</td><td style="text-align:center;color:#22c55e">${r.w}</td><td style="text-align:center;color:#ef4444">${r.l}</td><td style="text-align:center;font-weight:700">${r.p}</td><td style="text-align:center">${r.nrr.toFixed(2)}</td></tr>`;
+  });
+  tbl+='</table></div>';
+  bracket.innerHTML=tbl;
+  // Results
+  if(T.results.length){
+    let rhtml=`<div style="background:#181d27;border-radius:12px;padding:14px;margin-bottom:14px;"><h3 style="color:#ff6b35;margin-bottom:8px;">Recent Results</h3>`;
+    T.results.slice(-6).reverse().forEach(r=>{
+      rhtml+=`<div style="padding:5px 0;border-bottom:1px solid #2c3445;font-size:13px;">${pickTeams()[r.a].flag} ${r.a} vs ${pickTeams()[r.b].flag} ${r.b} — <b style="color:${r.winner===T.userTeam?'#22c55e':'#fff'}">${r.winner} won</b></div>`;
+    });
+    rhtml+='</div>';
+    bracket.innerHTML+=rhtml;
+  }
+  // Next match button
+  const nextMatch=T.schedule.find(m=>!m.done);
+  const nextBtn=document.getElementById('tourneyNextBtn');
+  if(nextMatch){
+    const userPlays=nextMatch.a===T.userTeam||nextMatch.b===T.userTeam;
+    nextBtn.style.display='block';
+    nextBtn.textContent=userPlays?`YOUR MATCH: ${pickTeams()[nextMatch.a].flag}${nextMatch.a} vs ${pickTeams()[nextMatch.b].flag}${nextMatch.b} ▶`:`SIMULATE: ${pickTeams()[nextMatch.a].flag}${nextMatch.a} vs ${pickTeams()[nextMatch.b].flag}${nextMatch.b} ▶`;
+  } else {
+    // Check if group done
+    nextBtn.style.display='block';
+    nextBtn.textContent='→ CHECK STANDINGS & PROCEED';
+  }
+}
+
+function tourneyNext(){
+  const nextMatch=T.schedule.find(m=>!m.done);
+  if(!nextMatch){
+    if(T.phase==='group'){advanceTourney();}
+    else if(T.phase==='semis'){setupFinal();}
+    else{show('homeScreen');}
+    return;
+  }
+  const userPlays=nextMatch.a===T.userTeam||nextMatch.b===T.userTeam;
+  if(userPlays){
+    G.myKey=T.userTeam;G.myTeam=pickTeams()[T.userTeam];
+    const oppKey=nextMatch.a===T.userTeam?nextMatch.b:nextMatch.a;
+    G.oppKey=oppKey;G.oppTeam=pickTeams()[oppKey];
+    T.currentMatch=nextMatch;
+    if(T.userXI){G.myXI=T.userXI;startMatchFromTourney();}
+    else{buildSquad();show('squadScreen');}
+  } else {
+    // Simulate match
+    const res=simulateAIMatch(nextMatch.a,nextMatch.b);
+    recordTourneyResult(nextMatch,res.winner,res.margin);
+    nextMatch.done=true;
+    showTourneyBracket();
+  }
+}
+
+function simulateAIMatch(a,b){
+  const ta=pickTeams()[a],tb=pickTeams()[b];
+  const strA=ta.players.reduce((s,p)=>s+p.bat+p.bowl,0);
+  const strB=tb.players.reduce((s,p)=>s+p.bat+p.bowl,0);
+  const prob=strA/(strA+strB);
+  const winner=Math.random()<prob?a:b;
+  const margin=Math.floor(Math.random()*8)+1;
+  const type=Math.random()<0.5?`${margin} wickets`:`${margin*5} runs`;
+  return{winner,margin:type};
+}
+
+function recordTourneyResult(match,winner,margin){
+  match.done=true;match.winner=winner;
+  const loser=match.a===winner?match.b:match.a;
+  T.pointsTable[winner].w++;T.pointsTable[winner].p+=2;T.pointsTable[winner].played++;
+  T.pointsTable[loser].l++;T.pointsTable[loser].played++;
+  T.pointsTable[winner].nrr+=(Math.random()*0.5);
+  T.pointsTable[loser].nrr-=(Math.random()*0.3);
+  T.results.push({a:match.a,b:match.b,winner,margin});
+}
+
+function startMatchFromTourney(){
+  G.inning=1;show('gameScreen');resizeCanvas();setupInning();
+  G._tourneyReturn=true;G._tourneyMatch=T.currentMatch;
+}
+
+function setupFinal(){
+  const semiResults=T.results.filter(r=>T.schedule.find(m=>m.a===r.a&&m.b===r.b&&T.phase==='semis')||false);
+  // Get semi winners from schedule
+  const finalists=T.schedule.filter(m=>m.done).map(m=>m.winner);
+  T.phase='final';
+  T.schedule=[{a:finalists[0]||'TBD',b:finalists[1]||'TBD',done:false,winner:null}];
+  // Reset points table for final display
+  document.getElementById('tourneyTitle').textContent='🏆 FINAL';
+  showTourneyBracket();
+}
+
+function advanceTourney(){
+  const sorted=Object.keys(T.pointsTable).sort((a,b)=>T.pointsTable[b].p-T.pointsTable[a].p||(T.pointsTable[b].nrr-T.pointsTable[a].nrr));
+  const top4=sorted.slice(0,4);
+  if(!top4.includes(T.userTeam)){
+    // User eliminated
+    show('tourneyScreen');
+    document.getElementById('tourneyBracket').innerHTML=`<div style="text-align:center;padding:30px;"><div style="font-size:3em;">😢</div><h2 style="color:#ef4444;margin:15px 0;">ELIMINATED</h2><p style="color:#9aa3b2;">Your team didn't qualify for the semi-finals.</p></div>`;
+    document.getElementById('tourneyNextBtn').textContent='🏠 Back to Home';
+    document.getElementById('tourneyNextBtn').onclick=()=>show('homeScreen');
+    return;
+  }
+  // Set up semis
+  T.phase='semis';
+  T.schedule=[
+    {a:top4[0],b:top4[3],done:false,winner:null},
+    {a:top4[1],b:top4[2],done:false,winner:null}
+  ];
+  document.getElementById('tourneyTitle').textContent='SEMI-FINALS';
+  showTourneyBracket();
+}
+
+// Tournament result routing handled inside showResult() via G._tourneyReturn flag
 
 let pool=[],xi=[];
 function buildSquad(){pool=G.myTeam.players.slice();xi=[];renderSquad();}
@@ -890,6 +1102,9 @@ function endInning(){
 }
 
 function showResult(){
+  // Remove any previously appended tournament buttons
+  document.querySelectorAll('#resultScreen .tourney-btn').forEach(el=>el.remove());
+  document.getElementById('playAgainBtn').style.display='block';
   show('resultScreen');const i1=G.inning1,i2=G.inning2;
   let userWon,bannerTxt;
   if(i2.score>=i1.score+1){bannerTxt=`${i2.team.name} WON by ${10-i2.wkts} wickets!`;userWon=i2.userBatting;}
@@ -898,6 +1113,36 @@ function showResult(){
   const b=document.getElementById('resultBanner');
   b.className='banner '+(userWon===null?'':(userWon?'win':'lose'));
   b.textContent=userWon===true?'🏆 '+bannerTxt+' YOU WIN!':(userWon===false?bannerTxt+' You lose.':bannerTxt);
+  // Tournament: record result and show "Back to Tournament" button
+  if(G._tourneyReturn&&G._tourneyMatch&&typeof T!=='undefined'&&T){
+    const tm=G._tourneyMatch;
+    const matchWinnerTeam=i2.score>=i1.score+1?i2.team:i1.score===i2.score?null:i1.team;
+    const pool2=pickTeams();
+    const aTeam=pool2[tm.a],bTeam=pool2[tm.b];
+    const winnerKey2=matchWinnerTeam===aTeam?tm.a:(matchWinnerTeam===bTeam?tm.b:tm.a);
+    const margin=i2.score>=i1.score+1?`${10-i2.wkts} wkts`:`${i1.score-i2.score} runs`;
+    recordTourneyResult(tm,winnerKey2,margin);
+    // Check if phase is done
+    const remaining=T.schedule.filter(m=>!m.done);
+    document.getElementById('playAgainBtn').style.display='none';
+    const tb=document.createElement('button');
+    tb.className='btn tourney-btn';tb.style.marginTop='12px';
+    if(remaining.length===0&&T.phase==='group'){
+      tb.textContent='VIEW STANDINGS ▶';
+      tb.onclick=()=>{advanceTourney();};
+    }else if(remaining.length===0&&T.phase==='semis'){
+      tb.textContent='FINALS ▶';
+      tb.onclick=()=>{setupFinal();};
+    }else if(remaining.length===0&&T.phase==='final'){
+      tb.textContent='🏆 CHAMPION!';
+      tb.onclick=()=>{show('homeScreen');};
+    }else{
+      tb.textContent='BACK TO TOURNAMENT ▶';
+      tb.onclick=()=>{showTourneyBracket();show('tourneyScreen');};
+    }
+    document.getElementById('resultScreen').appendChild(tb);
+    G._tourneyReturn=false;G._tourneyMatch=null;
+  }
   let best=null,bestScore=-1;
   [i1,i2].forEach(inn=>{
     inn.batStats.forEach(s=>{if(s.r>0){const v=s.r+s.sixes*4+s.fours*2;if(v>bestScore){bestScore=v;best={name:s.p.name,line:`${s.r}(${s.b})`};}}});
