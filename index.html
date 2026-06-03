@@ -563,7 +563,7 @@ function drawBall(){
   ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,-0.6,0.6);ctx.stroke();
 }
 
-let anim={phase:'idle',bowler:{x:0,y:0,frame:0},shot:null,delT:0,shotAnim:0};
+let anim={phase:'idle',bowler:{x:0,y:0,frame:0},shot:null,delT:0,shotAnim:0,batRunning:null};
 let lastTime=0;
 function loop(ts){
   const dt=Math.min(40,ts-lastTime);lastTime=ts;
@@ -573,6 +573,10 @@ function loop(ts){
   drawBall();
   if(timing.active)stepTiming(dt);
   if(anim.phase==='shot')anim.shotAnim+=dt*0.02;
+  if(anim.batRunning!==null){
+    anim.batRunning+=dt;
+    if(anim.batRunning>200)anim.batRunning=null; // 200ms running animation
+  }
   // Draw aim target
   if(aimTarget.set&&(anim.phase==='waitDelivery'||anim.phase==='waitAim')){
     const pulse=0.6+Math.sin(Date.now()*0.006)*0.4;
@@ -586,10 +590,38 @@ function loop(ts){
 // drawFielders() defined below with full animation support
 function drawBatsman(){
   const x=W*0.5+W*0.045,y=pitchBot()-10;
-  let pose={legs:0.2,arm:0.2,bat:true,batdx:14};
-  if(anim.phase==='shot'&&anim.shotAnim<8){pose.arm=1;pose.batdx=24*(anim.shot==='LOFT'?1.3:1);}
-  drawStick(x,y,0.95,pose,'#102a52');
-  drawStick(W*0.5-W*0.02,pitchTop()+30,0.55,{legs:0.2,arm:0.1,bat:true,batdx:10},'#102a52');
+  const nsX=W*0.5-W*0.02,nsY=pitchTop()+30;
+
+  // Striker pose — ready stance with bat raised
+  let pose={legs:0.3,arm:0.3,arm2:0.1,bat:true,batdx:16};
+  if(anim.phase==='shot'&&anim.shotAnim<8){
+    pose.arm=1;pose.arm2=0.8;pose.legs=0.5;pose.batdx=Math.max(20,24*(anim.shot==='LOFT'?1.3:1));
+  }
+
+  // Running animation: batsmen run back-and-forth between crease positions
+  let strikerX=x,strikerY=y,nstrikerX=nsX,nstrikerY=nsY;
+  if(anim.batRunning){
+    const runProg=Math.min(1,anim.batRunning*0.005); // progress 0->1 over 200ms
+    // Striker runs toward non-striker position, non-striker runs toward striker position
+    strikerX=x+(nsX-x)*runProg;
+    strikerY=y+(nsY-y)*runProg;
+    nstrikerX=nsX+(x-nsX)*runProg;
+    nstrikerY=nsY+(y-nsY)*runProg;
+    // Running pose
+    const legSwing=Math.sin(anim.batRunning*0.08)*0.9;
+    const armSwing=Math.sin(anim.batRunning*0.08+1.5)*0.6;
+    pose={legs:0.5+legSwing*0.4,arm:armSwing,arm2:-armSwing*0.5,bat:false};
+  }
+
+  drawStick(strikerX,strikerY,0.95,pose,'#1e40af');
+  // Non-striker in better pose and scale
+  let nsPose={legs:0.15,arm:0.2,arm2:0.1,bat:true,batdx:10};
+  if(anim.batRunning){
+    const legSwing=Math.sin(anim.batRunning*0.08)*0.9;
+    const armSwing=Math.sin(anim.batRunning*0.08+1.5)*0.6;
+    nsPose={legs:0.5+legSwing*0.4,arm:armSwing,arm2:-armSwing*0.5,bat:false};
+  }
+  drawStick(nstrikerX,nstrikerY,0.8,nsPose,'#3b82f6');
 }
 function drawBowler(){
   const b=anim.bowler,x=b.x,y=b.y;
@@ -1084,8 +1116,12 @@ function commitBall(outcome,st,bowlStat,shot,q){
     if(outcome.runs===4){st.fours++;msg='FOUR! Beautifully played to the boundary.';}
     else if(outcome.runs===6){st.sixes++;msg='SIX! That has gone all the way!';}
     else if(outcome.runs===0)msg=shot==='DEFEND'?'Solid defence, no run.':'Dot ball, well fielded.';
-    else msg=`${outcome.runs} run${outcome.runs>1?'s':''}.`+(q==='perfect'?' Perfectly timed!':'');
-    if(outcome.runs%2===1)[G.striker,G.nonstriker]=[G.nonstriker,G.striker];
+    else{msg=`${outcome.runs} run${outcome.runs>1?'s':''}.`+(q==='perfect'?' Perfectly timed!':'');
+      if(outcome.runs%2===1){
+        anim.batRunning=0; // Start running animation
+        [G.striker,G.nonstriker]=[G.nonstriker,G.striker];
+      }
+    }
   }
   commentary(msg);updateHUD();
   if(G.userBatting)document.getElementById('bowlerBar').style.display='none';
