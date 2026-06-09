@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cricket Champions - Phase 1 Modular</title>
+  <style>
+    :root {
+      --gold: #ffb300;
+      --orange: #ff6b35;
+      --bg: #0e1117;
+      --panel: #181d27;
+      --card: #222936;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: #eee;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 18px;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    h1 {
+      color: var(--gold);
+      text-align: center;
+      font-size: clamp(24px, 6vw, 46px);
+      margin: 10px 0;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(255, 107, 53, 0.4);
+    }
+
+    h2 {
+      color: var(--orange);
+      text-align: center;
+      margin: 6px 0 16px;
+      font-size: clamp(18px, 4vw, 28px);
+    }
+
+    .sub {
+      text-align: center;
+      color: #9aa3b2;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid #2c3445;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+      user-select: none;
+    }
+
+    .card:hover, .card.sel {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 179, 0, 0.25);
+    }
+
+    .card .flag {
+      font-size: 40px;
+    }
+
+    .card .nm {
+      font-weight: 700;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+
+    .card .full {
+      font-size: 11px;
+      color: #9aa3b2;
+      margin-top: 3px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--orange), var(--gold));
+      color: #1a1205;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 14px auto 0;
+      display: block;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn.ghost {
+      background: #2c3445;
+      color: #eee;
+    }
+
+    #gameScreen {
+      padding: 0;
+    }
+
+    #cv {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      background: #5aa9e0;
+      touch-action: manipulation;
+    }
+
+    .hud {
+      position: fixed;
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 1px 3px #000;
+      pointer-events: none;
+      z-index: 5;
+      font-size: 14px;
+    }
+
+    #hudTL {
+      top: 8px;
+      left: 10px;
+    }
+
+    #hudTR {
+      top: 8px;
+      right: 10px;
+      text-align: right;
+    }
+
+    #hudScore {
+      font-size: 22px;
+      color: var(--gold);
+    }
+
+    #commentary {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 150px;
+      text-align: center;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      text-shadow: 0 1px 4px #000;
+      z-index: 5;
+      padding: 0 12px;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+
+    #controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 8px;
+      z-index: 6;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+    }
+
+    .ctl {
+      background: var(--card);
+      border: 2px solid #2c3445;
+      border-radius: 12px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ctl:active {
+      transform: scale(0.95);
+    }
+
+    .ctl.dis {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .ctl .em {
+      font-size: 24px;
+    }
+
+    .ctl .cn {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--gold);
+    }
+
+    .ctl .ch {
+      font-size: 9px;
+      color: #9aa3b2;
+    }
+  </style>
+</head>
+<body>
+  <!-- Screens will be dynamically injected -->
+  <div class="screen active" id="homeScreen">
+    <h1>🏏 CRICKET CHAMPIONS</h1>
+    <p class="sub">Modular Phase 1 - Starting...</p>
+    <button class="btn">Loading Game...</button>
+  </div>
+
+  <div class="screen" id="gameScreen">
+    <canvas id="cv"></canvas>
+    <div class="hud" id="hudTL">
+      <div id="hudScore">0/0</div>
+      <div id="hudOvers">0.0 ov</div>
+    </div>
+    <div class="hud" id="hudTR">
+      <div id="hudTarget"></div>
+      <div id="hudBatter"></div>
+    </div>
+    <div id="commentary">Welcome to the match!</div>
+    <div id="controls"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

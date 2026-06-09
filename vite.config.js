@@ -1,21 +1,23 @@
 import { defineConfig } from 'vite';
+import path from 'path';
 
 export default defineConfig({
   root: '.',
   publicDir: 'public',
   server: {
     port: 3000,
-    open: true,
+    open: '/index.html',
+    host: 'localhost',
   },
   build: {
     outDir: 'dist',
     minify: 'terser',
     target: 'es2020',
-    sourcemap: true,
+    sourcemap: false,
   },
   resolve: {
     alias: {
-      '@': '/src',
+      '@': path.resolve(__dirname, './src'),
     },
   },
 });
