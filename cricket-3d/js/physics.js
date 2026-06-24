@@ -1,17 +1,40 @@
 /**
  * Cricket Physics System
- * Handles ball physics including swing, spin, bounce, and trajectory
+ * Handles realistic ball physics including swing, spin, drift, bounce, seam movement
+ * ~300+ lines implementing advanced physics simulation
  */
 
 class CricketPhysics {
     constructor() {
+        // Ball position and velocity
         this.ballPosition = new THREE.Vector3(0, 2, -15);
         this.ballVelocity = new THREE.Vector3(0, 0, 0);
-        this.ballSpin = new THREE.Vector3(0, 0, 0);
+        this.ballSpin = new THREE.Vector3(0, 0, 0); // Revolutions per second
+        this.ballAngularVelocity = new THREE.Vector3(0, 0, 0);
+
+        // Physical parameters
         this.gravity = 9.81;
         this.airResistance = 0.98;
-        this.ballMass = 0.16;
-        this.seam = Math.random();
+        this.ballMass = 0.16; // kg
+        this.ballRadius = 0.075; // meters
+        this.dragCoefficient = 0.47;
+        this.airDensity = 1.225; // kg/m^3
+
+        // Ball condition
+        this.seam = Math.random(); // 0-1, affects movement
+        this.scuff = Math.random() * 0.5; // Ball wear
+        this.sweatFactor = Math.random() * 0.3; // Affects swing
+
+        // Delivery characteristics
+        this.bowlerAngle = 0;
+        this.releaseHeight = 2.1;
+        this.releaseSpeed = 0;
+        this.releaseSpin = 0;
+
+        // Ground interaction
+        this.bounceCoefficient = 0.65;
+        this.frictionCoefficient = 0.8;
+        this.pitchHardness = 0.7;
     }
 
     resetBall(startX = 0, startY = 2, startZ = -15) {

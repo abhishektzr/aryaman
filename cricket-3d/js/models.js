@@ -1,9 +1,13 @@
 /**
- * 3D Models Module
- * Creates realistic cricket stadium, players, and equipment
+ * 3D Model Factory - Complete Player and Stadium Creation
+ * Generates detailed 3D models for cricket game
+ * ~500+ lines of model generation code with procedural textures
  */
 
 class ModelFactory {
+    /**
+     * Create complete cricket stadium with all features
+     */
     static createStadium(scene) {
         const stadiumGroup = new THREE.Group();
 

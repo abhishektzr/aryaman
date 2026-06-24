@@ -23,11 +23,15 @@ class GameScene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+        this.renderer.shadowMap.mapSize.width = 4096;
+        this.renderer.shadowMap.mapSize.height = 4096;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.2;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
         this.renderer.background = new THREE.Color(0x87ceeb);
         this.renderer.fog = new THREE.Fog(0x87ceeb, 300, 500);
+        this.renderer.antialias = true;
+        this.renderer.alpha = true;
     }
 
     setupLighting() {
