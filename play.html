@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cricket Champions - Phase 1 Modular</title>
+  <style>
+    :root {
+      --gold: #ffb300;
+      --orange: #ff6b35;
+      --bg: #0e1117;
+      --panel: #181d27;
+      --card: #222936;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: #eee;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 18px;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    h1 {
+      color: var(--gold);
+      text-align: center;
+      font-size: clamp(24px, 6vw, 46px);
+      margin: 10px 0;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(255, 107, 53, 0.4);
+    }
+
+    h2 {
+      color: var(--orange);
+      text-align: center;
+      margin: 6px 0 16px;
+      font-size: clamp(18px, 4vw, 28px);
+    }
+
+    .sub {
+      text-align: center;
+      color: #9aa3b2;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid #2c3445;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.15s;
+      user-select: none;
+    }
+
+    .card:hover, .card.sel {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 179, 0, 0.25);
+    }
+
+    .card .flag {
+      font-size: 40px;
+    }
+
+    .card .nm {
+      font-weight: 700;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+
+    .card .full {
+      font-size: 11px;
+      color: #9aa3b2;
+      margin-top: 3px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--orange), var(--gold));
+      color: #1a1205;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 14px auto 0;
+      display: block;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn.ghost {
+      background: #2c3445;
+      color: #eee;
+    }
+
+    #gameScreen {
+      padding: 0;
+    }
+
+    #cv {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      background: #5aa9e0;
+      touch-action: manipulation;
+    }
+
+    .hud {
+      position: fixed;
+      color: #fff;
+      font-weight: 700;
+      text-shadow: 0 1px 3px #000;
+      pointer-events: none;
+      z-index: 5;
+      font-size: 14px;
+    }
+
+    #hudTL {
+      top: 8px;
+      left: 10px;
+    }
+
+    #hudTR {
+      top: 8px;
+      right: 10px;
+      text-align: right;
+    }
+
+    #hudScore {
+      font-size: 22px;
+      color: var(--gold);
+    }
+
+    #commentary {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 150px;
+      text-align: center;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 15px;
+      text-shadow: 0 1px 4px #000;
+      z-index: 5;
+      padding: 0 12px;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+
+    #controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 8px;
+      z-index: 6;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+    }
+
+    #timingWrap {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 130px;
+      width: min(360px, 86vw);
+      height: 18px;
+      background: #11151d;
+      border-radius: 10px;
+      z-index: 6;
+      overflow: hidden;
+      display: none;
+      border: 1px solid #333;
+    }
+
+    #timingZone {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(34, 197, 94, 0.55);
+    }
+
+    #timingMark {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: #fff;
+      left: 0;
+      box-shadow: 0 0 6px #fff;
+    }
+
+    #resultScreen {
+      padding: 40px 20px;
+    }
+
+    .ctl {
+      background: var(--card);
+      border: 2px solid #2c3445;
+      border-radius: 12px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ctl:active {
+      transform: scale(0.95);
+    }
+
+    .ctl.dis {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .ctl .em {
+      font-size: 24px;
+    }
+
+    .ctl .cn {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--gold);
+    }
+
+    .ctl .ch {
+      font-size: 9px;
+      color: #9aa3b2;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen active" id="homeScreen">
+    <h1>🏏 CRICKET CHAMPIONS</h1>
+    <p class="sub">Phase 2 - Interactive Gameplay</p>
+    <div class="grid">
+      <div class="card" onclick="startQuickMatch()" style="cursor: pointer;">
+        <div class="flag">⚡</div>
+        <div class="nm">QUICK MATCH</div>
+        <div class="full">T20 · Play now</div>
+      </div>
+    </div>
+    <div style="margin-top: 20px; background: #181d27; padding: 15px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <p style="color: #ffb300; font-weight: 700; margin-bottom: 10px;">✓ Phase 2 Features:</p>
+      <ul style="color: #9aa3b2; font-size: 13px; text-align: left;">
+        <li>✓ Interactive batting (4 shot types)</li>
+        <li>✓ Timing system (perfect/good/ok/poor)</li>
+        <li>✓ AI bowling (smart delivery selection)</li>
+        <li>✓ Full match mechanics (innings, overs, wickets)</li>
+        <li>✓ Real-time scoring & commentary</li>
+        <li>✓ Fielder positioning</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="screen" id="gameScreen">
+    <canvas id="cv"></canvas>
+    <div class="hud" id="hudTL">
+      <div id="hudScore">0/0</div>
+      <div id="hudOvers">0.0 ov</div>
+    </div>
+    <div class="hud" id="hudTR">
+      <div id="hudTarget"></div>
+      <div id="hudBatter"></div>
+    </div>
+    <div id="commentary">Welcome to the match!</div>
+    <div id="timingWrap"><div id="timingZone"></div><div id="timingMark"></div></div>
+    <div id="controls"></div>
+  </div>
+
+  <div class="screen" id="resultScreen">
+    <div style="text-align: center; padding: 40px 20px;">
+      <h1 style="color: #ffb300; font-size: 36px; margin-bottom: 20px;">Loading...</h1>
+    </div>
+  </div>
+
+  <script>
+!function(){const t=document.createElement("link").relList;if(!(t&&t.supports&&t.supports("modulepreload"))){for(const t of document.querySelectorAll('link[rel="modulepreload"]'))e(t);new MutationObserver(t=>{for(const i of t)if("childList"===i.type)for(const t of i.addedNodes)"LINK"===t.tagName&&"modulepreload"===t.rel&&e(t)}).observe(document,{childList:!0,subtree:!0})}function e(t){if(t.ep)return;t.ep=!0;const e=function(t){const e={};return t.integrity&&(e.integrity=t.integrity),t.referrerPolicy&&(e.referrerPolicy=t.referrerPolicy),"use-credentials"===t.crossOrigin?e.credentials="include":"anonymous"===t.crossOrigin?e.credentials="omit":e.credentials="same-origin",e}(t);fetch(t.href,e)}}();const t=new class{constructor(){this.subscribers={}}subscribe(t,e){return this.subscribers[t]||(this.subscribers[t]=[]),this.subscribers[t].push(e),()=>{this.subscribers[t]=this.subscribers[t].filter(t=>t!==e)}}publish(t,e){this.subscribers[t]&&this.subscribers[t].forEach(i=>{try{i(e)}catch(s){console.error(`Error in event handler for '${t}':`,s)}})}clear(t){t?delete this.subscribers[t]:this.subscribers={}}},e="inning-start",i="inning-end",s="match-end",n="ball-played",a="boundary",o="wicket",r="dot-ball",h="score-changed",l="wickets-changed",c="overs-changed",d="review-challenge",u="bowler-changed",m="commentary-update";const g=new class{constructor(){this.reset()}reset(){this.state={mode:null,maxOvers:20,myKey:null,myTeam:null,oppKey:null,oppTeam:null,userBatFirst:!0,myXI:[],oppXI:[],inning:1,balls:0,score:0,wkts:0,fow:[],lastBallOver:-1,striker:0,nonstriker:1,batStats:[],bowlStats:[],curBowler:null,bowlers:[],battingXI:[],bowlingXI:[],battingTeam:null,bowlingTeam:null,userBatting:!0,target:null,inning1:null,inning2:null,tourney:null,reviewsUsed:{bat:0,bowl:0},reviewsAvailable:{bat:2,bowl:2},format:"T20"}}getCurrentBatter(){return this.state.batStats[this.state.striker]}getBatterName(){const t=this.getCurrentBatter();return t?`${t.p.name} ${t.r}(${t.b})`:""}getFormattedScore(){return`${this.state.score}/${this.state.wkts}`}getFormattedOvers(){return`${Math.floor(this.state.balls/6)}.${this.state.balls%6}`}setScore(e){this.state.score+=e,t.publish(h,{score:this.state.score})}addWicket(e,i){this.state.wkts++,e.out=!0,e.how=i,this.state.fow.push(`${this.state.score}/${this.state.wkts} (${e.p.name}, ${this.getFormattedOvers()})`),t.publish(l,{wickets:this.state.wkts,fow:this.state.fow})}advanceBall(){this.state.balls++,t.publish(c,{balls:this.state.balls,overs:this.getFormattedOvers()})}setBatsmen(t,e){this.state.striker=t,this.state.nonstriker=e}swapBatsmen(){[this.state.striker,this.state.nonstriker]=[this.state.nonstriker,this.state.striker]}setInning(i){this.state.inning=i,t.publish(e,{inning:i})}endInning(){1===this.state.inning?(this.state.inning1={score:this.state.score,wkts:this.state.wkts,balls:this.state.balls,batStats:this.state.batStats,bowlStats:this.state.bowlStats,fow:this.state.fow,team:this.state.battingTeam,userBatting:this.state.userBatting},this.state.target=this.state.score+1):this.state.inning2={score:this.state.score,wkts:this.state.wkts,balls:this.state.balls,batStats:this.state.batStats,bowlStats:this.state.bowlStats,fow:this.state.fow,team:this.state.battingTeam,userBatting:this.state.userBatting},t.publish(i,{inning:this.state.inning,snapshot:this.state.inning1||this.state.inning2})}useReview(e){this.state.reviewsUsed[e]++,t.publish(d,{side:e,used:this.state.reviewsUsed[e]})}getReviewsLeft(t){return this.state.reviewsAvailable[t]-this.state.reviewsUsed[t]}getState(){return{...this.state}}setState(t){this.state={...this.state,...t}}};class p{constructor(t){this.canvas=document.getElementById(t),this.ctx=this.canvas.getContext("2d"),this.dpr=window.devicePixelRatio||1,this.W=0,this.H=0,this.resizeCanvas(),window.addEventListener("resize",()=>this.resizeCanvas())}resizeCanvas(){this.W=window.innerWidth,this.H=window.innerHeight,this.canvas.width=this.W*this.dpr,this.canvas.height=this.H*this.dpr,this.canvas.style.width=this.W+"px",this.canvas.style.height=this.H+"px",this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0)}clear(){this.ctx.clearRect(0,0,this.W,this.H)}drawScene(t){const e=this.ctx.createLinearGradient(0,0,0,.5*this.H);e.addColorStop(0,"#3a7bd5"),e.addColorStop(1,"#8ec5e8"),this.ctx.fillStyle=e,this.ctx.fillRect(0,0,this.W,.16*this.H),this.ctx.fillStyle="#2b2f3a",this.ctx.fillRect(0,.1*this.H,this.W,.06*this.H);const i=this.ctx.createLinearGradient(0,.16*this.H,0,this.H);i.addColorStop(0,"#2e8b3d"),i.addColorStop(1,"#3fae53"),this.ctx.fillStyle=i,this.ctx.fillRect(0,.16*this.H,this.W,this.H),this.ctx.strokeStyle="#fff",this.ctx.lineWidth=3,this.ctx.beginPath(),this.ctx.ellipse(.5*this.W,.55*this.H,.46*this.W,.4*this.H,0,0,2*Math.PI),this.ctx.stroke(),this.ctx.strokeStyle="rgba(255,255,255,.4)",this.ctx.lineWidth=2,this.ctx.beginPath(),this.ctx.ellipse(.5*this.W,.52*this.H,.27*this.W,.24*this.H,0,0,2*Math.PI),this.ctx.stroke();const s=.16*this.H,n=.74*this.H,a=.06*this.W,o=.12*this.W;this.ctx.fillStyle="#c8a26a",this.ctx.beginPath(),this.ctx.moveTo(.5*this.W-a/2,s),this.ctx.lineTo(.5*this.W+a/2,s),this.ctx.lineTo(.5*this.W+o/2,n),this.ctx.lineTo(.5*this.W-o/2,n),this.ctx.closePath(),this.ctx.fill(),this.ctx.strokeStyle="#fff",this.ctx.lineWidth=2,this.ctx.beginPath(),this.ctx.moveTo(.5*this.W-.7*a,s+10),this.ctx.lineTo(.5*this.W+.7*a,s+10),this.ctx.stroke(),this.ctx.beginPath(),this.ctx.moveTo(.5*this.W-.7*o,n-14),this.ctx.lineTo(.5*this.W+.7*o,n-14),this.ctx.stroke(),this.drawStumps(.5*this.W,s+6,8),this.drawStumps(.5*this.W,n-10,16)}drawStumps(t,e,i){this.ctx.strokeStyle="#f5deb3",this.ctx.lineWidth=Math.max(2,i/6);for(let s=-1;s<=1;s++)this.ctx.beginPath(),this.ctx.moveTo(t+s*i*.35,e),this.ctx.lineTo(t+s*i*.35,e-i),this.ctx.stroke()}drawStick(t,e,i,s,n){this.ctx.strokeStyle=n||"#111",this.ctx.lineWidth=Math.max(2,3*i),this.ctx.lineCap="round";const a=26*i;this.ctx.fillStyle=n||"#111",this.ctx.beginPath(),this.ctx.arc(t,e-a,5*i,0,2*Math.PI),this.ctx.fill(),this.ctx.beginPath(),this.ctx.moveTo(t,e-a+5*i),this.ctx.lineTo(t,e-.3*a),this.ctx.stroke();const o=t,r=e-.3*a,h=s.legs||0;this.ctx.beginPath(),this.ctx.moveTo(o,r),this.ctx.lineTo(o-7*i-6*h*i,e),this.ctx.stroke(),this.ctx.beginPath(),this.ctx.moveTo(o,r),this.ctx.lineTo(o+7*i+6*h*i,e),this.ctx.stroke();const l=e-a+8*i,c=s.arm||0;this.ctx.beginPath(),this.ctx.moveTo(o,l),this.ctx.lineTo(o-9*i,l+8*i-14*c*i),this.ctx.stroke(),this.ctx.beginPath(),this.ctx.moveTo(o,l),this.ctx.lineTo(o+9*i,l+8*i-14*(void 0!==s.arm2?s.arm2:c)*i),this.ctx.stroke(),s.bat&&(this.ctx.strokeStyle="#d2a05a",this.ctx.lineWidth=4*i,this.ctx.beginPath(),this.ctx.moveTo(o+9*i,l+6*i),this.ctx.lineTo(o+9*i+(s.batdx||16)*i,e-2*i),this.ctx.stroke())}drawCircle(t,e,i,s){this.ctx.fillStyle=s,this.ctx.beginPath(),this.ctx.arc(t,e,i,0,2*Math.PI),this.ctx.fill()}drawText(t,e,i,s={}){this.ctx.fillStyle=s.color||"#fff",this.ctx.font=s.font||"16px Arial",this.ctx.textAlign=s.align||"left",this.ctx.textBaseline=s.baseline||"top",s.shadow&&(this.ctx.shadowColor=s.shadow,this.ctx.shadowBlur=5),this.ctx.fillText(t,e,i),this.ctx.shadowBlur=0}getPitchTop(){return.16*this.H}getPitchBot(){return.74*this.H}}const b=new class{constructor(){this.container=document.getElementById("controls"),this.buttons=[],this.disabled=!1,this.setupTouchHandling()}setupTouchHandling(){document.addEventListener("touchmove",t=>{t.target.closest("#cv")&&t.preventDefault()},{passive:!1})}buildBattingControls(t){this.clear();[{emoji:"🛡️",name:"DEFEND",hint:"Safe block",action:"DEFEND"},{emoji:"🏏",name:"DRIVE",hint:"Straight",action:"DRIVE"},{emoji:"✂️",name:"CUT",hint:"Point/3rd",action:"CUT"},{emoji:"🚀",name:"LOFT",hint:"Go big!",action:"LOFT"}].forEach(e=>{const i=this.createButton(e,()=>t(e.action));this.container.appendChild(i),this.buttons.push(i)}),this.setEnabled(!0)}buildBowlingControls(t,e){this.clear();(t?[{emoji:"🔄",name:"OFF-BREAK",hint:"Turns away",action:"OFF-BREAK"},{emoji:"🌀",name:"LEG-SPIN",hint:"Turns in",action:"LEG-SPIN"},{emoji:"🎭",name:"GOOGLY",hint:"Wrong un!",action:"GOOGLY"},{emoji:"🔀",name:"DOOSRA",hint:"Other way",action:"DOOSRA"}]:[{emoji:"⚡",name:"FAST",hint:"Good length",action:"FAST"},{emoji:"💥",name:"BOUNCER",hint:"Short pitch",action:"BOUNCER"},{emoji:"🎯",name:"YORKER",hint:"At toes",action:"YORKER"},{emoji:"↙️",name:"INSWING",hint:"Swings in",action:"INSWING"}]).forEach(t=>{const i=this.createButton(t,()=>e(t.action));this.container.appendChild(i),this.buttons.push(i)}),this.setEnabled(!1)}createButton(t,e){const i=document.createElement("div");return i.className="ctl dis",i.innerHTML=`\n      <div class="em">${t.emoji}</div>\n      <div class="cn">${t.name}</div>\n      <div class="ch">${t.hint}</div>\n    `,i.addEventListener("click",()=>{this.disabled||e()}),i.addEventListener("touchstart",()=>i.style.opacity="0.8"),i.addEventListener("touchend",()=>i.style.opacity="1"),i}clear(){this.container.innerHTML="",this.buttons=[]}setEnabled(t){this.disabled=!t,this.buttons.forEach(e=>{e.classList.toggle("dis",!t)})}highlight(t){this.buttons.forEach((e,i)=>{i===t?(e.style.borderColor="#ffb300",e.style.boxShadow="0 0 10px rgba(255,179,0,0.5)"):(e.style.borderColor="#2c3445",e.style.boxShadow="none")})}};const f=new class{constructor(){this.scoreEl=document.getElementById("hudScore"),this.oversEl=document.getElementById("hudOvers"),this.targetEl=document.getElementById("hudTarget"),this.batterEl=document.getElementById("hudBatter"),this.commentaryEl=document.getElementById("commentary"),this.setupListeners()}setupListeners(){t.subscribe(h,t=>this.updateScore(t.score)),t.subscribe(l,t=>this.updateWickets(t.wickets)),t.subscribe(c,t=>this.updateOvers(t.overs)),t.subscribe(m,t=>this.showCommentary(t.text))}updateScore(t){this.scoreEl&&(this.scoreEl.textContent=t)}updateWickets(t){if(this.scoreEl){const e=this.scoreEl.textContent;this.scoreEl.textContent=`${e}/${t}`.replace(/\/\//g,"/")}}updateOvers(t){this.oversEl&&(this.oversEl.textContent=`${t} ov`)}setTarget(t){this.targetEl&&t&&(this.targetEl.textContent=`Target ${t}`)}setBatterInfo(t,e,i){this.batterEl&&(this.batterEl.textContent=`${t} ${e}(${i})*`)}showCommentary(t){this.commentaryEl&&(this.commentaryEl.textContent=t,this.commentaryEl.style.opacity="0",setTimeout(()=>{this.commentaryEl.style.transition="opacity 0.5s",this.commentaryEl.style.opacity="1"},50))}setFormattedScore(t,e){this.scoreEl&&(this.scoreEl.textContent=`${t}/${e}`)}show(){document.getElementById("hudTL")?.style.setProperty("display","block"),document.getElementById("hudTR")?.style.setProperty("display","block")}hide(){document.getElementById("hudTL")?.style.setProperty("display","none"),document.getElementById("hudTR")?.style.setProperty("display","none")}};const y=new class{constructor(){this.enabled=!0,this.masterVolume=.7,this.sfxVolume=.8,this.musicVolume=.5,this.sounds=new Map,this.audioContext=null}async init(){this.audioContext||(this.audioContext=new(window.AudioContext||window.webkitAudioContext))}async loadSound(t,e){try{const i=await fetch(e),s=await i.arrayBuffer(),n=await this.audioContext.decodeAudioData(s);return this.sounds.set(t,n),n}catch(i){console.error(`Failed to load sound ${t}:`,i)}}playSound(t,e=1){if(!this.enabled||!this.audioContext)return;const i=this.sounds.get(t);if(!i)return void console.warn(`Sound not found: ${t}`);const s=this.audioContext.createBufferSource(),n=this.audioContext.createGain();s.buffer=i,s.connect(n),n.connect(this.audioContext.destination),n.gain.value=e*this.sfxVolume*this.masterVolume,s.start(0)}playBoundary(){this.playSound("boundary",.8)}playWicket(){this.playSound("wicket",1)}playBatHit(){this.playSound("bat-hit",.6)}playRun(){this.playSound("run",.5)}setMasterVolume(t){this.masterVolume=Math.max(0,Math.min(1,t))}toggleMute(){return this.enabled=!this.enabled,this.enabled}};const w=new class{constructor(){this.state="idle",this.currentBall=null,this.ballInFlight=!1}setupInning(){const i=g.getState(),s=1===i.inning?i.userBatFirst:!i.userBatFirst;g.setState({userBatting:s,score:0,wkts:0,balls:0,fow:[],lastBallOver:-1,striker:0,nonstriker:1});const n=s?i.myXI:i.oppXI;g.setState({batStats:n.map(t=>({p:t,r:0,b:0,fours:0,sixes:0,out:!1,how:"not out"}))});const a=s?i.oppXI:i.myXI;g.setState({bowlStats:a.map(t=>({p:t,balls:0,runs:0,wkts:0}))});const o=a.filter(t=>"BOWL"===t.role||"ALL"===t.role).sort((t,e)=>e.bowl-t.bowl);g.setState({bowlers:o,curBowler:o[0],battingXI:n,bowlingXI:a,battingTeam:s?i.myTeam:i.oppTeam,bowlingTeam:s?i.oppTeam:i.myTeam}),g.setInning(i.inning),t.publish(e,{inning:i.inning}),this.state=`innings${i.inning}`,console.log(`📋 Inning ${i.inning} setup complete`)}playBall(e,i,s){if(this.ballInFlight)return;const h=g.getState(),l=h.batStats[h.striker],c=this.resolveOutcome(e,i,s,l.p);if(l.b++,g.advanceBall(),c.runs>0)l.r+=c.runs,g.setScore(c.runs),4===c.runs&&l.fours++,6===c.runs&&l.sixes++,c.runs%2==1&&g.swapBatsmen(),t.publish(n,{runs:c.runs,shot:e}),c.runs>=4&&t.publish(a,{runs:c.runs});else if(c.wicket){g.addWicket(l,c.how),t.publish(o,{how:c.how,batter:l.p.name});const e=Math.max(h.striker,h.nonstriker)+1;e<11&&h.wkts<10&&g.setState({striker:e})}else t.publish(r,{});if(h.balls%6==0&&h.balls>0){g.swapBatsmen();const e=this.getNextBowler();g.setState({curBowler:e}),t.publish(u,{bowler:e.name})}(h.balls>=6*h.maxOvers||h.wkts>=10)&&this.endInning()}resolveOutcome(t,e,i,s){const n={perfect:1,good:.72,ok:.42,poor:.12}[i]||.3,a=s.bat/100,o={DEFEND:{power:.4,wicketRisk:.05},DRIVE:{power:.75,wicketRisk:.12},CUT:{power:.65,wicketRisk:.15},LOFT:{power:.85,wicketRisk:.25}}[t]||{power:.5,wicketRisk:.1};let r=({FAST:{effectiveness:.8,wicketBase:.08},BOUNCER:{effectiveness:.6,wicketBase:.12},YORKER:{effectiveness:.9,wicketBase:.18},INSWING:{effectiveness:.75,wicketBase:.1},OUTSWING:{effectiveness:.75,wicketBase:.09},"OFF-BREAK":{effectiveness:.7,wicketBase:.1},"LEG-SPIN":{effectiveness:.7,wicketBase:.11},GOOGLY:{effectiveness:.8,wicketBase:.16},DOOSRA:{effectiveness:.8,wicketBase:.15},FLIPPER:{effectiveness:.75,wicketBase:.14}}[e]||{wicketBase:.1}).wicketBase*(1-.3*a)+o.wicketRisk*(1-n);if(r=Math.max(.01,Math.min(.5,r)),Math.random()<r){return{runs:0,wicket:!0,how:["bowled","caught","lbw"][Math.floor(3*Math.random())]}}const h=o.power*n*a,l=Math.random();let c=0;return c="DEFEND"===t?l<.2?1:0:"LOFT"===t?h>.6&&l<.4?6:h>.4&&l<.6?4:h>.2?l<.5?2:1:l<.3?1:0:"DRIVE"===t?h>.65&&l<.5?4:h>.4?[1,2,2,3][Math.floor(4*l)]:l<.4?1:0:h>.65&&l<.45?4:h>.4?[1,1,2][Math.floor(3*l)]:l<.3?1:0,{runs:c,wicket:!1}}getNextBowler(){const t=g.getState(),e=Math.floor(t.balls/6);return t.bowlers[e%t.bowlers.length]}endInning(){const e=g.getState();g.endInning(),1===e.inning?(console.log(`📊 Innings 1 end: ${e.score}/${e.wkts}`),this.state="innings2",setTimeout(()=>{g.setState({inning:2,score:0,wkts:0,balls:0,fow:[]}),this.setupInning()},2e3)):(console.log("🏁 Match complete!"),this.state="complete",t.publish(s,{inning1:e.inning1,inning2:e.inning2}))}};const S=new class{constructor(){this.timingActive=!1,this.timingPos=0,this.timingDir=1,this.zoneStart=.35,this.zoneWidth=.3,this.selectedShot=null}startTiming(){this.timingActive=!0,this.timingPos=0,this.timingDir=1,this.zoneStart=.3+.4*Math.random(),this.zoneWidth=.25;const t=document.getElementById("timingWrap");if(t){t.style.display="block";const e=document.getElementById("timingZone");e&&(e.style.left=100*this.zoneStart+"%",e.style.width=100*this.zoneWidth+"%")}}stopTiming(){this.timingActive=!1;const t=document.getElementById("timingWrap");t&&(t.style.display="none")}updateTiming(t){if(!this.timingActive)return;this.timingPos+=this.timingDir*t*.0011,this.timingPos>=1&&(this.timingPos=1,this.timingDir=-1),this.timingPos<=0&&(this.timingPos=0,this.timingDir=1);const e=document.getElementById("timingMark");e&&(e.style.left=100*this.timingPos+"%")}getTimingQuality(){if(!this.timingActive)return"poor";const t=this.zoneStart+this.zoneWidth/2,e=Math.abs(this.timingPos-t);return e<.25*this.zoneWidth?"perfect":e<.5*this.zoneWidth?"good":e<.25?"ok":"poor"}playShot(t,e){this.selectedShot=t;const i=this.getTimingQuality();this.stopTiming(),console.log(`⚾ Shot: ${t} | Timing: ${i} | Delivery: ${e}`),w.playBall(t,e,i),this.selectedShot=null}aiShot(t){const e=g.getState(),i=.6*(e.batStats[e.striker].p.bat/100)+(2===e.inning?.2:0);let s;s=i>1?Math.random()<.4?"LOFT":"DRIVE":i>.6?["DRIVE","CUT","DEFEND"][Math.floor(3*Math.random())]:Math.random()<.6?"DEFEND":"DRIVE";const n=["poor","ok","good","perfect"][Math.floor(4*Math.random())];console.log(`🤖 AI Shot: ${s} | Timing: ${n}`),w.playBall(s,t,n)}},x=[{emoji:"⚡",name:"FAST",hint:"Good length"},{emoji:"💥",name:"BOUNCER",hint:"Short pitch"},{emoji:"🎯",name:"YORKER",hint:"At toes"},{emoji:"↙️",name:"INSWING",hint:"Swings in"},{emoji:"↗️",name:"OUTSWING",hint:"Swings out"}],B=[{emoji:"🔄",name:"OFF-BREAK",hint:"Turns away"},{emoji:"🌀",name:"LEG-SPIN",hint:"Turns in"},{emoji:"🎭",name:"GOOGLY",hint:"Wrong un!"},{emoji:"🔀",name:"DOOSRA",hint:"Other way"},{emoji:"⬇️",name:"FLIPPER",hint:"Skids on"}];const L=new class{isSpin(t){if(!t)return!1;return t.bowl>=70&&["Kuldeep","Ashwin","Jadeja","Chahal","Patel","Narine","Santner","Hasaranga","Theekshana","Zampa","Sodhi","Rashid","Maharaj","Shamsi","Chakravarthy"].some(e=>t.name.includes(e))}getDeliveries(t){return this.isSpin(t)?B:x}selectDelivery(t){const e=g.getState(),i=this.isSpin(t),s=Math.floor(e.balls/6)%6;if(e.balls,2===e.inning&&6*e.maxOvers-e.balls<=12)return i?"GOOGLY":"YORKER";if(s<6)return i?"OFF-BREAK":"FAST";const n=this.getDeliveries(t).map(t=>t.name);return n[Math.floor(Math.random()*n.length)]}},v=[{name:"Mid-on",x:.5,y:.3},{name:"Cover",x:.3,y:.42},{name:"Mid-off",x:.7,y:.42},{name:"Fine leg",x:.18,y:.55},{name:"Third man",x:.82,y:.55},{name:"Mid-wicket",x:.35,y:.62},{name:"Point",x:.65,y:.62},{name:"Long-on",x:.12,y:.4},{name:"Long-off",x:.88,y:.4},{name:"Deep square",x:.5,y:.18}];const k=new class{constructor(){this.fielders=this.initFielders()}initFielders(){return v.map(t=>({...t,fx:t.x,fy:t.y,running:!1,catching:!1,diving:!1}))}resetFielders(){this.fielders=this.initFielders()}getFielderAt(t){return this.fielders[t]}getAllFielders(){return this.fielders}setFielderCatching(t){this.fielders[t]&&(this.fielders[t].catching=!0)}setFielderDiving(t){this.fielders[t]&&(this.fielders[t].diving=!0)}moveFielderToPoint(t,e,i){this.fielders[t]&&(this.fielders[t].fx=e,this.fielders[t].fy=i,this.fielders[t].running=!0)}clearFielderState(t){this.fielders[t]&&(this.fielders[t].running=!1,this.fielders[t].catching=!1,this.fielders[t].diving=!1)}};function T(t){return t.map(t=>{return e=t[0],i=t[1],s=t[2],n=t[3],{name:e,role:i,bat:s,bowl:n};var e,i,s,n})}const A={ipl:{MI:{name:"Mumbai Indians",flag:"🔵",players:T([["Rohit Sharma","BAT",92,15],["Suryakumar Yadav","BAT",90,8],["Tilak Varma","BAT",83,30],["Hardik Pandya","ALL",82,76],["Naman Dhir","ALL",74,58],["Robin Minz","WK",72,5],["Karn Sharma","BOWL",38,80],["Jasprit Bumrah","BOWL",22,97],["Trent Boult","BOWL",28,88],["Deepak Chahar","BOWL",42,83],["Ashwani Kumar","BOWL",22,78]])},CSK:{name:"Chennai Super Kings",flag:"🟡",players:T([["Ruturaj Gaikwad","BAT",88,10],["Rachin Ravindra","ALL",80,72],["Shivam Dube","ALL",82,56],["MS Dhoni","WK",80,5],["Ravindra Jadeja","ALL",73,87],["Sam Curran","ALL",70,81],["Matheesha Pathirana","BOWL",26,87],["Deepak Chahar","BOWL",42,83],["Noor Ahmad","BOWL",30,82],["Khaleel Ahmed","BOWL",26,83],["Nathan Ellis","BOWL",30,82]])},RCB:{name:"Royal Challengers Bengaluru",flag:"🔴",players:T([["Virat Kohli","BAT",96,20],["Phil Salt","WK",82,5],["Rajat Patidar","BAT",82,10],["Liam Livingstone","ALL",82,72],["Jitesh Sharma","WK",78,5],["Krunal Pandya","ALL",70,78],["Swapnil Singh","ALL",66,70],["Bhuvneshwar Kumar","BOWL",40,85],["Josh Hazlewood","BOWL",22,90],["Yash Dayal","BOWL",26,80],["Suyash Sharma","BOWL",30,80]])},KKR:{name:"Kolkata Knight Riders",flag:"🟣",players:T([["Ajinkya Rahane","BAT",80,8],["Quinton de Kock","WK",88,5],["Venkatesh Iyer","ALL",82,56],["Andre Russell","ALL",84,82],["Rinku Singh","BAT",83,10],["Sunil Narine","ALL",76,87],["Angkrish Raghuvanshi","BAT",76,8],["Varun Chakaravarthy","BOWL",35,86],["Harshit Rana","BOWL",28,82],["Spencer Johnson","BOWL",26,82],["Anrich Nortje","BOWL",28,89]])},DC:{name:"Delhi Capitals",flag:"🟦",players:T([["Jake Fraser-McGurk","BAT",84,10],["Faf du Plessis","BAT",86,8],["Axar Patel","ALL",67,83],["Tristan Stubbs","BAT",80,10],["Rishabh Pant","WK",88,5],["Ashutosh Sharma","ALL",76,55],["Karun Nair","BAT",78,5],["T Natarajan","BOWL",26,84],["Kuldeep Yadav","BOWL",32,87],["Mukesh Kumar","BOWL",25,80],["Mitchell Starc","BOWL",30,93]])},PBKS:{name:"Punjab Kings",flag:"🟥",players:T([["Shashank Singh","BAT",78,10],["Prabhsimran Singh","WK",80,5],["Josh Inglis","WK",78,5],["Nehal Wadhera","BAT",76,10],["Glenn Maxwell","ALL",84,68],["Azmatullah Omarzai","ALL",74,70],["Harpreet Brar","ALL",64,79],["Arshdeep Singh","BOWL",32,87],["Yuzvendra Chahal","BOWL",35,87],["Harshal Patel","BOWL",40,84],["Marco Jansen","ALL",56,83]])},RR:{name:"Rajasthan Royals",flag:"🌸",players:T([["Yashasvi Jaiswal","BAT",88,10],["Sanju Samson","WK",86,5],["Riyan Parag","ALL",80,56],["Dhruv Jurel","WK",78,5],["Shimron Hetmyer","BAT",84,15],["Wanindu Hasaranga","ALL",68,86],["Sandeep Sharma","BOWL",26,82],["Trent Boult","BOWL",30,90],["Jofra Archer","BOWL",28,91],["Kumar Kartikeya","BOWL",30,80],["Maheesh Theekshana","BOWL",40,84]])},SRH:{name:"Sunrisers Hyderabad",flag:"🟧",players:T([["Travis Head","BAT",87,40],["Abhishek Sharma","ALL",83,62],["Ishan Kishan","WK",82,5],["Heinrich Klaasen","WK",86,5],["Nitish Reddy","ALL",78,63],["Aniket Verma","BAT",72,8],["Harshal Patel","BOWL",40,84],["Pat Cummins","BOWL",40,92],["Mohammed Shami","BOWL",26,91],["Zeeshan Ansari","BOWL",28,78],["Brydon Carse","BOWL",30,80]])},GT:{name:"Gujarat Titans",flag:"🦁",players:T([["Shubman Gill","BAT",91,10],["Shahrukh Khan","BAT",78,10],["Jos Buttler","WK",90,5],["Sai Sudharsan","BAT",82,10],["Rahul Tewatia","ALL",72,62],["Rashid Khan","ALL",60,93],["Dasun Shanaka","ALL",74,70],["Mohammed Siraj","BOWL",24,87],["Prasidh Krishna","BOWL",26,84],["Noor Ahmad","BOWL",30,82],["R Sai Kishore","BOWL",35,80]])},LSG:{name:"Lucknow Super Giants",flag:"🟢",players:T([["KL Rahul","WK",86,5],["Quinton de Kock","WK",88,5],["Aiden Markram","ALL",83,66],["Nicholas Pooran","WK",86,5],["Marcus Stoinis","ALL",78,70],["Krunal Pandya","ALL",70,78],["Ayush Badoni","ALL",74,55],["Avesh Khan","BOWL",26,83],["Ravi Bishnoi","BOWL",32,82],["Mohsin Khan","BOWL",24,82],["Shardul Thakur","ALL",56,78]])}}} };let W=null,O=null,E=0;async function I(){console.log("🏏 Cricket Champions - Phase 2 Initialization"),W=new p("cv"),await y.init(),t.subscribe(n,e=>{console.log("Ball played:",e),e.runs>=4?(y.playBoundary(),t.publish(m,{text:"BOUNDARY! Great shot!"})):e.runs>0&&y.playRun()}),t.subscribe(o,e=>{y.playWicket(),t.publish(m,{text:`WICKET! ${e.how}`})}),t.subscribe(h,t=>{f.updateScore(t.score)}),document.getElementById("homeScreen").innerHTML='\n    <h1>🏏 CRICKET CHAMPIONS</h1>\n    <p class="sub">Phase 2 - Interactive Gameplay</p>\n    <div class="grid">\n      <div class="card" onclick="startQuickMatch()">\n        <div class="flag">⚡</div>\n        <div class="nm">QUICK MATCH</div>\n        <div class="full">T20 · Play now</div>\n      </div>\n    </div>\n    <div style="margin-top: 20px; background: #181d27; padding: 15px; border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto;">\n      <p style="color: #ffb300; font-weight: 700; margin-bottom: 10px;">✓ Phase 2 Features:</p>\n      <ul style="color: #9aa3b2; font-size: 13px; text-align: left;">\n        <li>✓ Interactive batting (4 shot types)</li>\n        <li>✓ Timing system (perfect/good/ok/poor)</li>\n        <li>✓ AI bowling (smart delivery selection)</li>\n        <li>✓ Full match mechanics (innings, overs, wickets)</li>\n        <li>✓ Real-time scoring & commentary</li>\n        <li>✓ Fielder positioning</li>\n      </ul>\n    </div>\n  ',R("homeScreen"),function(){function t(e){const i=Math.min(40,e-E);E=e,W.clear(),W.drawScene(g.getState()),S.timingActive&&S.updateTiming(i);if(k.getAllFielders().forEach((t,e)=>{const i=t.fx*W.W,s=W.getPitchTop()+t.fy*(W.getPitchBot()-W.getPitchTop()),n="#1a3a8a";W.drawStick(i,s,.5,{legs:.1,arm:.2},n)}),S.timingActive){const t=W.getPitchBot()+20;W.ctx.fillStyle="rgba(0, 0, 0, 0.5)",W.ctx.fillRect(.25*W.W,t,.5*W.W,15)}O=requestAnimationFrame(t)}O=requestAnimationFrame(t)}(),console.log("✓ Game initialized successfully")}function R(t){document.querySelectorAll(".screen").forEach(t=>t.classList.remove("active")),document.getElementById(t).classList.add("active")}function P(){const e=g.getState();if("complete"===w.state)return void function(){const t=g.getState().inning1,e=g.getState().inning2;let i="";i=e.score>=t.score?`${e.team.name} won by ${10-e.wkts} wickets!`:`${t.team.name} won by ${t.score-e.score} runs!`;document.getElementById("resultScreen").innerHTML=`\n    <div style="text-align: center; padding: 40px 20px;">\n      <h1 style="color: #ffb300; font-size: 36px; margin-bottom: 20px;">🏆 MATCH COMPLETE</h1>\n      <div style="background: #181d27; padding: 20px; border-radius: 10px; margin-bottom: 20px;">\n        <p style="font-size: 24px; color: #fff; margin-bottom: 10px;">${i}</p>\n        <p style="color: #9aa3b2;">Innings 1: ${t.score}/${t.wkts} | Innings 2: ${e.score}/${e.wkts}</p>\n      </div>\n      <button class="btn" onclick="location.reload()" style="margin-top: 20px;">🔄 Play Again</button>\n    </div>\n  `,R("resultScreen")}();const i=L.selectDelivery(e.curBowler);t.publish(m,{text:`${e.curBowler.name} to bowl...`}),e.userBatting?(b.buildBattingControls(t=>{S.playShot(t,i),setTimeout(P,1500)}),S.startTiming()):(S.aiShot(i),setTimeout(P,1500)),f.setBatterInfo(e.batStats[e.striker].p.name,e.batStats[e.striker].r,e.batStats[e.striker].b)}window.startQuickMatch=function(){console.log("🎮 Starting interactive match...");const e=Object.values(A.ipl),i=e[Math.floor(Math.random()*e.length)],s=e.find(t=>t!==i)||e[0],n=i.players.slice(0,11),a=s.players.slice(0,11);g.setState({mode:"friendly",maxOvers:6,myKey:i.name,myTeam:i,oppKey:s.name,oppTeam:s,myXI:n,oppXI:a,userBatFirst:Math.random()>.5,inning:1}),R("gameScreen"),f.show(),w.setupInning(),k.resetFielders(),t.publish(m,{text:`${g.getState().battingTeam.name} batting! Let's go!`}),setTimeout(P,1500)},window.startFriendlyMatch=startFriendlyMatch,window.showScreen=R,"loading"===document.readyState?document.addEventListener("DOMContentLoaded",I):I(),window.addEventListener("beforeunload",function(){O&&cancelAnimationFrame(O)});
+  </script>
+</body>
+</html>
