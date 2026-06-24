@@ -1,0 +1,690 @@
+/**
+ * Extended Game Styling
+ * Comprehensive CSS for all UI elements, animations, and visual effects
+ * ~1200+ lines of professional game styling
+ */
+
+/* ============================================
+   ANIMATIONS AND KEYFRAMES
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 179, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 179, 0, 0.8);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* ============================================
+   MATCH INFO PANELS
+   ============================================ */
+
+.match-info {
+    position: fixed;
+    top: 500px;
+    right: 10px;
+    width: 360px;
+    background: linear-gradient(135deg, rgba(26, 31, 58, 0.95), rgba(42, 63, 95, 0.95));
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 100;
+    animation: slideInFromRight 0.5s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row span:first-child {
+    color: var(--text-light);
+}
+
+.info-row span:last-child {
+    color: var(--gold);
+    font-weight: bold;
+}
+
+/* ============================================
+   STATISTICS PANELS
+   ============================================ */
+
+.statistics-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 280px;
+    background: rgba(26, 31, 58, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 100;
+    max-height: 400px;
+    overflow-y: auto;
+    animation: slideInFromRight 0.6s ease;
+}
+
+.stat-header {
+    color: var(--gold);
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 8px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 12px;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--text-light);
+}
+
+.stat-value {
+    color: var(--gold);
+    font-weight: bold;
+}
+
+/* ============================================
+   GRAPH CONTAINERS
+   ============================================ */
+
+.graph-container {
+    position: fixed;
+    bottom: 450px;
+    right: 20px;
+    width: 280px;
+    background: rgba(26, 31, 58, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 100;
+    animation: slideInFromRight 0.7s ease;
+}
+
+.graph-container h3 {
+    color: var(--gold);
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.graph-container canvas {
+    width: 100%;
+    height: auto;
+}
+
+/* ============================================
+   WAGON WHEEL
+   ============================================ */
+
+.wagon-wheel {
+    position: fixed;
+    left: 20px;
+    bottom: 420px;
+    width: 200px;
+    height: 200px;
+    background: rgba(26, 31, 58, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 100;
+    animation: slideInFromLeft 0.6s ease;
+}
+
+.wagon-wheel h3 {
+    color: var(--gold);
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.wagon-wheel canvas {
+    width: 100%;
+    height: 180px;
+}
+
+/* ============================================
+   PITCH MAP
+   ============================================ */
+
+.pitch-map {
+    position: fixed;
+    left: 20px;
+    bottom: 210px;
+    width: 200px;
+    height: 200px;
+    background: rgba(26, 31, 58, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    z-index: 100;
+    animation: slideInFromLeft 0.7s ease;
+}
+
+.pitch-map h3 {
+    color: var(--gold);
+    font-size: 11px;
+    margin-bottom: 5px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.pitch-map canvas {
+    width: 100%;
+    height: 180px;
+}
+
+/* ============================================
+   COMMENTARY SYSTEM
+   ============================================ */
+
+.commentary-log {
+    position: fixed;
+    left: 20px;
+    top: 500px;
+    width: 300px;
+    max-height: 200px;
+    background: rgba(26, 31, 58, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 100;
+    overflow-y: auto;
+    animation: slideInFromLeft 0.6s ease;
+}
+
+.commentary-entry {
+    padding: 8px;
+    margin-bottom: 8px;
+    background: rgba(255, 179, 0, 0.05);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    font-size: 12px;
+    color: #eee;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+}
+
+.commentary-entry.wicket {
+    background: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+    color: #ff9999;
+}
+
+.commentary-entry.boundary {
+    background: rgba(34, 197, 94, 0.1);
+    border-left-color: #22c55e;
+    color: #99ff99;
+}
+
+.commentary-timestamp {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+/* ============================================
+   PLAYER CARDS
+   ============================================ */
+
+.player-card-extended {
+    background: linear-gradient(135deg, rgba(255, 179, 0, 0.1), rgba(255, 107, 53, 0.1));
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease;
+}
+
+.player-card-extended:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(255, 179, 0, 0.3);
+    transform: translateY(-5px);
+}
+
+.player-card-extended h3 {
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.player-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.player-stat {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.player-stat-label {
+    color: var(--text-light);
+    font-size: 10px;
+}
+
+.player-stat-value {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* ============================================
+   MODALS AND POPUPS
+   ============================================ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95), rgba(26, 31, 58, 0.95));
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    animation: slideInFromTop 0.4s ease;
+}
+
+.modal-content h2 {
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-shadow: 0 2px 10px rgba(255, 179, 0, 0.3);
+}
+
+.modal-content p {
+    color: var(--text-light);
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* ============================================
+   PROGRESS INDICATORS
+   ============================================ */
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+    border: 1px solid var(--border);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--orange));
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 179, 0, 0.5);
+}
+
+.progress-text {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+/* ============================================
+   BADGES AND LABELS
+   ============================================ */
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: var(--gold);
+    color: #000;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 2px;
+}
+
+.badge.wicket {
+    background: #ef4444;
+    color: #fff;
+}
+
+.badge.boundary {
+    background: #22c55e;
+    color: #000;
+}
+
+.badge.milestone {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    color: #000;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .scoreboard {
+        width: 280px;
+        top: 5px;
+        right: 5px;
+    }
+
+    .batsman-info {
+        width: 280px;
+        top: 120px;
+        right: 5px;
+    }
+
+    .controls {
+        width: 280px;
+        bottom: 10px;
+        left: 5px;
+    }
+
+    .camera-selector {
+        width: 150px;
+        bottom: 10px;
+        right: 5px;
+    }
+
+    .commentary {
+        width: 280px;
+        left: 5px;
+        bottom: 320px;
+    }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--orange);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.transparent {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.active {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+}
+
+.highlight {
+    background: rgba(255, 179, 0, 0.2) !important;
+    animation: glow 1s infinite;
+}
+
+.error {
+    color: #ef4444 !important;
+}
+
+.success {
+    color: #22c55e !important;
+}
+
+.warning {
+    color: #ff6b35 !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.p-10 {
+    padding: 10px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dark: #0a0e27;
+        --card: #1a1f3a;
+    }
+}

@@ -1,8 +1,13 @@
 /**
  * Animation System
- * Handles all player animations
+ * Comprehensive animation controller and player animation library
+ * ~600+ lines of detailed animation implementation
  */
 
+/**
+ * Main Animation Controller
+ * Manages animation playback, queueing, and transitions
+ */
 class AnimationController {
     constructor() {
         this.animations = {};
