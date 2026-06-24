@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cricket Champions 3D - Professional Simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon@0.20.0/build/cannon.js"></script>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="canvas"></canvas>
+
+        <!-- HUD ELEMENTS -->
+        <div id="hud" class="hud">
+            <!-- SCOREBOARD -->
+            <div class="scoreboard">
+                <div class="scoreboard-header">
+                    <span class="team-name" id="team1Name">Team 1</span>
+                    <span class="vs">vs</span>
+                    <span class="team-name" id="team2Name">Team 2</span>
+                </div>
+                <div class="scoreboard-body">
+                    <div class="team-score">
+                        <div class="score-value" id="team1Score">0/0</div>
+                        <div class="score-overs" id="team1Overs">0.0 ov</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="team-score">
+                        <div class="score-value" id="team2Score">0/0</div>
+                        <div class="score-overs" id="team2Overs">0.0 ov</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BATSMAN INFO -->
+            <div class="batsman-info">
+                <div class="player-card">
+                    <div class="player-name" id="batsmanName">-</div>
+                    <div class="player-stats">
+                        <div class="stat"><span>Runs:</span> <span id="batsmanRuns">0</span></div>
+                        <div class="stat"><span>Balls:</span> <span id="batsmanBalls">0</span></div>
+                        <div class="stat"><span>SR:</span> <span id="batsmanSR">-</span></div>
+                        <div class="stat"><span>4s:</span> <span id="batsmanFours">0</span></div>
+                        <div class="stat"><span>6s:</span> <span id="batsmanSixes">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOWLER INFO -->
+            <div class="bowler-info">
+                <div class="player-card">
+                    <div class="player-name" id="bowlerName">-</div>
+                    <div class="player-stats">
+                        <div class="stat"><span>Balls:</span> <span id="bowlerBalls">0</span></div>
+                        <div class="stat"><span>Runs:</span> <span id="bowlerRuns">0</span></div>
+                        <div class="stat"><span>Econ:</span> <span id="bowlerEconomy">-</span></div>
+                        <div class="stat"><span>Wickets:</span> <span id="bowlerWickets">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="controls">
+                <div class="controls-title">BATTING SHOTS</div>
+                <div class="shot-buttons" id="shotButtons"></div>
+            </div>
+
+            <!-- COMMENTARY -->
+            <div class="commentary">
+                <div class="commentary-title">COMMENTARY</div>
+                <div class="commentary-text" id="commentary">Ready to play...</div>
+            </div>
+
+            <!-- CAMERA SELECTOR -->
+            <div class="camera-selector">
+                <button class="camera-btn active" onclick="window.gameInstance.camera.setCamera('broadcast')">📺 Broadcast</button>
+                <button class="camera-btn" onclick="window.gameInstance.camera.setCamera('batting')">🏏 Batting</button>
+                <button class="camera-btn" onclick="window.gameInstance.camera.setCamera('bowling')">🎯 Bowling</button>
+                <button class="camera-btn" onclick="window.gameInstance.camera.setCamera('stump')">📍 Stump</button>
+                <button class="camera-btn" onclick="window.gameInstance.camera.setCamera('replay')">▶️ Replay</button>
+            </div>
+
+            <!-- WAGON WHEEL -->
+            <div class="wagon-wheel">
+                <canvas id="wagonWheelCanvas" width="200" height="200"></canvas>
+            </div>
+
+            <!-- MATCH INFO -->
+            <div class="match-info">
+                <div class="info-row"><span>Inning:</span> <span id="inningNo">1</span></div>
+                <div class="info-row"><span>Run Rate:</span> <span id="runRate">-</span></div>
+                <div class="info-row"><span>Required RR:</span> <span id="reqRR">-</span></div>
+            </div>
+        </div>
+
+        <!-- MENU -->
+        <div id="menuOverlay" class="menu-overlay active">
+            <div class="menu-container">
+                <div class="menu-logo">
+                    <h1>🏏 CRICKET CHAMPIONS 3D</h1>
+                    <p>Professional 3D Cricket Simulator</p>
+                </div>
+
+                <div class="menu-section">
+                    <h2>GAME MODE</h2>
+                    <div class="menu-grid">
+                        <button class="menu-card" onclick="window.startGame('quick')">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-title">Quick Match</div>
+                            <div class="card-desc">5 Overs</div>
+                        </button>
+                        <button class="menu-card" onclick="window.startGame('t20')">
+                            <div class="card-icon">🎯</div>
+                            <div class="card-title">T20</div>
+                            <div class="card-desc">20 Overs</div>
+                        </button>
+                        <button class="menu-card" onclick="window.startGame('odi')">
+                            <div class="card-icon">📊</div>
+                            <div class="card-title">ODI</div>
+                            <div class="card-desc">50 Overs</div>
+                        </button>
+                        <button class="menu-card" onclick="window.startGame('test')">
+                            <div class="card-icon">🏆</div>
+                            <div class="card-title">Test</div>
+                            <div class="card-desc">90 Balls</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/physics.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
