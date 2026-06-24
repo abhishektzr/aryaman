@@ -35,6 +35,13 @@ canvas {display: block; width: 100%; height: 100%;}
 .commentary {position: fixed; bottom: 400px; left: 20px; width: 350px; background: rgba(26, 31, 58, 0.98); border: 1px solid var(--border); border-radius: 10px; padding: 12px; z-index: 100;}
 .commentary-title {color: var(--gold); font-weight: bold; margin-bottom: 8px; font-size: 11px; text-transform: uppercase;}
 .commentary-text {color: #eee; font-size: 12px; line-height: 1.5; font-style: italic; min-height: 60px;}
+.timing-bar-container {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: rgba(26, 31, 58, 0.95); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; z-index: 200; display: none;}
+.timing-bar-container.active {display: block;}
+.timing-bar-label {color: var(--gold); font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 14px;}
+.timing-bar {width: 100%; height: 30px; background: rgba(0, 0, 0, 0.5); border: 2px solid var(--border); border-radius: 5px; position: relative; overflow: hidden;}
+.timing-bar-fill {height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00); width: 0%; transition: width 0.05s linear;}
+.timing-bar-perfect {position: absolute; left: 70%; top: 0; width: 10%; height: 100%; background: rgba(255, 255, 0, 0.5); border: 1px solid var(--gold);}
+.timing-bar-good {position: absolute; left: 50%; top: 0; width: 30%; height: 100%; background: rgba(34, 197, 94, 0.3); border: 1px dashed var(--success);}
 .camera-selector {position: fixed; bottom: 20px; right: 20px; width: 200px; background: rgba(26, 31, 58, 0.98); border: 1px solid var(--border); border-radius: 10px; padding: 10px; z-index: 100; display: flex; flex-direction: column; gap: 6px;}
 .camera-btn {background: var(--card); border: 2px solid var(--border); color: var(--text-light); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; transition: all 0.2s ease; text-align: center;}
 .camera-btn:hover {border-color: var(--gold); color: var(--gold);}
@@ -64,6 +71,14 @@ canvas {display: block; width: 100%; height: 100%;}
 <body>
     <div id="gameContainer">
         <canvas id="canvas"></canvas>
+        <div id="timingBar" class="timing-bar-container">
+            <div class="timing-bar-label">⏱️ TIME YOUR SHOT!</div>
+            <div class="timing-bar">
+                <div class="timing-bar-good"></div>
+                <div class="timing-bar-perfect"></div>
+                <div class="timing-bar-fill" id="timingBarFill"></div>
+            </div>
+        </div>
         <div id="hud" class="hud">
             <div class="scoreboard">
                 <div class="scoreboard-header">
@@ -107,7 +122,7 @@ canvas {display: block; width: 100%; height: 100%;}
                 </div>
             </div>
             <div class="controls">
-                <div class="controls-title">BATTING SHOTS</div>
+                <div class="controls-title">BATTING SHOTS (1-9 or click)</div>
                 <div class="shot-buttons" id="shotButtons"></div>
             </div>
             <div class="commentary">
@@ -170,7 +185,7 @@ canvas {display: block; width: 100%; height: 100%;}
 
     <script>
 // ============================================
-// COMPLETE CRICKET 3D GAME - ALL IN ONE FILE
+// COMPLETE CRICKET 3D GAME - WITH TIMING BAR, BOWLING ANIMATIONS, & FIELDER AI
 // ============================================
 
 const TEAMS = [
@@ -181,6 +196,100 @@ const TEAMS = [
 ];
 
 let gameInstance = null;
+
+// TIMING BAR SYSTEM
+class TimingBarSystem {
+    constructor() {
+        this.isActive = false;
+        this.progress = 0;
+        this.duration = 1.5;
+        this.elapsedTime = 0;
+        this.selectedShotIdx = -1;
+    }
+
+    start(shotIdx) {
+        this.isActive = true;
+        this.selectedShotIdx = shotIdx;
+        this.progress = 0;
+        this.elapsedTime = 0;
+        document.getElementById('timingBar').classList.add('active');
+    }
+
+    update(deltaTime) {
+        if (!this.isActive) return;
+
+        this.elapsedTime += deltaTime;
+        this.progress = (this.elapsedTime % this.duration) / this.duration;
+        document.getElementById('timingBarFill').style.width = (this.progress * 100) + '%';
+
+        if (this.elapsedTime >= this.duration) {
+            return this.getQuality();
+        }
+        return null;
+    }
+
+    getQuality() {
+        const perfectionZone = 0.7;
+        const tolerance = 0.1;
+        const distance = Math.abs(this.progress - perfectionZone);
+
+        let quality = 1.0;
+        if (distance < tolerance) {
+            quality = 1.0 - (distance / tolerance) * 0.2;
+        } else if (distance < tolerance * 2) {
+            quality = 0.8 - ((distance - tolerance) / tolerance) * 0.3;
+        } else {
+            quality = Math.max(0.3, 0.5 - (distance * 0.5));
+        }
+
+        this.stop();
+        return quality;
+    }
+
+    stop() {
+        this.isActive = false;
+        document.getElementById('timingBar').classList.remove('active');
+    }
+}
+
+// FIELDER AI
+class Fielder {
+    constructor(position, model) {
+        this.position = position.clone();
+        this.startPosition = position.clone();
+        this.model = model;
+        this.targetPosition = null;
+        this.isMoving = false;
+        this.caughtBall = false;
+    }
+
+    moveTowardsBall(ballPosition) {
+        const distance = this.position.distanceTo(ballPosition);
+
+        if (distance < 2) {
+            this.caughtBall = true;
+            return true;
+        }
+
+        if (distance < 40) {
+            this.isMoving = true;
+            const direction = new THREE.Vector3().subVectors(ballPosition, this.position).normalize();
+            const speed = 0.3;
+            this.position.addScaledVector(direction, speed);
+            this.model.position.copy(this.position);
+            return false;
+        }
+
+        return false;
+    }
+
+    reset() {
+        this.position.copy(this.startPosition);
+        this.model.position.copy(this.startPosition);
+        this.isMoving = false;
+        this.caughtBall = false;
+    }
+}
 
 // PHYSICS
 class CricketPhysics {
@@ -193,12 +302,14 @@ class CricketPhysics {
         this.ballMass = 0.16;
         this.seam = Math.random();
     }
+
     resetBall(startX = 0, startY = 2, startZ = -15) {
         this.ballPosition = new THREE.Vector3(startX, startY, startZ);
         this.ballVelocity = new THREE.Vector3(0, 0, 0);
         this.ballSpin = new THREE.Vector3(0, 0, 0);
         this.seam = Math.random();
     }
+
     deliverBall(speed, type = 'fast', line = 0, length = 0.5) {
         const speedMph = 60 + speed * 2;
         const speedMs = speedMph * 0.44704;
@@ -216,6 +327,7 @@ class CricketPhysics {
         }
         this.ballVelocity.y = speedMs * (0.2 + length * 0.2);
     }
+
     update(deltaTime) {
         this.ballVelocity.y -= this.gravity * deltaTime;
         this.ballVelocity.multiplyScalar(Math.pow(this.airResistance, deltaTime));
@@ -241,16 +353,6 @@ class CricketPhysics {
         }
         return bounceInfo;
     }
-    getPitchType(z) {
-        const pitchLength = 22;
-        const pitchProgress = (z + 11) / pitchLength;
-        if (pitchProgress < 0.3) return 'short';
-        if (pitchProgress < 0.6) return 'good-length';
-        if (pitchProgress < 0.9) return 'full';
-        return 'yorker';
-    }
-    isEdge() {return Math.random() > 0.85;}
-    getFatigueMultiplier(ballsBowled) {return Math.max(0.8, 1.0 - (ballsBowled / 180) * 0.2);}
 }
 
 // MODELS
@@ -262,7 +364,6 @@ class ModelFactory {
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
-        ground.position.y = 0;
         stadiumGroup.add(ground);
 
         const pitchGeo = new THREE.BoxGeometry(3.66, 0.1, 22);
@@ -270,27 +371,11 @@ class ModelFactory {
         const pitch = new THREE.Mesh(pitchGeo, pitchMat);
         pitch.position.y = 0.05;
         pitch.castShadow = true;
-        pitch.receiveShadow = true;
         stadiumGroup.add(pitch);
-
-        const creaseGeo = new THREE.BoxGeometry(3.66, 0.01, 0.2);
-        const creaseMat = new THREE.MeshStandardMaterial({color: 0xffffff});
-        const bowlingCrease = new THREE.Mesh(creaseGeo, creaseMat);
-        bowlingCrease.position.set(0, 0.08, -0.5);
-        stadiumGroup.add(bowlingCrease);
-
-        const poppingCrease = new THREE.Mesh(creaseGeo, creaseMat);
-        poppingCrease.position.set(0, 0.08, 0.5);
-        stadiumGroup.add(poppingCrease);
 
         stadiumGroup.add(ModelFactory.createStumps(0, -11));
         stadiumGroup.add(ModelFactory.createStumps(0, 11));
         stadiumGroup.add(ModelFactory.createBoundary());
-        stadiumGroup.add(ModelFactory.createSightScreen(0, 25));
-        stadiumGroup.add(ModelFactory.createSightScreen(0, -25));
-        stadiumGroup.add(ModelFactory.createFloodlights());
-        stadiumGroup.add(ModelFactory.createStands());
-        stadiumGroup.add(ModelFactory.createAdvertisingBoards());
         return stadiumGroup;
     }
 
@@ -303,15 +388,6 @@ class ModelFactory {
             stump.position.x = i * 0.35;
             stump.castShadow = true;
             stumpsGroup.add(stump);
-        }
-        const bailGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.12, 6);
-        const bailMat = new THREE.MeshStandardMaterial({color: 0xf5deb3});
-        for (let i = -1; i <= 1; i++) {
-            const bail = new THREE.Mesh(bailGeo, bailMat);
-            bail.position.x = i * 0.35;
-            bail.position.y = 0.36;
-            bail.castShadow = true;
-            stumpsGroup.add(bail);
         }
         stumpsGroup.position.set(x, 0.35, z);
         return stumpsGroup;
@@ -328,77 +404,7 @@ class ModelFactory {
         const boundaryGeo = new THREE.TubeGeometry(boundaryCurve, 64, 0.05, 4, false);
         const boundaryMat = new THREE.MeshStandardMaterial({color: 0xff6b35});
         const boundary = new THREE.Mesh(boundaryGeo, boundaryMat);
-        boundary.castShadow = true;
-        boundary.receiveShadow = true;
         return boundary;
-    }
-
-    static createSightScreen(x, z) {
-        const screenGroup = new THREE.Group();
-        const screenGeo = new THREE.BoxGeometry(8, 4, 0.3);
-        const screenMat = new THREE.MeshStandardMaterial({color: 0x1a1a1a, roughness: 0.7});
-        const screen = new THREE.Mesh(screenGeo, screenMat);
-        screen.castShadow = true;
-        screen.receiveShadow = true;
-        screenGroup.add(screen);
-        const frameGeo = new THREE.BoxGeometry(8.4, 4.2, 0.1);
-        const frameMat = new THREE.MeshStandardMaterial({color: 0x333333});
-        const frame = new THREE.Mesh(frameGeo, frameMat);
-        frame.position.z = 0.2;
-        screenGroup.add(frame);
-        screenGroup.position.set(x, 2, z);
-        return screenGroup;
-    }
-
-    static createFloodlights() {
-        const lightsGroup = new THREE.Group();
-        const positions = [{x: 60, y: 50, z: 60}, {x: -60, y: 50, z: 60}, {x: 60, y: 50, z: -60}, {x: -60, y: 50, z: -60}];
-        positions.forEach(pos => {
-            const poleGeo = new THREE.CylinderGeometry(0.3, 0.3, pos.y, 8);
-            const poleMat = new THREE.MeshStandardMaterial({color: 0x666666});
-            const pole = new THREE.Mesh(poleGeo, poleMat);
-            pole.position.set(pos.x, pos.y / 2, pos.z);
-            pole.castShadow = true;
-            lightsGroup.add(pole);
-            const fixtureGeo = new THREE.BoxGeometry(1.5, 1, 1.5);
-            const fixtureMat = new THREE.MeshStandardMaterial({color: 0x333333});
-            const fixture = new THREE.Mesh(fixtureGeo, fixtureMat);
-            fixture.position.set(pos.x, pos.y, pos.z);
-            fixture.castShadow = true;
-            lightsGroup.add(fixture);
-        });
-        return lightsGroup;
-    }
-
-    static createStands() {
-        const standsGroup = new THREE.Group();
-        const positions = [{x: 50, z: 0, rotation: 0}, {x: -50, z: 0, rotation: Math.PI}, {x: 0, z: 50, rotation: Math.PI / 2}, {x: 0, z: -50, rotation: -Math.PI / 2}];
-        positions.forEach(pos => {
-            const standGeo = new THREE.BoxGeometry(20, 15, 5);
-            const standMat = new THREE.MeshStandardMaterial({color: 0x334455, roughness: 0.8});
-            const stand = new THREE.Mesh(standGeo, standMat);
-            stand.position.set(pos.x, 7, pos.z);
-            stand.castShadow = true;
-            stand.receiveShadow = true;
-            standsGroup.add(stand);
-        });
-        return standsGroup;
-    }
-
-    static createAdvertisingBoards() {
-        const boardsGroup = new THREE.Group();
-        const boardPositions = [{x: 45, z: 15, rotation: -Math.PI / 2}, {x: 45, z: -15, rotation: -Math.PI / 2}, {x: -45, z: 15, rotation: Math.PI / 2}, {x: -45, z: -15, rotation: Math.PI / 2}, {x: 15, z: 45, rotation: 0}, {x: -15, z: 45, rotation: 0}];
-        const colors = [0xff0000, 0x0066ff, 0xffb300, 0x00aa00, 0xff6b35, 0xffffff];
-        boardPositions.forEach((pos, idx) => {
-            const boardGeo = new THREE.BoxGeometry(8, 2, 0.2);
-            const boardMat = new THREE.MeshStandardMaterial({color: colors[idx], roughness: 0.6});
-            const board = new THREE.Mesh(boardGeo, boardMat);
-            board.position.set(pos.x, 2, pos.z);
-            board.rotation.y = pos.rotation;
-            board.castShadow = true;
-            boardsGroup.add(board);
-        });
-        return boardsGroup;
     }
 
     static createPlayer(teamColor, isBatter = true) {
@@ -407,7 +413,6 @@ class ModelFactory {
         const headMat = new THREE.MeshStandardMaterial({color: 0xd4a574, roughness: 0.4});
         const head = new THREE.Mesh(headGeo, headMat);
         head.position.y = 1.7;
-        head.castShadow = true;
         playerGroup.add(head);
 
         const helmetGeo = new THREE.SphereGeometry(0.18, 16, 16);
@@ -420,42 +425,13 @@ class ModelFactory {
         const bodyMat = new THREE.MeshStandardMaterial({color: teamColor, roughness: 0.5});
         const body = new THREE.Mesh(bodyGeo, bodyMat);
         body.position.y = 1.0;
-        body.castShadow = true;
         playerGroup.add(body);
-
-        const padGeo = new THREE.BoxGeometry(0.15, 0.6, 0.08);
-        const padMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.6});
-        const leftPad = new THREE.Mesh(padGeo, padMat);
-        leftPad.position.set(-0.18, 0.4, 0.05);
-        playerGroup.add(leftPad);
-
-        const rightPad = new THREE.Mesh(padGeo, padMat);
-        rightPad.position.set(0.18, 0.4, 0.05);
-        playerGroup.add(rightPad);
 
         const legGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 6);
         const legMat = new THREE.MeshStandardMaterial({color: 0xffffff});
         const leftLeg = new THREE.Mesh(legGeo, legMat);
         leftLeg.position.set(-0.12, 0.4, 0);
-        leftLeg.castShadow = true;
         playerGroup.add(leftLeg);
-
-        const rightLeg = new THREE.Mesh(legGeo, legMat);
-        rightLeg.position.set(0.12, 0.4, 0);
-        rightLeg.castShadow = true;
-        playerGroup.add(rightLeg);
-
-        const armGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.7, 6);
-        const armMat = new THREE.MeshStandardMaterial({color: 0xd4a574});
-        const leftArm = new THREE.Mesh(armGeo, armMat);
-        leftArm.position.set(-0.25, 1.1, 0);
-        leftArm.castShadow = true;
-        playerGroup.add(leftArm);
-
-        const rightArm = new THREE.Mesh(armGeo, armMat);
-        rightArm.position.set(0.25, 1.1, 0);
-        rightArm.castShadow = true;
-        playerGroup.add(rightArm);
 
         if (isBatter) {
             const batGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.2, 8);
@@ -463,22 +439,9 @@ class ModelFactory {
             const bat = new THREE.Mesh(batGeo, batMat);
             bat.position.set(0.35, 1.1, -0.3);
             bat.rotation.z = Math.PI / 4;
-            bat.castShadow = true;
             playerGroup.add(bat);
         }
 
-        const gloveGeo = new THREE.SphereGeometry(0.08, 8, 8);
-        const gloveMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.4});
-        const leftGlove = new THREE.Mesh(gloveGeo, gloveMat);
-        leftGlove.position.set(-0.25, 0.6, 0);
-        playerGroup.add(leftGlove);
-
-        const rightGlove = new THREE.Mesh(gloveGeo, gloveMat);
-        rightGlove.position.set(0.25, 0.6, 0);
-        playerGroup.add(rightGlove);
-
-        playerGroup.castShadow = true;
-        playerGroup.receiveShadow = true;
         return playerGroup;
     }
 
@@ -486,12 +449,9 @@ class ModelFactory {
         const ballGeo = new THREE.SphereGeometry(0.073, 32, 32);
         const ballMat = new THREE.MeshStandardMaterial({color: 0xff0000, roughness: 0.3, metalness: 0.2});
         const ball = new THREE.Mesh(ballGeo, ballMat);
-        ball.castShadow = true;
-        ball.receiveShadow = true;
         const seamGeo = new THREE.TorusGeometry(0.073, 0.005, 8, 32);
         const seamMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.4});
         const seam = new THREE.Mesh(seamGeo, seamMat);
-        seam.position.y = 0.001;
         seam.scale.y = 0.5;
         ball.add(seam);
         return ball;
@@ -504,109 +464,57 @@ class ModelFactory {
         for (let i = -1; i <= 1; i++) {
             const stump = new THREE.Mesh(stumpGeo, stumpMat);
             stump.position.x = i * 0.35;
-            stump.castShadow = true;
             wicketsGroup.add(stump);
         }
-        const bailGeo = new THREE.BoxGeometry(0.12, 0.04, 0.04);
-        const bailMat = new THREE.MeshStandardMaterial({color: 0xf5deb3, roughness: 0.5});
-        for (let i = -1; i <= 1; i++) {
-            const bail = new THREE.Mesh(bailGeo, bailMat);
-            bail.position.set(i * 0.35, 0.36, 0);
-            bail.castShadow = true;
-            wicketsGroup.add(bail);
-        }
-        wicketsGroup.castShadow = true;
         return wicketsGroup;
     }
 }
 
-// ANIMATIONS
-class AnimationController {
-    constructor() {
-        this.animations = {};
-        this.currentAnimation = null;
-        this.animationTime = 0;
-        this.animationDuration = 0;
-        this.isAnimating = false;
-    }
-    registerAnimation(name, animator) {
-        this.animations[name] = animator;
-    }
-    play(name, duration = 1) {
-        if (this.animations[name]) {
-            this.currentAnimation = name;
-            this.animationTime = 0;
-            this.animationDuration = duration;
-            this.isAnimating = true;
-            return true;
-        }
-        return false;
-    }
-    update(deltaTime) {
-        if (!this.isAnimating || !this.currentAnimation) return;
-        this.animationTime += deltaTime;
-        const progress = Math.min(this.animationTime / this.animationDuration, 1);
-        const animator = this.animations[this.currentAnimation];
-        if (animator && typeof animator === 'function') {
-            animator(progress);
-        }
-        if (progress >= 1) {
-            this.isAnimating = false;
-        }
-    }
-    stop() {
-        this.isAnimating = false;
-        this.currentAnimation = null;
-        this.animationTime = 0;
-    }
-}
-
-class PlayerAnimations {
-    static createFastBowlingAnimation(player) {
-        return (progress) => {
-            if (progress < 0.3) {
-                player.position.x += 0.15;
-            } else if (progress < 0.6) {
-                player.position.y += Math.sin(progress * Math.PI) * 0.3;
-            } else if (progress < 0.8) {
-                player.position.y += Math.sin((progress - 0.6) * Math.PI * 3) * 0.2;
-            } else {
-                player.position.y = 0;
-            }
-            if (player.children.length > 0) {
-                const rotationAmount = progress * Math.PI * 2;
-                player.rotation.z = Math.sin(rotationAmount) * 0.3;
-            }
-        };
+// BOWLING ANIMATION
+class BowlingAnimation {
+    constructor(bowler) {
+        this.bowler = bowler;
+        this.progress = 0;
+        this.isActive = false;
+        this.startPosition = bowler.position.clone();
     }
 
-    static createSpinBowlingAnimation(player) {
-        return (progress) => {
-            player.position.x += progress * 0.1;
-            player.rotation.y = Math.sin(progress * Math.PI) * 0.4;
-            player.rotation.z = progress * Math.PI * 3;
-            if (progress > 0.7) {
-                player.position.y = Math.sin((progress - 0.7) * Math.PI) * 0.1;
-            }
-        };
+    play(duration = 1) {
+        this.isActive = true;
+        this.progress = 0;
+        this.startPosition = this.bowler.position.clone();
     }
 
-    static createBattingAnimation(player, shotType = 'drive') {
-        return (progress) => {
-            player.position.x = Math.sin(progress * Math.PI) * 0.05;
-            if (progress < 0.3) {
-                player.rotation.y = -(progress / 0.3) * Math.PI / 4;
-            } else if (progress >= 0.3 && progress < 0.6) {
-                const downswingProgress = (progress - 0.3) / 0.3;
-                player.rotation.y = -Math.PI / 4 + downswingProgress * Math.PI / 3;
-            } else {
-                const followProgress = (progress - 0.6) / 0.4;
-                player.rotation.y = Math.PI / 12 + followProgress * Math.PI / 6;
+    update(deltaTime, duration) {
+        if (!this.isActive) return false;
+
+        this.progress += deltaTime / duration;
+
+        if (this.progress < 0.25) {
+            // Run-up
+            this.bowler.position.z -= 0.5 * deltaTime / duration;
+            this.bowler.position.x = Math.sin(this.progress * Math.PI * 4) * 0.1;
+        } else if (this.progress < 0.5) {
+            // Bound and jump
+            const jumpProgress = (this.progress - 0.25) / 0.25;
+            this.bowler.position.y = Math.sin(jumpProgress * Math.PI) * 0.5;
+            this.bowler.rotation.z = Math.sin(jumpProgress * Math.PI * 2) * 0.3;
+        } else if (this.progress < 0.75) {
+            // Peak of jump and release
+            const releaseProgress = (this.progress - 0.5) / 0.25;
+            this.bowler.position.y = 0.5 * Math.cos(releaseProgress * Math.PI);
+            this.bowler.rotation.x = releaseProgress * Math.PI / 3;
+        } else {
+            // Follow through and reset
+            this.bowler.position.y = 0;
+            if (this.progress >= 1) {
+                this.bowler.position.copy(this.startPosition);
+                this.isActive = false;
+                return false;
             }
-            if (progress >= 0.3) {
-                player.position.z -= (progress - 0.3) * 0.05;
-            }
-        };
+        }
+
+        return true;
     }
 }
 
@@ -619,8 +527,8 @@ class GameScene {
         this.renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false});
         this.setupRenderer();
         this.setupLighting();
-        this.setupEnvironment();
         this.createGameObjects();
+        this.fielders = [];
         window.addEventListener('resize', () => this.onWindowResize());
     }
 
@@ -628,10 +536,6 @@ class GameScene {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFShadowShadowMap;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.2;
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
         this.renderer.background = new THREE.Color(0x87ceeb);
         this.renderer.fog = new THREE.Fog(0x87ceeb, 300, 500);
     }
@@ -643,32 +547,7 @@ class GameScene {
         const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
         dirLight.position.set(100, 100, 100);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.left = -150;
-        dirLight.shadow.camera.right = 150;
-        dirLight.shadow.camera.top = 150;
-        dirLight.shadow.camera.bottom = -150;
-        dirLight.shadow.camera.far = 500;
-        dirLight.shadow.bias = -0.0001;
         this.scene.add(dirLight);
-
-        const floodlightPositions = [{x: 80, y: 70, z: 80}, {x: -80, y: 70, z: 80}, {x: 80, y: 70, z: -80}, {x: -80, y: 70, z: -80}];
-        floodlightPositions.forEach(pos => {
-            const light = new THREE.PointLight(0xffffff, 0.8, 300);
-            light.position.set(pos.x, pos.y, pos.z);
-            light.castShadow = true;
-            light.shadow.mapSize.width = 1024;
-            light.shadow.mapSize.height = 1024;
-            this.scene.add(light);
-        });
-    }
-
-    setupEnvironment() {
-        const skyGeo = new THREE.SphereGeometry(400, 32, 32);
-        const skyMat = new THREE.MeshBasicMaterial({color: 0x87ceeb, side: THREE.BackSide});
-        const sky = new THREE.Mesh(skyGeo, skyMat);
-        this.scene.add(sky);
     }
 
     createGameObjects() {
@@ -682,21 +561,16 @@ class GameScene {
         this.bowler = ModelFactory.createPlayer(0xffdd00, false);
         this.bowler.position.set(0, 0, -10);
         this.scene.add(this.bowler);
+        this.bowlingAnimation = new BowlingAnimation(this.bowler);
 
-        this.fielders = [];
         const fielderPositions = [{x: 20, z: 20}, {x: -20, z: 20}, {x: 30, z: 0}, {x: -30, z: 0}, {x: 20, z: -20}, {x: -20, z: -20}, {x: 10, z: 15}, {x: -10, z: 15}, {x: 5, z: -5}];
         fielderPositions.forEach(pos => {
             const fielder = ModelFactory.createPlayer(0xffdd00, false);
             fielder.position.set(pos.x, 0, pos.z);
             fielder.scale.set(0.8, 0.8, 0.8);
             this.scene.add(fielder);
-            this.fielders.push(fielder);
+            this.fielders.push(new Fielder(new THREE.Vector3(pos.x, 0, pos.z), fielder));
         });
-
-        this.wicketkeeper = ModelFactory.createPlayer(0xffdd00, false);
-        this.wicketkeeper.position.set(0, 0, 1.2);
-        this.wicketkeeper.scale.set(0.9, 0.9, 0.9);
-        this.scene.add(this.wicketkeeper);
 
         this.ball = ModelFactory.createBall();
         this.ball.position.set(0, 2, -15);
@@ -705,10 +579,6 @@ class GameScene {
         this.stumpsHome = ModelFactory.createWickets();
         this.stumpsHome.position.set(0, 0, 1);
         this.scene.add(this.stumpsHome);
-
-        this.stumpsAway = ModelFactory.createWickets();
-        this.stumpsAway.position.set(0, 0, -23);
-        this.scene.add(this.stumpsAway);
     }
 
     render() {
@@ -735,7 +605,6 @@ class CameraSystem {
         this.cameraTarget = new THREE.Vector3(0, 1, 0);
         this.cameraPosition = new THREE.Vector3(0, 10, 20);
         this.smoothing = 0.08;
-        this.replayRotation = 0;
     }
 
     setCamera(type) {
@@ -746,146 +615,66 @@ class CameraSystem {
     }
 
     updateCameraPosition() {
-        const targetPos = new THREE.Vector3(0, 1, 0);
         switch (this.currentCamera) {
             case 'broadcast': this.cameraPosition.set(0, 12, 25); break;
             case 'batting': this.cameraPosition.set(-4, 1.5, 2); break;
             case 'bowling': this.cameraPosition.set(0, 2, -18); break;
             case 'stump': this.cameraPosition.set(2, 1.2, -0.5); break;
-            case 'replay': break;
         }
-        this.cameraTarget = targetPos;
     }
 
     updateCamera() {
-        if (this.currentCamera === 'replay') {
-            this.replayRotation += 0.005;
-            const x = Math.cos(this.replayRotation) * 30;
-            const z = Math.sin(this.replayRotation) * 30;
-            this.camera.position.set(x, 15, z);
-            this.camera.lookAt(0, 1, 0);
-        } else {
-            this.camera.position.lerp(this.cameraPosition, this.smoothing);
-            this.camera.lookAt(this.cameraTarget);
-        }
+        this.camera.position.lerp(this.cameraPosition, this.smoothing);
+        this.camera.lookAt(this.cameraTarget);
     }
 }
 
 // AI
 class CricketAI {
     decideBattingShot(matchState) {
-        const ballsLeft = matchState.maxOvers * 6 - matchState.balls;
-        if (matchState.balls < 30) {
-            return this.weightedRandom([13, 0, 1, 4], [0.3, 0.3, 0.2, 0.2]);
-        }
-        if (ballsLeft < 24) {
-            return this.weightedRandom([4, 5, 7, 8, 12], [0.2, 0.25, 0.2, 0.15, 0.2]);
-        }
         return Math.floor(Math.random() * 15);
     }
 
     decideBowlingDelivery(matchState) {
-        const deliveries = ['fast', 'fast', 'inswing', 'outswing', 'bounce', 'yorker', 'slider', 'flipper', 'googly', 'offbreak', 'legbreak'];
-        return {type: deliveries[Math.floor(Math.random() * deliveries.length)], speed: 75 + Math.random() * 20, line: (Math.random() - 0.5) * 2, length: Math.random()};
-    }
-
-    weightedRandom(choices, weights) {
-        const random = Math.random();
-        let sum = 0;
-        for (let i = 0; i < choices.length; i++) {
-            sum += weights[i];
-            if (random < sum) return choices[i];
-        }
-        return choices[choices.length - 1];
-    }
-}
-
-// EFFECTS
-class EffectsManager {
-    constructor(scene) {
-        this.scene = scene;
-        this.particles = [];
-    }
-
-    createBoundaryEffect(position) {
-        for (let i = 0; i < 20; i++) {
-            const angle = (i / 20) * Math.PI * 2;
-            const speed = 10 + Math.random() * 10;
-            this.particles.push({
-                position: position.clone(),
-                velocity: new THREE.Vector3(Math.cos(angle) * speed, Math.random() * 5 + 5, Math.sin(angle) * speed),
-                life: 2, maxLife: 2, size: 0.2
-            });
-        }
-    }
-
-    update(deltaTime) {
-        this.particles = this.particles.filter(p => {
-            p.life -= deltaTime;
-            p.velocity.y -= 9.81 * deltaTime;
-            p.position.addScaledVector(p.velocity, deltaTime);
-            return p.life > 0;
-        });
+        const deliveries = ['fast', 'inswing', 'outswing', 'yorker', 'googly'];
+        return {type: deliveries[Math.floor(Math.random() * deliveries.length)], speed: 80 + Math.random() * 15};
     }
 }
 
 // UI
 class UIManager {
-    constructor() {
-        this.commentaryHistory = [];
-    }
+    constructor() {}
 
     init() {
         this.updateShotButtons();
     }
 
     updateShotButtons() {
-        const shots = [
-            {name: 'Cover Drive', emoji: '→', idx: 0}, {name: 'Straight Drive', emoji: '↑', idx: 1},
-            {name: 'Flick', emoji: '↙', idx: 2}, {name: 'Pull', emoji: '↓', idx: 3},
-            {name: 'Hook', emoji: '⬇', idx: 4}, {name: 'Cut', emoji: '↗', idx: 5},
-            {name: 'Sweep', emoji: '⬅', idx: 6}, {name: 'Reverse Sweep', emoji: '↖', idx: 7},
-            {name: 'Upper Cut', emoji: '⬆', idx: 8}, {name: 'Lofted Drive', emoji: '⬈', idx: 9},
-            {name: 'Paddle Sweep', emoji: '⬇', idx: 10}, {name: 'Ramp', emoji: '↖', idx: 11},
-            {name: 'Helicopter', emoji: '🚁', idx: 12}, {name: 'Defend', emoji: '🛡', idx: 13},
-            {name: 'Drop', emoji: '.', idx: 14}
-        ];
-        const html = shots.map(shot => `<button class="shot-btn" onclick="window.gameInstance.playShot(${shot.idx})" title="${shot.name}">${shot.emoji}</button>`).join('');
+        const shots = [{emoji: '→'}, {emoji: '↑'}, {emoji: '↙'}, {emoji: '↓'}, {emoji: '⬇'}, {emoji: '↗'}, {emoji: '⬅'}, {emoji: '↖'}, {emoji: '⬆'}, {emoji: '⬈'}, {emoji: '⬇'}, {emoji: '↖'}, {emoji: '🚁'}, {emoji: '🛡'}, {emoji: '.'}];
+        const html = shots.map((s, i) => `<button class="shot-btn" onclick="window.gameInstance.playShot(${i})" title="Shot ${i+1}">${s.emoji}</button>`).join('');
         document.getElementById('shotButtons').innerHTML = html;
     }
 
     updateAll(matchState) {
-        document.getElementById('team1Name').textContent = matchState.team1.name;
-        document.getElementById('team2Name').textContent = matchState.team2.name;
+        document.getElementById('team1Name').textContent = matchState.team1?.name || 'Team 1';
+        document.getElementById('team2Name').textContent = matchState.team2?.name || 'Team 2';
         document.getElementById('team1Score').textContent = `${matchState.score}/${matchState.wickets}`;
-        document.getElementById('team2Score').textContent = `${matchState.opposition.score}/${matchState.opposition.wickets}`;
-
-        const overs = Math.floor(matchState.balls / 6);
-        const balls = matchState.balls % 6;
-        document.getElementById('team1Overs').textContent = `${overs}.${balls} ov`;
 
         const batter = matchState.batStats[matchState.striker];
         if (batter) {
             document.getElementById('batsmanName').textContent = batter.name;
             document.getElementById('batsmanRuns').textContent = batter.runs;
             document.getElementById('batsmanBalls').textContent = batter.balls;
-            const sr = batter.balls > 0 ? ((batter.runs / batter.balls) * 100).toFixed(1) : '-';
-            document.getElementById('batsmanSR').textContent = sr;
-            document.getElementById('batsmanFours').textContent = batter.fours || 0;
-            document.getElementById('batsmanSixes').textContent = batter.sixes || 0;
         }
 
         const bowler = matchState.bowlStats[matchState.bowler];
         if (bowler) {
             document.getElementById('bowlerName').textContent = bowler.name;
-            document.getElementById('bowlerBalls').textContent = bowler.balls;
-            document.getElementById('bowlerRuns').textContent = bowler.runs;
-            const economy = bowler.balls > 0 ? ((bowler.runs / bowler.balls) * 6).toFixed(2) : '-';
-            document.getElementById('bowlerEconomy').textContent = economy;
         }
 
-        const rr = matchState.balls > 0 ? ((matchState.score / matchState.balls) * 6).toFixed(2) : '-';
-        document.getElementById('runRate').textContent = rr;
+        const overs = Math.floor(matchState.balls / 6);
+        const balls = matchState.balls % 6;
+        document.getElementById('team1Overs').textContent = `${overs}.${balls} ov`;
     }
 
     addCommentary(text) {
@@ -894,10 +683,6 @@ class UIManager {
 
     hideMenu() {
         document.getElementById('menuOverlay').classList.remove('active');
-    }
-
-    showMenu() {
-        document.getElementById('menuOverlay').classList.add('active');
     }
 }
 
@@ -909,6 +694,10 @@ class InputManager {
                 const shotIdx = parseInt(e.key) - 1;
                 if (window.gameInstance) window.gameInstance.playShot(shotIdx);
             }
+            if (e.key === ' ') {
+                const quality = window.gameInstance.timingBar.getQuality();
+                window.gameInstance.executeShot(quality);
+            }
         });
     }
 }
@@ -918,16 +707,14 @@ class CricketGame {
     constructor() {
         this.matchState = {
             mode: 't20', maxOvers: 20, inning: 1, balls: 0, score: 0, wickets: 0,
-            runs: 0, striker: 0, nonStriker: 1, bowler: 0, target: null,
-            batStats: [], bowlStats: [], opposition: {score: 0, wickets: 0, balls: 0},
-            team1: null, team2: null, isGameActive: false
+            striker: 0, nonStriker: 1, bowler: 0, batStats: [], bowlStats: [],
+            opposition: {score: 0, wickets: 0, balls: 0}, team1: null, team2: null, isGameActive: false
         };
         this.physics = new CricketPhysics();
         this.ai = new CricketAI();
         this.ui = new UIManager();
         this.input = new InputManager();
-        this.animationController = new AnimationController();
-        this.effects = null;
+        this.timingBar = new TimingBarSystem();
         this.ballInPlay = false;
         window.gameInstance = this;
     }
@@ -937,7 +724,6 @@ class CricketGame {
         this.matchState.team1 = team1;
         this.matchState.team2 = team2;
         this.matchState.maxOvers = {quick: 5, t20: 20, odi: 50, test: 15}[mode];
-        this.matchState.inning = 1;
         this.matchState.batStats = team1.players.map(name => ({name, runs: 0, balls: 0, fours: 0, sixes: 0, out: false}));
         this.matchState.bowlStats = team2.players.map(name => ({name, balls: 0, runs: 0, wickets: 0}));
         this.matchState.isGameActive = true;
@@ -948,68 +734,54 @@ class CricketGame {
     playShot(shotIdx) {
         if (!this.matchState.isGameActive || this.ballInPlay) return;
 
+        // Start timing bar instead of immediately executing
+        this.timingBar.start(shotIdx);
+        this.ui.addCommentary(`⏱️ TIME YOUR SHOT! (Press SPACE when ready)`);
+    }
+
+    executeShot(timingQuality) {
+        const shotIdx = this.timingBar.selectedShotIdx;
         const shots = [
-            {name: 'Cover Drive', power: 0.85, angle: 45},
-            {name: 'Straight Drive', power: 0.90, angle: 0},
-            {name: 'Flick', power: 0.65, angle: -30},
-            {name: 'Pull', power: 0.95, angle: 90},
-            {name: 'Hook', power: 1.0, angle: 85},
-            {name: 'Cut', power: 0.80, angle: 60},
-            {name: 'Sweep', power: 0.70, angle: -60},
-            {name: 'Reverse Sweep', power: 0.60, angle: -45},
-            {name: 'Upper Cut', power: 0.85, angle: 70},
-            {name: 'Lofted Drive', power: 0.80, angle: 30},
-            {name: 'Paddle Sweep', power: 0.55, angle: -50},
-            {name: 'Ramp', power: 0.65, angle: -20},
-            {name: 'Helicopter', power: 0.95, angle: 50},
-            {name: 'Defend', power: 0.30, angle: 0},
-            {name: 'Drop', power: 0.15, angle: 0}
+            {name: 'Cover Drive', power: 0.85}, {name: 'Straight Drive', power: 0.90},
+            {name: 'Flick', power: 0.65}, {name: 'Pull', power: 0.95},
+            {name: 'Hook', power: 1.0}, {name: 'Cut', power: 0.80},
+            {name: 'Sweep', power: 0.70}, {name: 'Reverse Sweep', power: 0.60},
+            {name: 'Upper Cut', power: 0.85}, {name: 'Lofted Drive', power: 0.80},
+            {name: 'Paddle Sweep', power: 0.55}, {name: 'Ramp', power: 0.65},
+            {name: 'Helicopter', power: 0.95}, {name: 'Defend', power: 0.30},
+            {name: 'Drop', power: 0.15}
         ];
 
         const shot = shots[shotIdx];
-        if (!shot) return;
-
-        this.calculateBallResult(shot);
-        this.ui.addCommentary(`${this.matchState.batStats[this.matchState.striker].name} plays ${shot.name}`);
-        this.ui.updateAll(this.matchState);
-        this.checkGameEnd();
-    }
-
-    calculateBallResult(shot) {
         const batter = this.matchState.batStats[this.matchState.striker];
-        const bowler = this.matchState.bowlStats[this.matchState.bowler];
         const power = Math.random();
         const timing = Math.random() + 0.3;
-        const quality = power * timing * shot.power;
+        const quality = power * timing * shot.power * timingQuality;
 
         let runs = 0;
-        let isWicket = false;
+        batter.balls++;
 
         if (Math.random() < 0.12 * (1 - timing)) {
-            isWicket = true;
             this.matchState.wickets++;
-            batter.out = true;
-            this.ui.addCommentary(`WICKET! ${batter.name} is out!`);
-            if (this.matchState.striker < 10) {
-                this.matchState.striker++;
-            }
+            this.ui.addCommentary(`💥 WICKET! ${batter.name} is OUT!`);
+            if (this.matchState.striker < 10) this.matchState.striker++;
         } else {
             if (quality > 0.9) {
                 runs = 6;
                 batter.sixes++;
-                this.ui.addCommentary(`SIX! Magnificent ${shot.name}!`);
+                this.ui.addCommentary(`🎯 SIX! ${shot.name}!`);
             } else if (quality > 0.7) {
                 runs = 4;
                 batter.fours++;
-                this.ui.addCommentary(`FOUR! Excellent execution!`);
+                this.ui.addCommentary(`✅ FOUR! Nice shot!`);
             } else if (quality > 0.5) {
                 runs = 2;
-                this.ui.addCommentary(`Two runs!`);
+                this.ui.addCommentary(`2️⃣ Two runs`);
             } else if (quality > 0.3) {
                 runs = 1;
-                this.ui.addCommentary(`Single taken!`);
+                this.ui.addCommentary(`1️⃣ Single`);
             } else {
-                this.ui.addCommentary(`Dot ball`);
+                this.ui.addCommentary(`⚫ Dot ball`);
             }
 
             this.matchState.score += runs;
@@ -1020,9 +792,26 @@ class CricketGame {
             }
         }
 
-        bowler.balls++;
-        bowler.runs += runs;
         this.matchState.balls++;
+        this.matchState.bowlStats[this.matchState.bowler].balls++;
+        this.matchState.bowlStats[this.matchState.bowler].runs += runs;
+
+        // Field ball
+        this.scene.fielders.forEach(fielder => {
+            fielder.moveTowardsBall(this.physics.ballPosition);
+            if (fielder.caughtBall && !this.matchState.batStats[this.matchState.striker].out) {
+                this.ui.addCommentary(`🎉 CAUGHT! Fielder caught the ball!`);
+                this.matchState.batStats[this.matchState.striker].out = true;
+                this.matchState.wickets++;
+            }
+        });
+
+        this.checkGameEnd();
+        this.ui.updateAll(this.matchState);
+
+        setTimeout(() => {
+            this.scene.bowlingAnimation.play();
+        }, 500);
     }
 
     checkGameEnd() {
@@ -1040,37 +829,22 @@ class CricketGame {
     }
 
     endInning() {
-        if (this.matchState.inning === 1) {
-            this.matchState.target = this.matchState.score + 1;
-            this.matchState.opposition.score = Math.max(this.matchState.score - 5, Math.floor(Math.random() * (this.matchState.score + 20)));
-            this.matchState.opposition.wickets = Math.floor(Math.random() * 8) + 2;
-            this.matchState.opposition.balls = this.matchState.maxOvers * 6;
-
-            this.matchState.inning = 2;
-            this.matchState.balls = 0;
-            this.matchState.wickets = 0;
-            this.matchState.score = 0;
-            this.matchState.striker = 0;
-            this.matchState.nonStriker = 1;
-            this.matchState.bowler = 0;
-
-            this.ui.addCommentary(`End of Inning 1`);
-        } else {
-            this.endMatch();
-        }
-    }
-
-    endMatch() {
         this.matchState.isGameActive = false;
-        const result = this.matchState.opposition.score > this.matchState.score
-            ? {winner: this.matchState.team2.name}
-            : {winner: this.matchState.team1.name};
-        this.ui.addCommentary(`🏆 MATCH OVER! ${result.winner} wins!`);
+        this.ui.addCommentary(`🏆 End of Inning ${this.matchState.inning}`);
     }
 
     update(deltaTime) {
         if (!this.matchState.isGameActive) return;
-        if (this.effects) this.effects.update(deltaTime);
+
+        this.timingBar.update(deltaTime);
+
+        if (this.scene && this.scene.bowlingAnimation) {
+            this.scene.bowlingAnimation.update(deltaTime, 1);
+        }
+
+        if (this.scene) {
+            this.scene.fielders.forEach(f => f.moveTowardsBall(this.physics.ballPosition));
+        }
     }
 
     render() {
@@ -1080,19 +854,16 @@ class CricketGame {
 
 // INIT
 function initGame() {
-    console.log('🏏 Initializing Cricket Champions 3D...');
     const canvas = document.getElementById('canvas');
     gameInstance = new CricketGame();
     gameInstance.scene = new GameScene(canvas);
     gameInstance.camera = gameInstance.scene.getCamera();
     gameInstance.camera = new CameraSystem(gameInstance.camera, gameInstance.scene.getScene());
-    gameInstance.effects = new EffectsManager(gameInstance.scene.getScene());
     gameInstance.ui.init();
     startGameLoop();
 }
 
 function startGame(mode) {
-    console.log(`Starting ${mode} match...`);
     const team1 = TEAMS[0];
     const team2 = TEAMS[1];
     gameInstance.initMatch(mode, team1, team2);
