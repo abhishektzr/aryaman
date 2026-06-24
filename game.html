@@ -5,102 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Cricket Champions</title>
   <style>
-    :root {
-      --gold: #ffb300;
-      --orange: #ff6b35;
-      --bg: #0e1117;
-      --card: #222936;
-    }
+    :root { --gold: #ffb300; --orange: #ff6b35; --bg: #0e1117; --card: #222936; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: #eee; font-family: Arial, sans-serif; overflow: hidden; }
-    .screen { position: fixed; inset: 0; display: none; flex-direction: column; overflow-y: auto; padding: 20px; justify-content: center; align-items: center; }
+    html, body { height: 100%; background: var(--bg); color: #eee; font-family: Arial, sans-serif; }
+    .screen { position: fixed; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; }
     .screen.active { display: flex; }
-    h1 { color: var(--gold); text-align: center; font-size: 48px; margin-bottom: 30px; }
-    .grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 400px; width: 100%; }
-    .card { background: var(--card); border: 2px solid #444; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,179,0,0.3); }
-    .card-emoji { font-size: 50px; margin-bottom: 10px; }
-    .card-title { font-size: 20px; font-weight: bold; color: var(--gold); }
-    .card-desc { font-size: 14px; color: #888; margin-top: 5px; }
-    #gameScreen { display: none; }
-    #gameScreen.active { display: flex; }
-    #cv { width: 100vw; height: 100vh; background: #5aa9e0; display: block; }
-    .hud { position: fixed; color: white; font-weight: bold; text-shadow: 0 1px 3px black; z-index: 10; }
-    #hudTL { top: 10px; left: 10px; font-size: 16px; }
-    #hudScore { font-size: 24px; color: var(--gold); }
-    #controls { position: fixed; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; background: rgba(0,0,0,0.6); z-index: 20; }
-    .btn { background: linear-gradient(135deg, var(--orange), var(--gold)); color: #1a1205; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 20px; }
-    .btn:hover { opacity: 0.9; }
-    .ctl { background: var(--card); border: 2px solid #444; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; color: var(--gold); font-weight: bold; }
-    .ctl:active { transform: scale(0.95); }
+    h1 { color: var(--gold); font-size: 50px; margin-bottom: 30px; }
+    .card { background: var(--card); border: 2px solid #444; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; transition: 0.2s; max-width: 300px; }
+    .card:hover { border-color: var(--gold); transform: scale(1.05); }
+    .card-emoji { font-size: 60px; margin-bottom: 15px; }
+    .card-title { font-size: 24px; font-weight: bold; color: var(--gold); }
+    #gameScreen { padding: 0; }
+    #cv { position: fixed; inset: 0; width: 100vw; height: 100vh; background: #5aa9e0; }
+    .hud { position: fixed; color: white; font-weight: bold; text-shadow: 0 2px 4px black; z-index: 10; font-size: 18px; }
+    #hudTL { top: 15px; left: 15px; }
+    #hudScore { color: var(--gold); font-size: 28px; }
+    #hudOvers { margin-top: 5px; }
+    #commentary { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--gold); font-style: italic; z-index: 10; max-width: 80%; }
+    #controls { position: fixed; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 8px; background: rgba(0,0,0,0.7); z-index: 20; }
+    .ctl { background: var(--card); border: 2px solid #444; border-radius: 8px; padding: 12px 6px; text-align: center; cursor: pointer; font-size: 11px; color: var(--gold); font-weight: bold; transition: 0.1s; }
+    .ctl:active { transform: scale(0.95); border-color: var(--gold); }
+    .ctl .em { font-size: 20px; }
   </style>
 </head>
 <body>
   <div class="screen active" id="homeScreen">
     <h1>🏏 CRICKET CHAMPIONS</h1>
-    <div class="grid">
-      <div class="card" onclick="startGame()">
-        <div class="card-emoji">⚡</div>
-        <div class="card-title">QUICK MATCH</div>
-        <div class="card-desc">T20 • Play now</div>
-      </div>
+    <div class="card" onclick="startGame()">
+      <div class="card-emoji">⚡</div>
+      <div class="card-title">QUICK MATCH</div>
+      <p style="color: #888; margin-top: 10px; font-size: 14px;">T20 • 6 Overs</p>
     </div>
   </div>
 
-  <div id="gameScreen">
+  <div class="screen" id="gameScreen">
     <canvas id="cv"></canvas>
     <div class="hud" id="hudTL">
       <div id="hudScore">0/0</div>
       <div id="hudOvers">0.0 ov</div>
     </div>
+    <div id="commentary">Match starting...</div>
     <div id="controls"></div>
   </div>
 
   <script>
-    const EventBus = class {
-      constructor() { this.subs = {}; }
-      sub(evt, fn) { (this.subs[evt] = this.subs[evt] || []).push(fn); }
-      pub(evt, data) { (this.subs[evt] || []).forEach(fn => fn(data)); }
-    };
-
-    const bus = new EventBus();
     const state = {
-      mode: null, maxOvers: 6, inning: 1, balls: 0, score: 0, wkts: 0,
-      striker: 0, nonstriker: 1, userBatting: true, battingTeam: null,
-      bowlingTeam: null, myTeam: null, oppTeam: null, myXI: [], oppXI: [],
-      batStats: [], bowlStats: [], curBowler: null, bowlers: []
+      balls: 0, score: 0, wkts: 0, striker: 0, batStats: [],
+      maxOvers: 6, gameActive: true, lastCommentary: ''
     };
 
-    const teams = {
-      MI: { name: "Mumbai Indians", flag: "🔵", players: [
-        {name: "Rohit Sharma", role: "BAT", bat: 92, bowl: 15},
-        {name: "Suryakumar Yadav", role: "BAT", bat: 90, bowl: 8},
-        {name: "Tilak Varma", role: "BAT", bat: 83, bowl: 30},
-        {name: "Hardik Pandya", role: "ALL", bat: 82, bowl: 76},
-        {name: "Naman Dhir", role: "ALL", bat: 74, bowl: 58},
-        {name: "Robin Minz", role: "WK", bat: 72, bowl: 5},
-        {name: "Karn Sharma", role: "BOWL", bat: 38, bowl: 80},
-        {name: "Jasprit Bumrah", role: "BOWL", bat: 22, bowl: 97},
-        {name: "Trent Boult", role: "BOWL", bat: 28, bowl: 88},
-        {name: "Deepak Chahar", role: "BOWL", bat: 42, bowl: 83},
-        {name: "Ashwani Kumar", role: "BOWL", bat: 22, bowl: 78}
-      ]},
-      CSK: { name: "Chennai Super Kings", flag: "🟡", players: [
-        {name: "Ruturaj Gaikwad", role: "BAT", bat: 88, bowl: 10},
-        {name: "Rachin Ravindra", role: "ALL", bat: 80, bowl: 72},
-        {name: "Shivam Dube", role: "ALL", bat: 82, bowl: 56},
-        {name: "MS Dhoni", role: "WK", bat: 80, bowl: 5},
-        {name: "Ravindra Jadeja", role: "ALL", bat: 73, bowl: 87},
-        {name: "Sam Curran", role: "ALL", bat: 70, bowl: 81},
-        {name: "Matheesha Pathirana", role: "BOWL", bat: 26, bowl: 87},
-        {name: "Deepak Chahar", role: "BOWL", bat: 42, bowl: 83},
-        {name: "Noor Ahmad", role: "BOWL", bat: 30, bowl: 82},
-        {name: "Khaleel Ahmed", role: "BOWL", bat: 26, bowl: 83},
-        {name: "Nathan Ellis", role: "BOWL", bat: 30, bowl: 82}
-      ]}
-    };
+    const teams = [
+      { name: "Mumbai Indians", emoji: "🔵", players: ["Rohit", "Suryakumar", "Tilak", "Hardik", "Naman", "Robin", "Karn", "Bumrah", "Trent", "Deepak", "Ashwani"] },
+      { name: "Chennai Super Kings", emoji: "🟡", players: ["Ruturaj", "Rachin", "Shivam", "Dhoni", "Jadeja", "Curran", "Pathirana", "Deepak", "Ahmad", "Khaleel", "Ellis"] },
+      { name: "Kolkata Knight Riders", emoji: "🟣", players: ["Rahane", "Quinton", "Venkatesh", "Russell", "Rinku", "Narine", "Raghuvanshi", "Varun", "Rana", "Johnson", "Nortje"] }
+    ];
 
-    const Renderer = class {
+    class Renderer {
       constructor() {
         this.canvas = document.getElementById('cv');
         this.ctx = this.canvas.getContext('2d');
@@ -117,104 +77,118 @@
         this.canvas.style.height = this.H + 'px';
         this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       }
-      clear() { this.ctx.clearRect(0, 0, this.W, this.H); }
       draw() {
-        this.clear();
-        const grad = this.ctx.createLinearGradient(0, 0, 0, this.H * 0.2);
-        grad.addColorStop(0, '#3a7bd5');
-        grad.addColorStop(1, '#8ec5e8');
-        this.ctx.fillStyle = grad;
-        this.ctx.fillRect(0, 0, this.W, this.H * 0.2);
+        this.ctx.clearRect(0, 0, this.W, this.H);
 
-        const grad2 = this.ctx.createLinearGradient(0, this.H * 0.2, 0, this.H);
-        grad2.addColorStop(0, '#2e8b3d');
-        grad2.addColorStop(1, '#3fae53');
-        this.ctx.fillStyle = grad2;
-        this.ctx.fillRect(0, this.H * 0.2, this.W, this.H * 0.8);
+        // Sky
+        const skyGrad = this.ctx.createLinearGradient(0, 0, 0, this.H * 0.25);
+        skyGrad.addColorStop(0, '#3a7bd5');
+        skyGrad.addColorStop(1, '#8ec5e8');
+        this.ctx.fillStyle = skyGrad;
+        this.ctx.fillRect(0, 0, this.W, this.H * 0.25);
 
+        // Ground
+        const groundGrad = this.ctx.createLinearGradient(0, this.H * 0.25, 0, this.H);
+        groundGrad.addColorStop(0, '#2e8b3d');
+        groundGrad.addColorStop(1, '#3fae53');
+        this.ctx.fillStyle = groundGrad;
+        this.ctx.fillRect(0, this.H * 0.25, this.W, this.H * 0.75);
+
+        // Pitch
         this.ctx.strokeStyle = '#fff';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();
-        this.ctx.ellipse(this.W * 0.5, this.H * 0.55, this.W * 0.45, this.H * 0.35, 0, 0, Math.PI * 2);
+        this.ctx.ellipse(this.W / 2, this.H * 0.55, this.W * 0.45, this.H * 0.3, 0, 0, Math.PI * 2);
         this.ctx.stroke();
       }
-    };
+    }
 
-    const Controls = class {
-      constructor() { this.container = document.getElementById('controls'); }
-      buildBatting(fn) {
-        this.container.innerHTML = '';
-        ['🛡️ DEFEND', '🏏 DRIVE', '✂️ CUT', '🚀 LOFT'].forEach((shot, i) => {
-          const btn = document.createElement('div');
-          btn.className = 'ctl';
-          btn.textContent = shot;
-          btn.onclick = () => fn(['DEFEND', 'DRIVE', 'CUT', 'LOFT'][i]);
-          this.container.appendChild(btn);
-        });
-      }
-    };
-
-    const HUD = class {
-      constructor() {
-        this.scoreEl = document.getElementById('hudScore');
-        this.oversEl = document.getElementById('hudOvers');
-      }
-      updateScore(s, w) { this.scoreEl.textContent = s + '/' + w; }
-      updateOvers(b) { this.oversEl.textContent = Math.floor(b / 6) + '.' + (b % 6) + ' ov'; }
-    };
-
-    const Match = class {
+    class Game {
       constructor() {
         this.renderer = new Renderer();
-        this.controls = new Controls();
-        this.hud = new HUD();
-        this.animId = null;
+        this.t1 = teams[Math.floor(Math.random() * teams.length)];
+        this.t2 = teams.find(t => t !== this.t1) || teams[0];
+        this.ballCount = 0;
       }
-      start() {
-        const teams_list = Object.values(teams);
-        const t1 = teams_list[Math.floor(Math.random() * teams_list.length)];
-        const t2 = teams_list.find(t => t !== t1) || teams_list[0];
 
-        state.myTeam = t1;
-        state.oppTeam = t2;
-        state.myXI = t1.players;
-        state.oppXI = t2.players;
-        state.battingTeam = t1;
-        state.bowlingTeam = t2;
-        state.batStats = t1.players.map(p => ({p, r: 0, b: 0, out: false}));
-        state.bowlStats = t2.players.map(p => ({p, balls: 0, runs: 0, wkts: 0}));
-        state.bowlers = t2.players.filter(p => p.bowl >= 70).sort((a, b) => b.bowl - a.bowl);
-        state.curBowler = state.bowlers[0];
+      start() {
+        state.batStats = this.t1.players.map(name => ({ name, r: 0, b: 0 }));
+        setComment(`${this.t1.name} ${this.t1.emoji} batting!`);
 
         document.getElementById('homeScreen').classList.remove('active');
         document.getElementById('gameScreen').classList.add('active');
 
-        this.controls.buildBatting((shot) => this.playBall(shot));
+        this.buildControls();
         this.loop();
       }
-      playBall(shot) {
-        const batter = state.batStats[state.striker];
-        const runs = Math.random() > 0.7 ? 0 : Math.floor(Math.random() * 7);
-        state.score += runs;
-        state.balls++;
-        this.hud.updateScore(state.score, state.wkts);
-        this.hud.updateOvers(state.balls);
 
-        if (state.balls >= 36 || state.wkts >= 10) {
-          alert('Match Over! Final: ' + state.score + '/' + state.wkts);
-          location.reload();
+      buildControls() {
+        const html = `
+          <div class="ctl" onclick="game.play('DEFEND')"><div class="em">🛡️</div><div>DEFEND</div></div>
+          <div class="ctl" onclick="game.play('DRIVE')"><div class="em">🏏</div><div>DRIVE</div></div>
+          <div class="ctl" onclick="game.play('CUT')"><div class="em">✂️</div><div>CUT</div></div>
+          <div class="ctl" onclick="game.play('LOFT')"><div class="em">🚀</div><div>LOFT</div></div>
+        `;
+        document.getElementById('controls').innerHTML = html;
+      }
+
+      play(shot) {
+        if (!state.gameActive) return;
+
+        let runs = 0;
+        const rand = Math.random();
+
+        if (shot === 'DEFEND') runs = rand > 0.7 ? 1 : 0;
+        else if (shot === 'DRIVE') runs = rand > 0.5 ? 2 : (rand > 0.8 ? 4 : 1);
+        else if (shot === 'CUT') runs = rand > 0.6 ? 2 : (rand > 0.85 ? 4 : 1);
+        else if (shot === 'LOFT') runs = rand > 0.4 ? (rand > 0.7 ? 6 : 4) : (rand > 0.8 ? 1 : 0);
+
+        const isWicket = Math.random() < 0.08;
+
+        if (isWicket) {
+          state.wkts++;
+          state.striker = Math.min(state.striker + 1, 10);
+          setComment(`WICKET! ${this.t1.players[state.striker - 1]} out!`);
+        } else {
+          state.score += runs;
+          if (runs === 4) setComment(`FOUR! Great shot!`);
+          else if (runs === 6) setComment(`SIX! Massive!`);
+          else if (runs === 0) setComment(`Dot ball`);
+          else setComment(`${runs} runs`);
+        }
+
+        state.balls++;
+        updateHUD();
+
+        if (state.balls >= state.maxOvers * 6 || state.wkts >= 10) {
+          state.gameActive = false;
+          setTimeout(() => {
+            alert(`🏁 Match Over!\n\n${this.t1.name} ${this.t1.emoji}\nScore: ${state.score}/${state.wkts}\nOvers: ${Math.floor(state.balls/6)}.${state.balls%6}`);
+            location.reload();
+          }, 500);
         }
       }
+
       loop() {
         this.renderer.draw();
-        this.animId = requestAnimationFrame(() => this.loop());
+        requestAnimationFrame(() => this.loop());
       }
-    };
+    }
 
-    const match = new Match();
+    function setComment(text) {
+      document.getElementById('commentary').textContent = text;
+      state.lastCommentary = text;
+    }
 
+    function updateHUD() {
+      document.getElementById('hudScore').textContent = state.score + '/' + state.wkts;
+      document.getElementById('hudOvers').textContent = Math.floor(state.balls / 6) + '.' + (state.balls % 6) + ' ov';
+    }
+
+    let game;
     function startGame() {
-      match.start();
+      game = new Game();
+      game.start();
     }
 
     window.startGame = startGame;
